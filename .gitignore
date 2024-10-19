@@ -1,0 +1,10 @@
+!.gitignore
+/.vscode
+/bin
+/lib
+/build
+/caknag_build
+/tests/bin
+/tests/lib
+/tests/build
+/tests/caknag_build
