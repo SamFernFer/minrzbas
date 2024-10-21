@@ -4,6 +4,16 @@ set(CMAKE_CXX_STANDARD 20)
 
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+	# Removes the "-D_DLL" flag, thus linking the program statically with the standard library.
+	string(REPLACE "-D_DLL" "" CMAKE_CXX_FLAGS_DEBUG ${CMAKE_CXX_FLAGS_DEBUG})
+elseif (CMAKE_BUILD_TYPE STREQUAL "Release")
+	# Removes the "-D_DLL" flag, thus linking the program statically with the standard library.
+	string(REPLACE "-D_DLL" "" CMAKE_CXX_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE})
+else()
+	message(FATAL_ERROR "Unknown build type \"${CMAKE_BUILD_TYPE}\"")
+endif()
+
 add_library(minrzbas STATIC
 	"${PROJECT_SOURCE_DIR}/external/whereami/src/whereami.c"
 	"Program.cpp"
@@ -64,8 +74,6 @@ elseif (CMAKE_BUILD_TYPE STREQUAL "Release")
 		"libboost_python38-clangw17-mt-s-x64-1_82.lib"
 		"libboost_regex-clangw17-mt-s-x64-1_82.lib"
 	)
-else()
-	message(FATAL_ERROR "Unknown build type \"${CMAKE_BUILD_TYPE}\"")
 endif()
 
 if (NOT FENTON_BUILD_TESTS)
