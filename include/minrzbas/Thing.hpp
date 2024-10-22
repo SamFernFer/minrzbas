@@ -1,3 +1,6 @@
+#ifndef FENTON_MINRZBAS_THING_HPP
+#define FENTON_MINRZBAS_THING_HPP
+
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmicrosoft-cpp-macro"
 #pragma clang diagnostic ignored "-Wgnu-anonymous-struct"
@@ -17,6 +20,9 @@ namespace Fenton::Minrzbas {
         std::string class_;
         // The Python expression to be used as a condition.
         std::string cond;
+        bool operator==(const Class& other) {
+            return class_ == other.class_ && cond == other.cond;
+        }
     };
     struct Directory {
         // The directory's path. It is recommended that it has no directory separator at the end
@@ -36,7 +42,6 @@ namespace Fenton::Minrzbas {
         // Each directory has a list of every class which should be checked for in its child files.
         std::unordered_map<std::string, std::list<Class>> dirs;
     };
-    Context currentCtx;
     // Adds a directory to the context object.
     void addDirectory(
         Context& ctx,
@@ -45,7 +50,6 @@ namespace Fenton::Minrzbas {
         std::string_view cond
     );
     Context getContext(const boost::program_options::variables_map& vm);
-    void doThing(const boost::program_options::variables_map& vm) {
-        currentCtx = getContext(vm);
-    }
+    void doThing(const boost::program_options::variables_map& vm);
 }
+#endif

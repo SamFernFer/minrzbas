@@ -53,10 +53,11 @@ namespace Fenton::Minrzbas {
             .class_ = std::string(class_),
             .cond = std::string(cond)
         };
-        if (auto _find = ctx.dirs.find(path); _find == ctx.dirs.cend()) {
+        // TODO: change to a heterogeneous unordered_map.
+        if (auto _find = ctx.dirs.find(std::string(path)); _find == ctx.dirs.cend()) {
             ctx.dirs.emplace(std::make_pair(std::string(path), std::list<Class>({_class})));
         } else {
-            _find.second.emplace_back(_class);
+            _find->second.emplace_back(_class);
         }
     }
     Context getContext(const po::variables_map& vm) {
@@ -76,5 +77,8 @@ namespace Fenton::Minrzbas {
             }
         }
         return std::move(_ctx);
+    }
+    void doThing(const boost::program_options::variables_map& vm) {
+        Context _ctx = getContext(vm);
     }
 }

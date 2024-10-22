@@ -1,9 +1,23 @@
 // This is the code which handles the processing of command-line arguments.
+#ifndef FENTON_MINRZBAS_PROGRAM_HPP
+#define FENTON_MINRZBAS_PROGRAM_HPP
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wmicrosoft-cpp-macro"
+#pragma clang diagnostic ignored "-Wgnu-anonymous-struct"
+#pragma clang diagnostic ignored "-Wlanguage-extension-token"
+#include <boost/program_options.hpp>
+#pragma clang diagnostic pop
 
 namespace Fenton::Minrzbas {
     // Gets the list of options.
-    po::options_description getOptionsDesc();
-    po::variables_map getVarMap(int argc, const char** argv);
+    boost::program_options::options_description getOptionsDesc();
+    // Parses the command-line options and returns the variables map.
+    boost::program_options::variables_map getVarMap(
+        const boost::program_options::options_description& desc,
+        int argc,
+        const char** argv
+    );
     // Handles the command-line options.
     int main(int argc, const char** argv);
 }
+#endif

@@ -1,14 +1,10 @@
 #include <minrzbas/Program.hpp>
 #include <minrzbas/Thing.hpp>
 #include <utils/Misc.hpp>
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wmicrosoft-cpp-macro"
-#pragma clang diagnostic ignored "-Wgnu-anonymous-struct"
-#pragma clang diagnostic ignored "-Wlanguage-extension-token"
-#include <boost/json.hpp>
-#pragma clang diagnostic pop
+#include <utils/JSON.hpp>
 #include <iostream>
 
+namespace json = boost::json;
 namespace Fenton::Minrzbas::Tests {
     static Context contextFromArray(const json::array& arr) {
         Context _ctx;
@@ -16,13 +12,19 @@ namespace Fenton::Minrzbas::Tests {
             addDirectory(
                 _ctx,
                 v.at(0).as_string().c_str(),
-                v.at(1).as_string().c_str()
+                v.at(1).as_string().c_str(),
                 v.at(2).as_string().c_str()
             );
         }
         return _ctx;
     }
-    static print(std::ostream& stream, const Context& ctx) {
+    // static void printSingleDir(std::ostream& stream) {
+
+    // }
+    static void printCtxDirs(std::ostream& stream, const Context& ctx) {
+        
+    }
+    static bool ctxDirsEqual(const Context& a, const Context& b) {
         
     }
     bool classes() {
@@ -46,9 +48,10 @@ namespace Fenton::Minrzbas::Tests {
             // This case has a test.
             if (const json::value* _vPtr = _case.if_contains("in")) {
                 try {
+                    const std::array& _in = _vPtr->as_array();
                     std::vector<const char*> _argsVec;
                     _argsVec.emplace_back("");
-                    for (const json::value& v : _vPtr->as_array()) {
+                    for (const json::value& v : _in) {
                         _argsVec.emplace_back(v.as_string().c_str());
                     }
                     _argsVec.emplace_back(nullptr);
@@ -60,8 +63,11 @@ namespace Fenton::Minrzbas::Tests {
                         ;
                         try {
                             // Send the arguments to the parser function.
-                            Fenton::Minrzbas::main(_argsVec.size()-1, _argsVec.data());
+                            Context _ctx = getContext(getVarMap(
+                                _argsVec.size() - 1, _argsVec.data()
+                            ));
                             _pass = false;
+                            Fenton::printlnf("[Input] {}", quote(_in));
                             Fenton::println("[Expected] exception:");
                             Fenton::println(_expectedWhat.c_str());
                             Fenton::println("[Actual] exception: not thrown");
@@ -72,6 +78,7 @@ namespace Fenton::Minrzbas::Tests {
                             const char* _what = e.what();
                             if (std::strcmp(_what, _expectedWhat.c_str()) != 0) {
                                 _pass = false;
+                                Fenton::printlnf("[Input] {}", quote(_in));
                                 Fenton::println("[Expected] exception:");
                                 Fenton::println(_expectedWhat.c_str());
                                 Fenton::println("[Actual] exception:");
@@ -80,6 +87,7 @@ namespace Fenton::Minrzbas::Tests {
                             }
                         } catch (...) {
                             _pass = false;
+                            Fenton::printlnf("[Input] {}", quote(_in));
                             Fenton::println("[Expected] exception:");
                             Fenton::println(_expectedWhat.c_str());
                             Fenton::println("[Actual] exception: unknown");
@@ -87,16 +95,14 @@ namespace Fenton::Minrzbas::Tests {
                         }
                     // An output is expected.
                     } else {
+                        using namespace Fenton::Minrzbas;
+
                         Context _expectedCtx = contextFromArray(_case.at("out").as_array());
+                        Context _ctx = getContext(getVarMap(getOptionsDesc(
+                            _argsVec.size() - 1, _argsVec.data()
+                        )));
 
-                        Fenton::
-                        Context _ctx = 
-                        const Dyn
-                            _value = Fenton::Caknag::eval(_in, _env),
-                            _expectedValue = dynFromJSONArray(_out)
-                        ;
-
-                        if (_value != _expectedValue) {
+                        if (!ctxDirsEqual(_ctx, _expectedCtx) {
                             _pass = false;
                             Fenton::printlnf("[Input] {}", quote(_in));
                             Fenton::println("[Expected] context:");

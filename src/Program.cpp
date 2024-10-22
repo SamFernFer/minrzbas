@@ -1,13 +1,6 @@
 #include <minrzbas/Program.hpp>
 #include <minrzbas/Thing.hpp>
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wmicrosoft-cpp-macro"
-#pragma clang diagnostic ignored "-Wgnu-anonymous-struct"
-#pragma clang diagnostic ignored "-Wlanguage-extension-token"
-#include <boost/program_options.hpp>
-#pragma clang diagnostic pop
-
 #include <iostream>
 
 namespace po = boost::program_options;
@@ -26,19 +19,11 @@ namespace Fenton::Minrzbas {
         ;
         return _desc;
     }
-    po::variables_map getVarMap(int argc, const char** argv) {
+    po::variables_map getVarMap(const po::options_description& desc, int argc, const char** argv) {
         po::variables_map _vm;
-        po::store(po::parse_command_line(argc, argv, _desc), _vm);
+        po::store(po::parse_command_line(argc, argv, desc), _vm);
         po::notify(_vm);
-
-        if (_vm.count("help")) {
-            std::cout << _desc << "\n";
-            return 1;
-        }
-        if (_vm.count("version")) {
-            std::cout << versionString << "\n";
-            return 1;
-        }
+        return std::move(_vm);
     }
     int main(int argc, const char** argv) {
         po::options_description _desc = getOptionsDesc();
@@ -48,7 +33,15 @@ namespace Fenton::Minrzbas {
             return 1;
         }
         try {
-            
+            po::variables_map _vm = getVarMap(_desc, argc, argv);
+            if (_vm.count("help")) {
+                std::cout << _desc << "\n";
+                return 1;
+            }
+            if (_vm.count("version")) {
+                std::cout << versionString << "\n";
+                return 1;
+            }
             getContext(_vm);
             return 0;
         } catch (const std::exception& e) {
