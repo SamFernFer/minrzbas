@@ -2,5 +2,5 @@
 
 namespace Fenton::Minrzbas {
     // Handles the command-line options.
-    int main(int argc, char** argv);
+    int main(int argc, const char** argv);
 }

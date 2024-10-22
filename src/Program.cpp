@@ -14,25 +14,38 @@ namespace po = boost::program_options;
 namespace Fenton::Minrzbas {
     constexpr const char* versionString = "1.0.0";
 
-    int main(int argc, char** argv) {
+    int main(int argc, const char** argv) {
         po::options_description _desc("Allowed options");
         _desc.add_options()
             ("help,h", "Displays help information.")
             ("version,V", "Displays the program's version.")
+            ("include,I", "Adds a path to the \"include\" class.")
+            ("src,S", "Adds a path to the \"src\" class.")
         ;
-        po::variables_map _vm;
-        po::store(po::parse_command_line(argc, argv, _desc), _vm);
-        po::notify(_vm);
-
-        if (_vm.count("help")) {
+        // Displays help information when no arguments are passed.
+        if (argc <= 1) {
             std::cout << _desc << "\n";
             return 1;
         }
-        if (_vm.count("version")) {
-            std::cout << versionString << "\n";
-            return 1;
+        try {
+            po::variables_map _vm;
+            po::store(po::parse_command_line(argc, argv, _desc), _vm);
+            po::notify(_vm);
+
+            if (_vm.count("help")) {
+                std::cout << _desc << "\n";
+                return 1;
+            }
+            if (_vm.count("version")) {
+                std::cout << versionString << "\n";
+                return 1;
+            }
+            // std::cout << boost::json::array({0, 1, 9}) << std::endl;
+            return 0;
+        } catch (const std::exception& e) {
+            std::cout << "[Exception] " << e.what() << "\n\n";
+            std::cout << _desc << "\n";
+            return -1;
         }
-        // std::cout << boost::json::array({0, 1, 9}) << std::endl;
-        return 0;
     }
 }
