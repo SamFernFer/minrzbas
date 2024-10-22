@@ -18,7 +18,11 @@ endif()
 
 add_library(minrzbas STATIC
 	"${PROJECT_SOURCE_DIR}/external/whereami/src/whereami.c"
+	"utils/FileUtils.cpp"
+	"utils/JSON.cpp"
+	"utils/Misc.cpp"
 	"Program.cpp"
+	"Thing.cpp"
 )
 # set_property(TARGET minrzbas PROPERTY
 #   MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
@@ -42,12 +46,14 @@ else()
 endif()
 
 target_include_directories(minrzbas PUBLIC
-    "${BOOST_ROOT}"
+	"${BOOST_ROOT}"
+	"${PYTHON_INCLUDE}"
     "${PROJECT_SOURCE_DIR}/external/whereami/src"
     "${PROJECT_SOURCE_DIR}/include"
 )
 target_link_directories(minrzbas PUBLIC
 	"${BOOST_LIB}"
+	"${PYTHON_LIB}"
 )
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")

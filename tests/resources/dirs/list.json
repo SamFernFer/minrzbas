@@ -1,0 +1,10 @@
+[
+    {
+        "in": "",
+        "out": [
+            // Yes, you need 4 backslashes to send only one through 2 layers of string.
+            [ "include", "path/to/thing", "re.fullmatch('.*\\\\.', relName)" ],
+            [ "src", "other", "cond" ]
+        ]
+    }
+]

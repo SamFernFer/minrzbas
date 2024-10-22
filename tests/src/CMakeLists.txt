@@ -6,6 +6,8 @@ set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
 add_executable(tests
 	"Program.cpp"
+	"Common.cpp"
+	"ThingTest.cpp"
 )
 
 target_compile_definitions(tests PRIVATE "-DBOOST_ALL_NO_LIB")
