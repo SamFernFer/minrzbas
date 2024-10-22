@@ -10,7 +10,10 @@ add_executable(tests
 	"ThingTest.cpp"
 )
 
-target_compile_definitions(tests PRIVATE "-DBOOST_ALL_NO_LIB")
+target_compile_definitions(tests PUBLIC
+	"-DBOOST_ALL_NO_LIB"
+	"-DHAVE_SNPRINTF"
+)
 
 if(MSVC)
 	target_compile_options(tests PRIVATE /Zc:preprocessor)

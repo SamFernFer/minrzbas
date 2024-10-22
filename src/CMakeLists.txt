@@ -27,7 +27,10 @@ add_library(minrzbas STATIC
 # set_property(TARGET minrzbas PROPERTY
 #   MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
-target_compile_definitions(minrzbas PUBLIC "-DBOOST_ALL_NO_LIB")
+target_compile_definitions(minrzbas PUBLIC
+	"-DBOOST_ALL_NO_LIB"
+	"-DHAVE_SNPRINTF"
+)
 
 if(MSVC)
 	target_compile_options(minrzbas PUBLIC /Zc:preprocessor)
@@ -94,7 +97,11 @@ if (NOT FENTON_BUILD_TESTS)
 	)
 	set_target_properties(program PROPERTIES OUTPUT_NAME "minrzbas")
 
-	target_compile_definitions(program PUBLIC "-DBOOST_ALL_NO_LIB" "-DBUILD_SHARED_LIBS=OFF")
+	target_compile_definitions(program PUBLIC
+		"-DBOOST_ALL_NO_LIB"
+		# "-DBUILD_SHARED_LIBS=OFF"
+		"-DHAVE_SNPRINTF"
+	)
 
 	target_include_directories(program PUBLIC "${PROJECT_SOURCE_DIR}/include")
 	# Link with the library containing the actual code.

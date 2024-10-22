@@ -6,7 +6,7 @@
 #pragma clang diagnostic ignored "-Wgnu-anonymous-struct"
 #pragma clang diagnostic ignored "-Wlanguage-extension-token"
 #include <boost/program_options.hpp>
-#include <boost/python.hpp>
+// #include <boost/python.hpp>
 #pragma clang diagnostic pop
 #include <string>
 #include <map>
@@ -20,8 +20,8 @@ namespace Fenton::Minrzbas {
         std::string class_;
         // The Python expression to be used as a condition.
         std::string cond;
-        bool operator==(const Class& other) {
-            return class_ == other.class_ && cond == other.cond;
+        bool operator==(const Class& other) const {
+            return this->class_ == other.class_ && this->cond == other.cond;
         }
     };
     struct Directory {

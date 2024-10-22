@@ -24,15 +24,16 @@ namespace Fenton::Minrzbas {
         for (std::size_t i = 0; i < str.size(); ++i) {
             // Split by the character.
             if ((str[i] == sep)) {
+                bool _isNotLast = i < (str.size() - 1);
                 // Allows escaping the separator character by doubling it.
-                if (i < str.size() - 1 || str[i + 1] == sep) {
+                if (_isNotLast && str[i + 1] == sep) {
                     ++i;
                     continue;
                 }
                 // The first half.
                 _pair.first = std::string(str.substr(0, i));
                 // Prevents an error inside substr when the separator character is the last one.
-                if (i < str.size() - 1) {
+                if (_isNotLast) {
                     // Retrieves the second half.
                     _pair.second = std::string(str.substr(i + 1));
                 }
