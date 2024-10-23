@@ -46,7 +46,7 @@ namespace Fenton::Minrzbas {
         std::list<Directory> orderedDirs;
         // Each directory has a list of every class which should be checked for in its child files.
         // The keys are std::string_view so that there's no need for the map to be heterogeneous.
-        std::unordered_map<std::string_view, std::list<Directory>::iterator> dirs;
+        std::unordered_map<std::string, Directory*> dirs;
     };
     // Adds a directory to the context object.
     void addDirectory(

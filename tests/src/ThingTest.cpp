@@ -19,8 +19,20 @@ namespace Fenton::Minrzbas::Tests {
         }
         return _ctx;
     }
-    static void printSingleDir(std::ostream& stream, std::string_view path, const Class& c) {
-        
+    static bool dirsMapEqual(
+        const decltype(Context::dirs)& a,
+        const decltype(Context::dirs)& b
+    ) {
+        if (a.size() != b.size()) return false;
+        for (
+            auto it1 = a.begin(), it2 = b.begin();
+            // No need to check for both, as we are already certain that the sizes are equal.
+            it1 != a.end(); 
+            ++it1, ++it2
+        ) {
+            if ()
+        }
+        return true;
     }
     static void printCtxDirs(std::ostream& stream, const Context& ctx) {
         stream << "[\n";
@@ -119,7 +131,7 @@ namespace Fenton::Minrzbas::Tests {
                         ));
 
                         if (
-                            _ctx.orderedDirs != _expectedCtx.orderedDirs // Compares the lists.
+                            !orderedDirsEqual(_ctx.orderedDirs, _expectedCtx.orderedDirs) // Compares the lists.
                             || _ctx.dirs != _expectedCtx.dirs // Compares the maps.
                         ) {
                             _pass = false;
