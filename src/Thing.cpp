@@ -59,12 +59,14 @@ namespace Fenton::Minrzbas {
                 .path = std::string(path),
                 .classes = { _class }
             };
-            ctx.orderedDirs.emplace_back(_dir);
+            ctx.orderedDirs.emplace_back(
+                _dir
+            );
             ctx.dirs.emplace(std::make_pair(
                 // The string_view should point to the path variable in the Directory object 
                 // in the list. The parameter path is going to be destroyed later.
-                ctx.orderedDirs.cend()->path,
-                ctx.orderedDirs.cend()
+                std::string_view(ctx.orderedDirs.rbegin()->path),
+                ctx.orderedDirs.rbegin().base()
             ));
         } else {
             // Adds the class to the directory's list of classes.
