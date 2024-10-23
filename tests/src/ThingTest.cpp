@@ -19,18 +19,31 @@ namespace Fenton::Minrzbas::Tests {
         }
         return _ctx;
     }
+    // Cheecks if two maps of string to directories are equal. The values are pointers, 
+    // so this function compares the objects pointed instead of their addresses.
+    // If any of the values is nullptr, considers them different.
     static bool dirsMapEqual(
         const decltype(Context::dirs)& a,
         const decltype(Context::dirs)& b
     ) {
+        // They are for sure different if they have different sizes.
         if (a.size() != b.size()) return false;
-        for (
-            auto it1 = a.begin(), it2 = b.begin();
-            // No need to check for both, as we are already certain that the sizes are equal.
-            it1 != a.end(); 
-            ++it1, ++it2
-        ) {
-            if ()
+        // Copy the first map.
+        decltype(Context::dirs) _tempMap = a;
+        for (const auto& p : b) {
+            // The value is nullptr, so returns false.
+            if (!p.second) return false;
+            // Checks if the first map contains the key.
+            if (const auto& _find = _tempMap.find(p.first); _find != _tempMap.end()) {
+                // The value is nullptr, so returns false.
+                if (!_find->second) return false;
+                // The Directory objects are different, so returns false.
+                if (*p.second != *_find->second) return false;
+                // Removes the node to make the next searches faster.
+                _tempMap.erase(_find);
+            } else {
+                return false;
+            }
         }
         return true;
     }
@@ -131,8 +144,8 @@ namespace Fenton::Minrzbas::Tests {
                         ));
 
                         if (
-                            !orderedDirsEqual(_ctx.orderedDirs, _expectedCtx.orderedDirs) // Compares the lists.
-                            || _ctx.dirs != _expectedCtx.dirs // Compares the maps.
+                            _ctx.orderedDirs != _expectedCtx.orderedDirs // Compares the lists.
+                            || !dirsMapEqual(_ctx.dirs, _expectedCtx.dirs) // Compares the maps.
                         ) {
                             _pass = false;
                             Fenton::println("[Input] ");

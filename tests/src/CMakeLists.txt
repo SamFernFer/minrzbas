@@ -12,6 +12,8 @@ add_executable(tests
 
 target_compile_definitions(tests PUBLIC
 	"-DBOOST_ALL_NO_LIB"
+	# NOTE: Does it make the program completely static?
+	"-DBUILD_SHARED_LIBS=OFF"
 	"-DHAVE_SNPRINTF"
 )
 

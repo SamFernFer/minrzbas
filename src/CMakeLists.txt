@@ -4,18 +4,6 @@ set(CMAKE_CXX_STANDARD 20)
 
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
-if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-	# Removes the "-D_DLL" flag, thus linking the program statically with the standard library.
-	string(REPLACE "-D_DLL" "" CMAKE_CXX_FLAGS_DEBUG ${CMAKE_CXX_FLAGS_DEBUG})
-	string(REPLACE "-D_DLL" "" CMAKE_C_FLAGS_DEBUG ${CMAKE_C_FLAGS_DEBUG})
-elseif (CMAKE_BUILD_TYPE STREQUAL "Release")
-	# Removes the "-D_DLL" flag, thus linking the program statically with the standard library.
-	string(REPLACE "-D_DLL" "" CMAKE_CXX_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE})
-	string(REPLACE "-D_DLL" "" CMAKE_C_FLAGS_RELEASE ${CMAKE_C_FLAGS_RELEASE})
-else()
-	message(FATAL_ERROR "Unknown build type \"${CMAKE_BUILD_TYPE}\"")
-endif()
-
 add_library(minrzbas STATIC
 	"${PROJECT_SOURCE_DIR}/external/whereami/src/whereami.c"
 	"utils/FileUtils.cpp"
@@ -29,6 +17,8 @@ add_library(minrzbas STATIC
 
 target_compile_definitions(minrzbas PUBLIC
 	"-DBOOST_ALL_NO_LIB"
+	# NOTE: Does it make the program completely static?
+	"-DBUILD_SHARED_LIBS=OFF"
 	"-DHAVE_SNPRINTF"
 )
 
@@ -60,32 +50,24 @@ target_link_directories(minrzbas PUBLIC
 )
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-	# Removes the "-D_DLL" flag, thus linking the program statically with the standard library.
-	string(REPLACE "-D_DLL" "" CMAKE_CXX_FLAGS_DEBUG ${CMAKE_CXX_FLAGS_DEBUG})
-	target_link_libraries(minrzbas
-		"libboost_chrono-clangw17-mt-sgd-x64-1_82.lib"
-		"libboost_json-clangw17-mt-sgd-x64-1_82.lib"
-		"libboost_locale-clangw17-mt-sgd-x64-1_82.lib"
-		"libboost_program_options-clangw17-mt-sgd-x64-1_82.lib"
-		"libboost_python38-clangw17-mt-sgd-x64-1_82.lib"
-		"libboost_regex-clangw17-mt-sgd-x64-1_82.lib"
-	)
+	set(BOOST_TAGS mt-sgd)
 elseif (CMAKE_BUILD_TYPE STREQUAL "Release")
-	# Removes the "-D_DLL" flag, thus linking the program statically with the standard library.
-	string(REPLACE "-D_DLL" "" CMAKE_CXX_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE})
-
-	# NOTE: Does not work.
-	# set(CMAKE_CXX_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE} /MT)
-
-	target_link_libraries(minrzbas
-		"libboost_chrono-clangw17-mt-s-x64-1_82.lib"
-		"libboost_json-clangw17-mt-s-x64-1_82.lib"
-		"libboost_locale-clangw17-mt-s-x64-1_82.lib"
-		"libboost_program_options-clangw17-mt-s-x64-1_82.lib"
-		"libboost_python38-clangw17-mt-s-x64-1_82.lib"
-		"libboost_regex-clangw17-mt-s-x64-1_82.lib"
-	)
+	set(BOOST_TAGS mt-s)
+else()
+	message(FATAL_ERROR "Unknown build type \"${CMAKE_BUILD_TYPE}\".")
 endif()
+
+set(BOOST_VER 1_82)
+set(BOOST_TOOLSET clangw17)
+
+target_link_libraries(minrzbas
+             "libboost_chrono-${BOOST_TOOLSET}-${BOOST_TAGS}-x64-${BOOST_VER}.lib"
+	           "libboost_json-${BOOST_TOOLSET}-${BOOST_TAGS}-x64-${BOOST_VER}.lib"
+	         "libboost_locale-${BOOST_TOOLSET}-${BOOST_TAGS}-x64-${BOOST_VER}.lib"
+	"libboost_program_options-${BOOST_TOOLSET}-${BOOST_TAGS}-x64-${BOOST_VER}.lib"
+	       "libboost_python38-${BOOST_TOOLSET}-${BOOST_TAGS}-x64-${BOOST_VER}.lib"
+	          "libboost_regex-${BOOST_TOOLSET}-${BOOST_TAGS}-x64-${BOOST_VER}.lib"
+)
 
 if (NOT FENTON_BUILD_TESTS)
 	# TODO: When not building the tests, build an interface executable linked with the 
@@ -99,7 +81,7 @@ if (NOT FENTON_BUILD_TESTS)
 
 	target_compile_definitions(program PUBLIC
 		"-DBOOST_ALL_NO_LIB"
-		# "-DBUILD_SHARED_LIBS=OFF"
+		"-DBUILD_SHARED_LIBS=OFF"
 		"-DHAVE_SNPRINTF"
 	)
 
