@@ -50,15 +50,25 @@ namespace Fenton::Minrzbas {
         std::string_view path,
         std::string_view cond
     ) {
-        Class _class {
+        const Class _class {
             .class_ = std::string(class_),
             .cond = std::string(cond)
         };
-        // TODO: change to a heterogeneous unordered_map.
-        if (auto _find = ctx.dirs.find(std::string(path)); _find == ctx.dirs.cend()) {
-            ctx.dirs.emplace(std::make_pair(std::string(path), std::list<Class>({_class})));
+        if (auto _find = ctx.dirs.find(path); _find == ctx.dirs.cend()) {
+            Directory _dir {
+                .path = std::string(path),
+                .classes = { _class }
+            };
+            ctx.orderedDirs.emplace_back(_dir);
+            ctx.dirs.emplace(std::make_pair(
+                // The string_view should point to the path variable in the Directory object 
+                // in the list. The parameter path is going to be destroyed later.
+                ctx.orderedDirs.cend()->path,
+                ctx.orderedDirs.cend()
+            ));
         } else {
-            _find->second.emplace_back(_class);
+            // Adds the class to the directory's list of classes.
+            _find->second->classes.emplace_back(_class);
         }
     }
     Context getContext(const po::variables_map& vm) {
@@ -81,5 +91,10 @@ namespace Fenton::Minrzbas {
     }
     void doThing(const boost::program_options::variables_map& vm) {
         Context _ctx = getContext(vm);
+        // Iterate through all directories.
+        // - Iterate through all files.
+        // - - Iterate through all the classes in this directory.
+        // - - - Filter based on the condition and execute each event based on the database of 
+        // - - - the previous filtering.
     }
 }

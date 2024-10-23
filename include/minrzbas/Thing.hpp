@@ -30,6 +30,9 @@ namespace Fenton::Minrzbas {
         std::string path;
         // The classes to find files for inside this directory and subdirectories.
         std::list<Class> classes;
+        bool operator==(const Directory& other) const {
+            return this->path == other.path && this->classes == other.classes;
+        }
     };
     // Simply the content of a script file.
     struct Script {
@@ -39,8 +42,11 @@ namespace Fenton::Minrzbas {
     struct Context {
         // Each class has a map of every event to its associated script.
         std::unordered_map<std::string, std::unordered_map<std::string, Script>> scripts;
+        // The directories in the order they were specified in.
+        std::list<Directory> orderedDirs;
         // Each directory has a list of every class which should be checked for in its child files.
-        std::unordered_map<std::string, std::list<Class>> dirs;
+        // The keys are std::string_view so that there's no need for the map to be heterogeneous.
+        std::unordered_map<std::string_view, std::list<Directory>::iterator> dirs;
     };
     // Adds a directory to the context object.
     void addDirectory(

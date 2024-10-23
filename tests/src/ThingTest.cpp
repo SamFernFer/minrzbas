@@ -24,12 +24,16 @@ namespace Fenton::Minrzbas::Tests {
     }
     static void printCtxDirs(std::ostream& stream, const Context& ctx) {
         stream << "[\n";
-        for (const auto& d : ctx.dirs) {
-            for (const auto& c : d.second) {
+        for (const auto& d : ctx.orderedDirs) {
+            for (const auto& c : d.classes) {
                 stream << '\t'
+                    // The class' name.
                     << quote(c.class_)
-                    << ':' << quote(d.first)
+                    // The path.
+                    << ':' << quote(d.path)
+                    // The class' condition.
                     << ':' << quote(c.cond)
+                    // The trailing comma is not irrelevant.
                     << ",\n"
                 ;
             }
@@ -114,7 +118,10 @@ namespace Fenton::Minrzbas::Tests {
                             getOptionsDesc(), _argsVec.size() - 1, _argsVec.data()
                         ));
 
-                        if (_ctx.dirs != _expectedCtx.dirs) {
+                        if (
+                            _ctx.orderedDirs != _expectedCtx.orderedDirs // Compares the lists.
+                            || _ctx.dirs != _expectedCtx.dirs // Compares the maps.
+                        ) {
                             _pass = false;
                             Fenton::println("[Input] ");
                             pretty_print(Fenton::getDefaultOutput(), _in);
