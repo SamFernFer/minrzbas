@@ -1,0 +1,9 @@
+[
+    {
+        "in": [
+            "--srcdir", "../../resources/testProject1",
+            "-Iinclude"
+        ],
+        "out": ""
+    }
+]

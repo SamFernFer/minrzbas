@@ -70,7 +70,7 @@ namespace Fenton::Minrzbas::Tests {
 
         // Remember not to use a reference, because the original value will get 
         // destroyed.
-        const json::array _cases = loadJSONFile("dirs/list.json").as_array();
+        const json::array _cases = loadJSONFile("dirs/classes.json").as_array();
 
         std::string_view _title = "?";
 
