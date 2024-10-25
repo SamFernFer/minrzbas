@@ -1,6 +1,7 @@
 #include <minrzbas/Thing.hpp>
 #include <utils/Misc.hpp>
 
+#define BOOST_PYTHON_STATIC_LIB
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmicrosoft-cpp-macro"
 #pragma clang diagnostic ignored "-Wgnu-anonymous-struct"
@@ -17,6 +18,17 @@ namespace po = boost::program_options;
 namespace py = boost::python;
 
 namespace Fenton::Minrzbas {
+    static bool _pyInit = false;
+    void initPy() {
+        Py_Initialize();
+        _pyInit = true;
+    }
+    void tryInitPy() {
+        if (!_pyInit) {
+            initPy();
+        }
+    }
+
     std::ostream& operator<<(std::ostream& stream, const std::vector<std::string>& vec) {
         if (!vec.empty()) {
             stream << quote(vec.front());
@@ -100,19 +112,37 @@ namespace Fenton::Minrzbas {
         }
         return std::move(_ctx);
     }
-    void filterDir(const std::string_view root, ) {
-
+    void filterDir(
+        const std::string_view root,
+        const std::string relName,
+        const std::multimap<std::string, py::object>& condsMap,
+        std::unordered_map<std::string, std::list<std::filesystem::path>>& outClasses
+    ) {
+        for (auto it = fs::directory_iterator(path); it != fs::directory_iterator(); it++) {
+            if 
+            for (const auto& p : condsMap) {
+                p.second(relName);
+            }
+        }
     }
     void filterFiles(
         const Context& ctx,
         std::unordered_map<std::string, std::list<std::filesystem::path>>& outClasses
     ) {
+        tryInitPy();
         for (const auto& d : ctx.orderedDirs) {
-            std::list<py::object> _conds;
+            std::multimap<std::string, py::object> _condsMap;
             for (const auto& c : d.classes) {
-                _conds.emplace_back();
+                py::object main_module = py::import("__main__");
+
+                py::object main_namespace = main_module.attr("__dict__");
+
+                main_namespace["update"](py::import("re").attr("__dict__"));
+
+                py::object _funcObj = py::eval(("lambda relName: " + c.cond).c_str(), main_namespace);
+                _condsMap.emplace(c.class_, _funcObj);
             }
-            filterDir(d.path, _conds, outClasses);
+            filterDir(d.path, "", _condsMap, outClasses);
         }
     }
     void doThing(const boost::program_options::variables_map& vm) {

@@ -12,8 +12,15 @@
 #include <list>
 
 namespace Fenton::Minrzbas {
-    constexpr char* _hppDefaultCond = "relName.endswith('.hpp')";
-    constexpr char* _cppDefaultCond = "relName.endswith('.cpp')";
+    constexpr const char* _hppDefaultCond = "relName.endswith('.hpp')";
+    constexpr const char* _cppDefaultCond = "relName.endswith('.cpp')";
+
+    // Forces the initialisation of the Python interpreter.
+    // Throws an exception if it fails.
+    void initPy();
+    // Initialises the Python interpreter if it hasn't been already.
+    // Throws an exception if it fails.
+    void tryInitPy();
 
     // The class is in a struct separate from the directory, because a directory might 
     // have multiple classes, each with their own conditions.
