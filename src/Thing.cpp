@@ -1,11 +1,21 @@
 #include <minrzbas/Thing.hpp>
 #include <utils/Misc.hpp>
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wmicrosoft-cpp-macro"
+#pragma clang diagnostic ignored "-Wgnu-anonymous-struct"
+#pragma clang diagnostic ignored "-Wlanguage-extension-token"
+#include <boost/python.hpp>
+#pragma clang diagnostic pop
+
 #include <iostream>
 #include <utility>
 #include <filesystem>
 
 namespace fs = std::filesystem;
 namespace po = boost::program_options;
+namespace py = boost::python;
+
 namespace Fenton::Minrzbas {
     std::ostream& operator<<(std::ostream& stream, const std::vector<std::string>& vec) {
         if (!vec.empty()) {
@@ -82,7 +92,28 @@ namespace Fenton::Minrzbas {
                 addDirectory(_ctx, "src", _split.first, _split.second);
             }
         }
+        if (vm.count("srcdir")) {
+            _ctx.srcdir = vm["srcdir"].as<std::string>();
+        }
+        if (vm.count("resdir")) {
+            _ctx.resdir = vm["resdir"].as<std::string>();
+        }
         return std::move(_ctx);
+    }
+    void filterDir(const std::string_view root, ) {
+
+    }
+    void filterFiles(
+        const Context& ctx,
+        std::unordered_map<std::string, std::list<std::filesystem::path>>& outClasses
+    ) {
+        for (const auto& d : ctx.orderedDirs) {
+            std::list<py::object> _conds;
+            for (const auto& c : d.classes) {
+                _conds.emplace_back();
+            }
+            filterDir(d.path, _conds, outClasses);
+        }
     }
     void doThing(const boost::program_options::variables_map& vm) {
         Context _ctx = getContext(vm);

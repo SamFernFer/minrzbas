@@ -16,6 +16,10 @@ namespace Fenton::Minrzbas {
                 "Adds a path to the \"include\" class.")
             ("src,S", po::value<std::vector<std::string>>(),
                 "Adds a path to the \"src\" class.")
+            ("srcdir", po::value<std::string>(), 
+                "Sets the current directory for relative directory paths.")
+            ("resdir", po::value<std::string>(), 
+                "Sets the current directory for relative script paths.")
         ;
         return _desc;
     }
