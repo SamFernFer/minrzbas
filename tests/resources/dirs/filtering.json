@@ -2,7 +2,7 @@
     {
         "in": [
             "--srcdir", "../../resources/testProject1",
-            "-Iinclude:re.fullmatch('(Printer|Plant).hpp', relName)"
+            "-Iinclude:re.fullmatch('(Printer|Plant|vegetables/Cabbage).hpp', relName)"
         ],
         "out": {
             // NOTE: The value assigned to srcdir will be prefixed to each path when 

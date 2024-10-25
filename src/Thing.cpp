@@ -12,6 +12,7 @@
 #include <iostream>
 #include <utility>
 #include <filesystem>
+#include <set>
 
 namespace fs = std::filesystem;
 namespace po = boost::program_options;
@@ -113,25 +114,49 @@ namespace Fenton::Minrzbas {
         return std::move(_ctx);
     }
     void filterDir(
-        const std::string_view root,
-        const std::string relName,
-        const std::multimap<std::string, py::object>& condsMap,
-        std::unordered_map<std::string, std::list<std::filesystem::path>>& outClasses
+        const fs::path& dirPath,
+        const std::string& relName,
+        const std::unordered_multimap<std::string, py::object>& condsMap,
+        std::unordered_map<std::string, std::unordered_set<std::filesystem::path>>& outClasses
     ) {
-        for (auto it = fs::directory_iterator(path); it != fs::directory_iterator(); it++) {
-            if 
-            for (const auto& p : condsMap) {
-                p.second(relName);
+        for (auto it = fs::directory_iterator(dirPath); it != fs::directory_iterator(); it++) {
+            if (it->is_regular_file()) {
+                std::string _relName = relName + it->path().filename().string();
+
+                for (const auto& p : condsMap) {
+                    // Calls the function with the relative path.
+                    py::object _obj = p.second(_relName);
+                    // If the condition passes.
+                    if (py::extract<bool>(_obj)) {
+                        // Searches for the class in the map.
+                        auto& _find = outClasses.find(p.first);
+                        if (_find == outClasses.end()) {
+                            // The class' name is the key and a set with the path as its only 
+                            // element is the key.
+                            outClasses.emplace(p.first, { it->path() });
+                        } else {
+                            // If the map already contains the class, only adds the path if the 
+                            // class does not contain it already.
+                            if (!_find->second.contains(it->path())) {
+                                _find->second.emplace(it->path());
+                            }
+                        }
+                    }
+                }
+            } else if (it->is_directory()) {
+                std::string _relName = relName + it->path().filename().string() + "/";
+                filterDir(it->path(), _relName, condsMap, outClasses);
             }
         }
     }
     void filterFiles(
         const Context& ctx,
-        std::unordered_map<std::string, std::list<std::filesystem::path>>& outClasses
+        std::unordered_map<std::string, std::unordered_set<std::filesystem::path>>& outClasses
     ) {
         tryInitPy();
         for (const auto& d : ctx.orderedDirs) {
-            std::multimap<std::string, py::object> _condsMap;
+            std::unordered_multimap<std::string, py::object> _condsMap;
+            // Create Python lambda objects from the condition strings.
             for (const auto& c : d.classes) {
                 py::object main_module = py::import("__main__");
 
@@ -142,7 +167,7 @@ namespace Fenton::Minrzbas {
                 py::object _funcObj = py::eval(("lambda relName: " + c.cond).c_str(), main_namespace);
                 _condsMap.emplace(c.class_, _funcObj);
             }
-            filterDir(d.path, "", _condsMap, outClasses);
+            filterDir(fs::path(d.path), "", _condsMap, outClasses);
         }
     }
     void doThing(const boost::program_options::variables_map& vm) {
