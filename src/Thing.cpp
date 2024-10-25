@@ -12,7 +12,6 @@
 #include <iostream>
 #include <utility>
 #include <filesystem>
-#include <set>
 
 namespace fs = std::filesystem;
 namespace po = boost::program_options;
@@ -129,11 +128,13 @@ namespace Fenton::Minrzbas {
                     // If the condition passes.
                     if (py::extract<bool>(_obj)) {
                         // Searches for the class in the map.
-                        auto& _find = outClasses.find(p.first);
+                        auto _find = outClasses.find(p.first);
                         if (_find == outClasses.end()) {
                             // The class' name is the key and a set with the path as its only 
                             // element is the key.
-                            outClasses.emplace(p.first, { it->path() });
+                            outClasses.emplace(
+                                p.first, std::unordered_set<std::filesystem::path>{ it->path() }
+                            );
                         } else {
                             // If the map already contains the class, only adds the path if the 
                             // class does not contain it already.

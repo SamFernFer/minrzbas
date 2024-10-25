@@ -10,6 +10,9 @@
 #include <string>
 #include <map>
 #include <list>
+#include <set>
+#include <unordered_set>
+#include <filesystem>
 
 namespace Fenton::Minrzbas {
     constexpr const char* _hppDefaultCond = "relName.endswith('.hpp')";
@@ -84,6 +87,10 @@ namespace Fenton::Minrzbas {
         std::string_view cond
     );
     Context getContext(const boost::program_options::variables_map& vm);
+    void filterFiles(
+        const Context& ctx,
+        std::unordered_map<std::string, std::unordered_set<std::filesystem::path>>& outClasses
+    );
     void doThing(const boost::program_options::variables_map& vm);
 }
 #endif
