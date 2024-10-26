@@ -11,7 +11,7 @@
 #include <map>
 #include <list>
 #include <set>
-#include <unordered_set>
+#include <set>
 #include <filesystem>
 
 namespace Fenton::Minrzbas {
@@ -89,7 +89,7 @@ namespace Fenton::Minrzbas {
     Context getContext(const boost::program_options::variables_map& vm);
     void filterFiles(
         const Context& ctx,
-        std::unordered_map<std::string, std::unordered_set<std::filesystem::path>>& outClasses
+        std::unordered_map<std::string, std::set<std::filesystem::path>>& outClasses
     );
     void doThing(const boost::program_options::variables_map& vm);
 }

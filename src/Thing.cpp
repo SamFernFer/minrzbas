@@ -116,7 +116,7 @@ namespace Fenton::Minrzbas {
         const fs::path& dirPath,
         const std::string& relName,
         const std::unordered_multimap<std::string, py::object>& condsMap,
-        std::unordered_map<std::string, std::unordered_set<std::filesystem::path>>& outClasses
+        std::unordered_map<std::string, std::set<std::filesystem::path>>& outClasses
     ) {
         for (auto it = fs::directory_iterator(dirPath); it != fs::directory_iterator(); it++) {
             if (it->is_regular_file()) {
@@ -133,7 +133,7 @@ namespace Fenton::Minrzbas {
                             // The class' name is the key and a set with the path as its only 
                             // element is the key.
                             outClasses.emplace(
-                                p.first, std::unordered_set<std::filesystem::path>{ it->path() }
+                                p.first, std::set<std::filesystem::path>{ it->path() }
                             );
                         } else {
                             // If the map already contains the class, only adds the path if the 
@@ -152,8 +152,26 @@ namespace Fenton::Minrzbas {
     }
     void filterFiles(
         const Context& ctx,
-        std::unordered_map<std::string, std::unordered_set<std::filesystem::path>>& outClasses
+        std::unordered_map<std::string, std::set<std::filesystem::path>>& outClasses
     ) {
+        // Makes sure the current directory is set back even if an exception is 
+        // thrown.
+        struct DirChanger {
+            fs::path prevPath;
+            DirChanger(const fs::path& newPath) {
+                // Only changes the current directory if the new directory is not empty.
+                if (newPath.empty()) return;
+
+                prevPath = fs::current_path();
+                fs::current_path(newPath);
+            }
+            DirChanger() = default;
+            ~DirChanger() {
+                if (!prevPath.empty())
+                    fs::current_path(prevPath);
+            }
+        } _dirChanger(ctx.srcdir);
+
         tryInitPy();
         for (const auto& d : ctx.orderedDirs) {
             std::unordered_multimap<std::string, py::object> _condsMap;
@@ -163,7 +181,7 @@ namespace Fenton::Minrzbas {
 
                 py::object main_namespace = main_module.attr("__dict__");
 
-                main_namespace["update"](py::import("re").attr("__dict__"));
+                // main_namespace.attr("update")(py::import("re").attr("__dict__"));
 
                 py::object _funcObj = py::eval(("lambda relName: " + c.cond).c_str(), main_namespace);
                 _condsMap.emplace(c.class_, _funcObj);

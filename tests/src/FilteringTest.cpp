@@ -1,4 +1,5 @@
 #include <minrzbas/Thing.hpp>
+#include <minrzbas/Program.hpp>
 
 #include <utils/JSON.hpp>
 #include <utils/Misc.hpp>
@@ -6,11 +7,12 @@
 #include <iostream>
 #include <map>
 #include <set>
-#include <unordered_set>
+#include <set>
 #include <string>
 #include <filesystem>
 
 namespace json = boost::json;
+namespace fs = std::filesystem;
 
 #define FENTON_TESTS_PROJECT Minrzbas
 #define FENTON_TESTS_FUNC_NAME filtering
@@ -31,28 +33,29 @@ namespace json = boost::json;
 #define FENTON_TESTS_ERROR
 #define FENTON_TESTS_PRINT_INPUT pretty_print(Fenton::getDefaultOutput(), _in);
 #define FENTON_TESTS_EXPECTED\
-    std::unordered_map<std::string, std::unordered_set<std::filesystem::path>>& _expectedOutClasses\
-    outClassesFromJSONObject(_case.at("out").as_object(), _expectedOutClasses)
+    std::unordered_map<std::string, std::set<std::filesystem::path>> _expectedOutClasses;\
+    outClassesFromJSONObject(_case.at("out").as_object(), _expectedOutClasses);
 #define FENTON_TESTS_ACTUAL\
-    std::unordered_map<std::string, std::unordered_set<std::filesystem::path>>& _actualOutClasses\
+    std::unordered_map<std::string, std::set<std::filesystem::path>> _actualOutClasses;\
     filterFiles(_ctx, _actualOutClasses);
 // For testing.
 #define FENTON_TESTS_UNEQUAL true
-#define FENTON_TESTS_PRINT_EXPECTED printOutClasses(_expectedOutClasses);
+#define FENTON_TESTS_PRINT_EXPECTED printOutClasses(Fenton::getDefaultOutput(), _expectedOutClasses);
 
-#define FENTON_TESTS_PRINT_ACTUAL printOutClasses(_actualOutClasses);
+#define FENTON_TESTS_PRINT_ACTUAL printOutClasses(Fenton::getDefaultOutput(), _actualOutClasses);
 #define FENTON_TESTS_TEST_NAME "Filtering"
 
 namespace Fenton::FENTON_TESTS_PROJECT::Tests {
 
     void outClassesFromJSONObject(
         const json::object& obj,
-        std::unordered_map<std::string, std::unordered_set<std::filesystem::path>>& outClasses
+        std::unordered_map<std::string, std::set<std::filesystem::path>>& outClasses
     ) {
         for (const auto& p : obj) {
-            auto _empl = outClasses.emplace(p.key_c_str(), {});
+            std::set<std::filesystem::path> _set;
+            auto _empl = outClasses.emplace(p.key_c_str(), _set);
             for (const auto& e : p.value().as_array()) {
-                _empl.first->second.emplace(e.as_string().c_str());
+                _set.emplace(e.as_string().c_str());
             }
         }
     }
@@ -68,15 +71,15 @@ namespace Fenton::FENTON_TESTS_PROJECT::Tests {
     }
     void printOutClasses(
         std::ostream& out,
-        const std::unordered_map<std::string, std::unordered_set<std::filesystem::path>>& outClasses
+        const std::unordered_map<std::string, std::set<std::filesystem::path>>& outClasses
     ) {
         std::map<std::string, std::set<std::filesystem::path>>
             _orderedOutClasses;
         
         // Constructs an ordered version of the classes and its paths.
         for (const auto& c : outClasses) {
-            auto _empl = _orderedOutClasses.emplace(c.first, {});
-            auto& _set = _empl.first->second.emplace();
+            auto _empl = _orderedOutClasses.emplace(c.first, std::set<std::filesystem::path>{});
+            auto& _set = _empl.first->second;
             for (const auto& p : c.second) {
                 _set.emplace(p);
             }

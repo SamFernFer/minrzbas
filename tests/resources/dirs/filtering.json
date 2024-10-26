@@ -1,7 +1,7 @@
 [
     {
         "in": [
-            "--srcdir", "../../resources/testProject1",
+            "--srcdir", "../resources/testProject1",
             "-Iinclude:re.fullmatch('(Printer|Plant|vegetables/Cabbage).hpp', relName)",
             "-Sinclude:'Human' in relName"
         ],
