@@ -1,0 +1,43 @@
+[
+    {
+        "in": {
+            // Arguments for libclang.
+            "args": [
+                "-Iinclude"
+            ],
+            "file": "testProject1/include/Printer.hpp"
+        },
+        // The output JSON.
+        "out": {
+            "namespaces": {
+                "Test1": {
+                    "types": {
+                        "Printer": {
+                            "variables": {
+                                "text": {
+                                    "access": "private",
+                                    "type": "std::string",
+                                    "default": "ERROR!"
+                                }
+                            },
+                            "constructors": [
+                                {
+                                    
+                                },
+                                {
+                                    ""
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        }
+    }
+]
+
+// Printer();
+// Printer(const std::string& text);
+// void SetText(const std::string& text);
+// std::string GetText() const;
+// void Print() const;
