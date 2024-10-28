@@ -13,7 +13,7 @@ FENTON_TESTS_ERROR
 FENTON_TESTS_PRINT_INPUT
 FENTON_TESTS_EXPECTED
 FENTON_TESTS_ACTUAL
-FENTON_TESTS_COMPARE
+FENTON_TESTS_UNEQUAL
 FENTON_TESTS_PRINT_EXPECTED
 FENTON_TESTS_PRINT_ACTUAL
 FENTON_TESTS_TEST_NAME
@@ -93,11 +93,11 @@ namespace Fenton::FENTON_TESTS_PROJECT::Tests {
                             FENTON_TESTS_UNEQUAL
                         ) {
                             _pass = false;
-                            Fenton::println("[Input] ");
+                            Fenton::println("[Input]");
                             FENTON_TESTS_PRINT_INPUT
-                            Fenton::println("[Expected] context:");
+                            Fenton::println("[Expected]");
                             FENTON_TESTS_PRINT_EXPECTED
-                            Fenton::println("[Actual] context:");
+                            Fenton::println("[Actual]");
                             FENTON_TESTS_PRINT_ACTUAL
                             Fenton::printlnf("[CASE {0} FAILED] {1}", i, _title);
                         }

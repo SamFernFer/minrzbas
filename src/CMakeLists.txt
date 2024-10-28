@@ -11,6 +11,7 @@ add_library(minrzbas STATIC
 	"utils/Misc.cpp"
 	"Program.cpp"
 	"Thing.cpp"
+	"Parser.hpp"
 )
 # set_property(TARGET minrzbas PROPERTY
 #   MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
@@ -41,12 +42,14 @@ endif()
 target_include_directories(minrzbas PUBLIC
 	"${BOOST_ROOT}"
 	"${PYTHON_INCLUDE}"
+	"${LIBCLANG_INCLUDE}"
     "${PROJECT_SOURCE_DIR}/external/whereami/src"
     "${PROJECT_SOURCE_DIR}/include"
 )
 target_link_directories(minrzbas PUBLIC
 	"${BOOST_LIB}"
 	"${PYTHON_LIB}"
+	"${LIBCLANG_LIB}"
 )
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
@@ -61,6 +64,7 @@ set(BOOST_VER 1_82)
 set(BOOST_TOOLSET clangw17)
 
 target_link_libraries(minrzbas
+	"libclang.lib"
              "libboost_chrono-${BOOST_TOOLSET}-${BOOST_TAGS}-x64-${BOOST_VER}.lib"
 	           "libboost_json-${BOOST_TOOLSET}-${BOOST_TAGS}-x64-${BOOST_VER}.lib"
 	         "libboost_locale-${BOOST_TOOLSET}-${BOOST_TAGS}-x64-${BOOST_VER}.lib"

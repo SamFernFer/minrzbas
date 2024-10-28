@@ -1,7 +1,5 @@
 #include <minrzbas/Thing.hpp>
 #include <utils/Misc.hpp>
-
-#define BOOST_PYTHON_STATIC_LIB
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmicrosoft-cpp-macro"
 #pragma clang diagnostic ignored "-Wgnu-anonymous-struct"

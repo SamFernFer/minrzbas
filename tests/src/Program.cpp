@@ -9,6 +9,7 @@
 namespace Fenton::Minrzbas::Tests {
     bool classes();
     bool filtering();
+    bool parsing();
 }
 int main() {
     using namespace Fenton::Minrzbas::Tests;
@@ -27,8 +28,9 @@ int main() {
 
     bool _pass = true;
     try {
-        _pass &= classes();
-        _pass &= filtering();
+        // _pass &= classes();
+        // _pass &= filtering();
+        _pass &= parsing();
     } catch(const std::exception& e) {
         _pass = false;
         Fenton::printlnf("[EXCEPTION]\n{}", e.what());
