@@ -11,7 +11,7 @@ add_library(minrzbas STATIC
 	"utils/Misc.cpp"
 	"Program.cpp"
 	"Thing.cpp"
-	"Parser.hpp"
+	"Parser.cpp"
 )
 # set_property(TARGET minrzbas PROPERTY
 #   MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")

@@ -11,15 +11,17 @@ namespace json = boost::json;
 namespace fs = std::filesystem;
 
 namespace Fenton::Minrzbas::Tests {
-    // file is just the file's name as the rest of the path is already known.
-    boost::json::value loadJSONFile(const std::filesystem::path& fileName) {
-        const fs::path _filePath = 
-            fs::path(FileUtils::getExecutablePath())
+    std::filesystem::path pathInRes(const std::filesystem::path& fileName) {
+        return fs::path(FileUtils::getExecutablePath())
             .parent_path()
             .parent_path()
             / "resources"
             / fileName
         ;
+    }
+    // file is just the file's name as the rest of the path is already known.
+    boost::json::value loadJSONFile(const std::filesystem::path& fileName) {
+        const fs::path _filePath = pathInRes(fileName);
 
         if (!fs::is_regular_file(_filePath))
             throw std::runtime_error(std::format(

@@ -1,7 +1,80 @@
 #include <minrzbas/Parser.hpp>
+#include <clang-c/Index.h>
+
+#include <utils/Misc.hpp>
+
+#include <filesystem>
+#include <stdexcept>
+#include <format>
 
 namespace json = boost::json;
+namespace fs = std::filesystem;
+
 namespace Fenton::Minrzbas {
+    struct ReflVisitData {
+
+    };
+
+    // Converts a clang error code to a string.
+    std::string to_string(const CXErrorCode& v) {
+        switch (v) {
+            /**
+            * Zero (\c CXError_Success) is the only error code indicating success.  Other
+            * error codes, including not yet assigned non-zero values, indicate errors.
+            */
+        case CXError_Success: return "CXError_Success";
+
+            /**
+             * A generic error code, no further details are available.
+             *
+             * Errors of this kind can get their own specific error codes in future
+             * libclang versions.
+             */
+        case CXError_Failure: return "CXError_Failure";
+
+            /**
+             * libclang crashed while performing the requested operation.
+             */
+        case CXError_Crashed: return "CXError_Crashed";
+
+            /**
+             * The function detected that the arguments violate the function
+             * contract.
+             */
+        case CXError_InvalidArguments: return "CXError_InvalidArguments";
+
+            /**
+             * An AST deserialization error has occurred.
+             */
+        case CXError_ASTReadError: return "CXError_ASTReadError";
+        default: return "UNKNOWN";
+        }
+    }
+    std::ostream& operator<<(std::ostream& stream, const CXString& str)
+    {
+        stream << clang_getCString(str);
+        clang_disposeString(str);
+        return stream;
+    }
+    std::string to_string(const CXString& cxstr) {
+        std::string _str = clang_getCString(cxstr);
+        clang_disposeString(cxstr);
+        return _str;
+    }
+    std::string to_string(const CXCursor& cursor) {
+        return to_string(clang_getCursorSpelling(cursor));
+    }
+    std::string to_string(const CXType& type) {
+        return to_string(clang_getTypeSpelling(clang_getCanonicalType(type)));
+        //return to_string(/*clang_getTypeSpelling(clang_getCanonicalType(type))*/clang_getTypeSpelling(type));
+    }
+    std::string to_string(const CXCursorKind& kind) {
+        return to_string(clang_getCursorKindSpelling(kind));
+    }
+    std::string to_string(bool v) {
+        return v ? "true" : "false";
+    }
+
 #if 0
     static CXChildVisitResult reflVisitor(CXCursor c, CXCursor parent, CXClientData client_data) {
         if (!clang_Location_isFromMainFile(clang_getCursorLocation(c)))
@@ -168,25 +241,38 @@ namespace Fenton::Minrzbas {
     }
 #endif
     static CXChildVisitResult reflVisitor(CXCursor c, CXCursor parent, CXClientData client_data) {
+        if (!clang_Location_isFromMainFile(clang_getCursorLocation(c)))
+            return CXChildVisit_Continue;
+
+        std::string* _indent = static_cast<std::string*>(client_data);
+
+        // Prints the cursor's name.
+        Fenton::println(*_indent + to_string(clang_getCursorKind(c)) + ": " + to_string(c));
+
+        // Indent.
+        _indent->append(4, ' ');
+        // Visits the children recursively.
+        clang_visitChildren(c, reflVisitor, client_data);
+        // De-indent.
+        _indent->resize(_indent->size()-4);
+
         return CXChildVisit_Continue;
     }
 
-    boost::json::object UnitToJSON(
+    boost::json::object unitToJSON(
         const std::string& filePath,
         const std::vector<std::string>& args
     ) {
-        //std::string _rootName = fs::relative(path, basePath).string();
-        std::string _path = (dirPath / filePath).string();
-        if (!fs::exists(_path)) {
-            throw std::runtime_error(std::format("The file \"{0}\" could not be found.", _path));
+        if (!fs::exists(filePath)) {
+            throw std::runtime_error(std::format(
+                "The file \"{0}\" could not be found.", filePath
+            ));
         }
 
-        /*FT_PRINT_VALUE(_path);*/
-
-        std::vector<const char*> args;
-        for (auto& p : includePaths) {
-            args.push_back("-I");
-            args.push_back(p.c_str());
+        std::vector<const char*> _args;
+        // Prepares the arguments.
+        for (auto& a : args) {
+            _args.emplace_back(a.c_str());
         }
         /*for (auto& a : args) {
             std::cout << a << std::endl;
@@ -197,7 +283,7 @@ namespace Fenton::Minrzbas {
         CXTranslationUnit unit;
         CXErrorCode _errorCode = clang_parseTranslationUnit2(
             index,
-            _path.c_str(), args.data(), static_cast<int>(args.size()),
+            filePath.c_str(), _args.data(), static_cast<int>(_args.size()),
             nullptr, 0,
             CXTranslationUnit_DetailedPreprocessingRecord
             | CXTranslationUnit_SkipFunctionBodies
@@ -207,22 +293,27 @@ namespace Fenton::Minrzbas {
         // If the error code is not 0.
         if (_errorCode)
         {
-            throw std::runtime_error(
-                std::format("Unable to parse translation unit. Error: {0}", to_string(_errorCode)));
-            //exit(-1);
+            throw std::runtime_error(std::format(
+                "Unable to parse translation unit. Error: {0}", 
+                to_string(_errorCode)
+            ));
         }
 
-        ptr<Namespace> _rootNS = std::make_shared<Namespace>(filePath.string());
-        ReflVisitData _scope(unit, true, _rootNS, Access::None, 0);
+        // json::object _rootNS;
+        // ReflVisitData _data;
+        std::string _indent;
 
         CXCursor cursor = clang_getTranslationUnitCursor(unit);
         clang_visitChildren(
             cursor,
             reflVisitor,
-            &_scope);
+            &_indent
+        );
 
         clang_disposeTranslationUnit(unit);
         clang_disposeIndex(index);
-        return _rootNS;
+
+        // Not returning anything for now.
+        return {};
     }
 }
