@@ -3,10 +3,14 @@
 #define FENTON_TESTS_FILE_NAME "dirs/parsing.json"
 #define FENTON_TESTS_INPUT\
     using namespace Fenton::Minrzbas;\
+    using namespace std::string_literals;\
     const json::object& _in = _vPtr->as_object();\
     std::vector<std::string> _args;\
-    for (const json::value& v : _in.at("args").as_array()) {\
-        _args.emplace_back(v.as_string().c_str());\
+    for (const json::value& v : _in.at("includeDirs").as_array()) {\
+        fs::path _path = v.as_string().c_str();\
+        if (_path.is_relative())\
+            _path = pathInRes("testProject1" / _path);\
+        _args.emplace_back("-I" + _path.string());\
     }\
     std::string _fileName = pathInRes(_in.at("file").as_string().c_str()).string();
 #define FENTON_TESTS_ERROR
@@ -19,5 +23,7 @@
 #define FENTON_TESTS_TEST_NAME "Parsing"
 
 #include <minrzbas/Parser.hpp>
+
+namespace fs = std::filesystem;
 
 #include <TestTempl.hpp>

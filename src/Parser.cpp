@@ -241,13 +241,24 @@ namespace Fenton::Minrzbas {
     }
 #endif
     static CXChildVisitResult reflVisitor(CXCursor c, CXCursor parent, CXClientData client_data) {
-        if (!clang_Location_isFromMainFile(clang_getCursorLocation(c)))
+        if (
+            clang_Location_isInSystemHeader(clang_getCursorLocation(c))
+            || (!clang_Location_isFromMainFile(clang_getCursorLocation(c))
+            && clang_getCursorKind(c) != CXCursor_InclusionDirective)
+        )
             return CXChildVisit_Continue;
 
         std::string* _indent = static_cast<std::string*>(client_data);
 
         // Prints the cursor's name.
-        Fenton::println(*_indent + to_string(clang_getCursorKind(c)) + ": " + to_string(c));
+        Fenton::println(*_indent + "<" + to_string(clang_getCursorKind(c)) + ">: " + to_string(c));
+        if (clang_getCursorKind(c) == CXCursor_InclusionDirective) {
+            // Prints the included file.
+            Fenton::println(
+                *_indent + "    "
+                + quote(to_string(clang_getFileName(clang_getIncludedFile(c))))
+            );
+        }
 
         // Indent.
         _indent->append(4, ' ');
