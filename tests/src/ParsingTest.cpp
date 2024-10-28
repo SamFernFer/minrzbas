@@ -10,12 +10,12 @@
     }\
     std::string _fileName = pathInRes(_in.at("file").as_string().c_str()).string();
 #define FENTON_TESTS_ERROR
-#define FENTON_TESTS_PRINT_INPUT
-#define FENTON_TESTS_EXPECTED
+#define FENTON_TESTS_PRINT_INPUT pretty_print(Fenton::getDefaultOutput(), _in);
+#define FENTON_TESTS_EXPECTED json::object _expected = _case.at("out").as_object();
 #define FENTON_TESTS_ACTUAL json::object _actual = unitToJSON(_fileName, _args);
-#define FENTON_TESTS_UNEQUAL true
-#define FENTON_TESTS_PRINT_EXPECTED
-#define FENTON_TESTS_PRINT_ACTUAL
+#define FENTON_TESTS_UNEQUAL _actual != _expected
+#define FENTON_TESTS_PRINT_EXPECTED pretty_print(Fenton::getDefaultOutput(), _expected);
+#define FENTON_TESTS_PRINT_ACTUAL pretty_print(Fenton::getDefaultOutput(), _actual);
 #define FENTON_TESTS_TEST_NAME "Parsing"
 
 #include <minrzbas/Parser.hpp>

@@ -14,14 +14,13 @@
                 "Test1": {
                     "types": {
                         "Printer": {
-                            "variables": [
-                                {
-                                    "name": "text",
+                            "variables": {
+                                "text": {
                                     "access": "private",
                                     "type": "std::string",
                                     "default": "ERROR!"
                                 }
-                            ],
+                            },
                             "methods": [
                                 {
                                     "name": "SetText",
