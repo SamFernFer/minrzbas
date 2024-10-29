@@ -240,7 +240,7 @@ namespace Fenton::Minrzbas {
         return CXChildVisit_Continue;
     }
 #endif
-    static CXChildVisitResult reflVisitor(CXCursor c, CXCursor parent, CXClientData client_data) {
+    static CXChildVisitResult debugReflVisitor(CXCursor c, CXCursor parent, CXClientData client_data) {
         if (
             clang_Location_isInSystemHeader(clang_getCursorLocation(c))
             || (!clang_Location_isFromMainFile(clang_getCursorLocation(c))
@@ -263,10 +263,25 @@ namespace Fenton::Minrzbas {
         // Indent.
         _indent->append(4, ' ');
         // Visits the children recursively.
-        clang_visitChildren(c, reflVisitor, client_data);
+        clang_visitChildren(c, debugReflVisitor, client_data);
         // De-indent.
         _indent->resize(_indent->size()-4);
 
+        return CXChildVisit_Continue;
+    }
+    static CXChildVisitResult reflVisitor(CXCursor c, CXCursor parent, CXClientData client_data) {
+        if (!clang_Location_isFromMainFile(clang_getCursorLocation(c)))
+            return CXChildVisit_Continue;
+        
+        json::object& _obj = *static_cast<json::object*>(client_data);
+        
+        switch(clang_getCursorKind(c)) {
+            case CXCursor_Namespace:
+                // _obj.insert_or_assign("namespaces", json::object {
+                //     ""
+                // });
+                break;
+        }
         return CXChildVisit_Continue;
     }
 
@@ -285,12 +300,11 @@ namespace Fenton::Minrzbas {
         for (auto& a : args) {
             _args.emplace_back(a.c_str());
         }
-        /*for (auto& a : args) {
-            std::cout << a << std::endl;
-        }*/
-        
-        // Display the diagnostics.
-        CXIndex index = clang_createIndex(0, true);
+        CXIndex index = clang_createIndex(
+            0,
+            // Does not display diagnostics.
+            false
+        );
         CXTranslationUnit unit;
         CXErrorCode _errorCode = clang_parseTranslationUnit2(
             index,
@@ -310,14 +324,16 @@ namespace Fenton::Minrzbas {
             ));
         }
 
-        // json::object _rootNS;
+        // json::object _rootObj;
         // ReflVisitData _data;
         std::string _indent;
 
         CXCursor cursor = clang_getTranslationUnitCursor(unit);
         clang_visitChildren(
             cursor,
-            reflVisitor,
+            // reflVisitor,
+            debugReflVisitor,
+            // &_rootObj
             &_indent
         );
 
