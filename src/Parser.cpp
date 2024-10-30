@@ -240,6 +240,14 @@ namespace Fenton::Minrzbas {
         return CXChildVisit_Continue;
     }
 #endif
+    static json::object& atOrInsertObject(json::object& obj, std::string_view key) {
+        if (json::value* vPtr = obj.if_contains(key)) {
+            return vPtr->as_object();
+        } else {
+            return (obj[key] = json::object{}).get_object();
+        }
+    }
+
     static CXChildVisitResult debugReflVisitor(CXCursor c, CXCursor parent, CXClientData client_data) {
         if (
             clang_Location_isInSystemHeader(clang_getCursorLocation(c))
@@ -274,12 +282,25 @@ namespace Fenton::Minrzbas {
             return CXChildVisit_Continue;
         
         json::object& _obj = *static_cast<json::object*>(client_data);
+
+        json::object* _nss = nullptr;
+
+        auto _getNss = [&_obj, &_nss]()->void {
+            if (!_nss) {
+                _nss = &atOrInsertObject(_obj, "namespaces");
+            }
+        };
         
+        const std::string _cursorName = to_string(c);
         switch(clang_getCursorKind(c)) {
             case CXCursor_Namespace:
-                // _obj.insert_or_assign("namespaces", json::object {
-                //     ""
-                // });
+                _getNss();
+                // Visits the children recursively.
+                clang_visitChildren(
+                    c, reflVisitor,
+                    // Adds the namespace if it hadn't been already.
+                    &atOrInsertObject(*_nss, _cursorName)
+                );
                 break;
         }
         return CXChildVisit_Continue;
@@ -291,7 +312,7 @@ namespace Fenton::Minrzbas {
     ) {
         if (!fs::exists(filePath)) {
             throw std::runtime_error(std::format(
-                "The file \"{0}\" could not be found.", filePath
+                "The file {0} could not be found.", quote(filePath)
             ));
         }
 
@@ -324,23 +345,22 @@ namespace Fenton::Minrzbas {
             ));
         }
 
-        // json::object _rootObj;
+        json::object _rootObj;
         // ReflVisitData _data;
-        std::string _indent;
+        // std::string _indent;
 
         CXCursor cursor = clang_getTranslationUnitCursor(unit);
         clang_visitChildren(
             cursor,
             // reflVisitor,
-            debugReflVisitor,
-            // &_rootObj
-            &_indent
+            reflVisitor,
+            &_rootObj
+            // &_indent
         );
 
         clang_disposeTranslationUnit(unit);
         clang_disposeIndex(index);
 
-        // Not returning anything for now.
-        return {};
+        return _rootObj;
     }
 }
