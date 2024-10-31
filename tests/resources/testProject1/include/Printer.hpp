@@ -3,7 +3,12 @@
 
 std::int64_t var = -9808;
 namespace Test1 {
-    class [[minr::attrdecl("Printable")]] Printer {
+    struct __attribute__((thing())) Empty;
+    class
+    [[minr::attrdecl("Printable")]]
+    [[clang::annotate("Printable")]]
+    __attribute__((a("interesting", 90)))
+    Printer {
         std::string text = "ERROR!";
     public:
         Printer();
@@ -21,6 +26,12 @@ namespace Test1 {
     };
 }
 namespace Test1 {
+    struct Undeclared;
+    struct Declared {
+        int _thing = 0x99;
+    };
+    struct Declared;
+    struct Empty {};
     bool thing() {
         return false;
     }
@@ -38,4 +49,10 @@ namespace Aliases::Internal {
     T thing;
     T* otherThing = nullptr;
     nonex nonexVar = {};
+}
+namespace Aliases::Internal {
+    std::int64_t internalVar = 999;
+}
+namespace Aliases::Internal::Even {
+    std::string otherNames = "John and Elise.";
 }

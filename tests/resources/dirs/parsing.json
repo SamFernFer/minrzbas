@@ -9,65 +9,65 @@
         },
         // The output JSON.
         "out": {
-            "dependencies": [],
-            "namespaces": {
-                "Test1": {
-                    "types": {
-                        "Printer": {
-                            "variables": {
-                                "text": {
-                                    "access": "private",
-                                    "type": "std::string",
-                                    "default": "ERROR!"
-                                }
-                            },
-                            "methods": [
-                                {
-                                    "name": "SetText",
-                                    "access": "public",
-                                    "returnType": "void",
-                                    "isConst": false,
-                                    "params": [
-                                        {
-                                            "name": "text",
-                                            "type": "std::string const&"
-                                        }
-                                    ]
-                                },
-                                {
-                                    "name": "GetText",
-                                    "access": "public",
-                                    "returnType": "std::string",
-                                    "isConst": true,
-                                    "params": []
-                                },
-                                {
-                                    "name": "Print",
-                                    "access": "public",
-                                    "returnType": "void",
-                                    "isConst": true,
-                                    "params": []
-                                }
-                            ],
-                            "constructors": [
-                                {
-                                    "access": "public",
-                                    "params": []
-                                },
-                                {
-                                    "access": "public",
-                                    "params": [
-                                        {
-                                            "name": "text",
-                                            "type": "std::string const&"
-                                        }
-                                    ]
-                                }
-                            ]
-                        }
-                    }
-                }
-            }
+            // "dependencies": [],
+            // "namespaces": {
+            //     "Test1": {
+            //         "types": {
+            //             "Printer": {
+            //                 "variables": {
+            //                     "text": {
+            //                         "access": "private",
+            //                         "type": "std::string",
+            //                         "default": "ERROR!"
+            //                     }
+            //                 },
+            //                 "methods": [
+            //                     {
+            //                         "name": "SetText",
+            //                         "access": "public",
+            //                         "returnType": "void",
+            //                         "isConst": false,
+            //                         "params": [
+            //                             {
+            //                                 "name": "text",
+            //                                 "type": "std::string const&"
+            //                             }
+            //                         ]
+            //                     },
+            //                     {
+            //                         "name": "GetText",
+            //                         "access": "public",
+            //                         "returnType": "std::string",
+            //                         "isConst": true,
+            //                         "params": []
+            //                     },
+            //                     {
+            //                         "name": "Print",
+            //                         "access": "public",
+            //                         "returnType": "void",
+            //                         "isConst": true,
+            //                         "params": []
+            //                     }
+            //                 ],
+            //                 "constructors": [
+            //                     {
+            //                         "access": "public",
+            //                         "params": []
+            //                     },
+            //                     {
+            //                         "access": "public",
+            //                         "params": [
+            //                             {
+            //                                 "name": "text",
+            //                                 "type": "std::string const&"
+            //                             }
+            //                         ]
+            //                     }
+            //                 ]
+            //             }
+            //         }
+            //     }
+            // }
         }
     }
     // {

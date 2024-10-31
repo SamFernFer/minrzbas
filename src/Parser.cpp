@@ -267,6 +267,10 @@ namespace Fenton::Minrzbas {
                 + quote(to_string(clang_getFileName(clang_getIncludedFile(c))))
             );
         }
+        if (clang_Cursor_hasAttrs(c)) {
+            // Prints if it has attributes.
+            Fenton::println(*_indent + "    " + "[HAS ATTRIBUTES]");
+        }
 
         // Indent.
         _indent->append(4, ' ');
@@ -284,10 +288,16 @@ namespace Fenton::Minrzbas {
         json::object& _obj = *static_cast<json::object*>(client_data);
 
         json::object* _nss = nullptr;
+        json::object* _types = nullptr;
 
         auto _getNss = [&_obj, &_nss]()->void {
             if (!_nss) {
                 _nss = &atOrInsertObject(_obj, "namespaces");
+            }
+        };
+        auto _getTypes = [&_obj, &_types]()->void {
+            if (!_types) {
+                _types = &atOrInsertObject(_obj, "types");
             }
         };
         
@@ -302,6 +312,29 @@ namespace Fenton::Minrzbas {
                     &atOrInsertObject(*_nss, _cursorName)
                 );
                 break;
+            // NOTE: Currently, there's no distiction between classes and structs in the reflection 
+            // system.
+            case CXCursor_ClassDecl:
+            case CXCursor_StructDecl: {
+                _getTypes();
+                json::object& _type = atOrInsertObject(*_types, _cursorName);
+
+                bool _isDef = clang_isCursorDefinition(c);
+                if (json::value* _isDefPtr = _type.if_contains("isDefined")) {
+                    // Make sure that there's no undefining if a non-defining declaration comes 
+                    // after a definition.
+                    if (_isDef)
+                        *_isDefPtr = true;
+                } else {
+                    _type["isDefined"] = _isDef;
+                }
+
+                clang_visitChildren(
+                    c, reflVisitor,
+                    &_type
+                );
+                break;
+            }
         }
         return CXChildVisit_Continue;
     }
@@ -316,15 +349,17 @@ namespace Fenton::Minrzbas {
             ));
         }
 
-        std::vector<const char*> _args;
+        std::vector<const char*> _args {
+            "-std=c++23"
+        };
         // Prepares the arguments.
         for (auto& a : args) {
             _args.emplace_back(a.c_str());
         }
         CXIndex index = clang_createIndex(
             0,
-            // Does not display diagnostics.
-            false
+            // Does display diagnostics.
+            true
         );
         CXTranslationUnit unit;
         CXErrorCode _errorCode = clang_parseTranslationUnit2(
@@ -345,17 +380,23 @@ namespace Fenton::Minrzbas {
             ));
         }
 
-        json::object _rootObj;
-        // ReflVisitData _data;
-        // std::string _indent;
-
         CXCursor cursor = clang_getTranslationUnitCursor(unit);
+
+        std::string _indent;
+        // DEBUG - Visits the children recursively.
+        clang_visitChildren(
+            cursor,
+            debugReflVisitor,
+            &_indent
+        );
+
+        json::object _rootObj;
+        // Visits the children, building the JSON AST.
         clang_visitChildren(
             cursor,
             // reflVisitor,
             reflVisitor,
             &_rootObj
-            // &_indent
         );
 
         clang_disposeTranslationUnit(unit);
