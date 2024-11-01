@@ -267,10 +267,10 @@ namespace Fenton::Minrzbas {
                 + quote(to_string(clang_getFileName(clang_getIncludedFile(c))))
             );
         }
-        if (clang_Cursor_hasAttrs(c)) {
-            // Prints if it has attributes.
-            Fenton::println(*_indent + "    " + "[HAS ATTRIBUTES]");
-        }
+        // if (clang_Cursor_hasAttrs(c)) {
+        //     // Prints if it has attributes.
+        //     Fenton::println(*_indent + "    " + "[HAS ATTRIBUTES]");
+        // }
 
         // Indent.
         _indent->append(4, ' ');

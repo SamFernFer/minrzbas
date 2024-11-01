@@ -1,23 +1,39 @@
 #include <string>
 #include <cstdint>
 
+[[clang::annotate("minr::ignored")]];
+
 std::int64_t var = -9808;
 namespace Test1 {
-    struct __attribute__((thing())) Empty;
+    #pragma clang attribute push ([[clang::annotate("minr::ignored")]], apply_to = any(function, record))
+    struct Empty;
     class
-    [[minr::attrdecl("Printable")]]
-    [[clang::annotate("Printable")]]
-    __attribute__((a("interesting", 90)))
+    // [[clang::annotate("Printable")]]
+    [[
+        clang::annotate("minrattr::printable"),
+        clang::annotate(R"attr(Initialisable, Other, Thing(R"(inner)"))attr"),
+        clang::annotate("Movable")
+    ]]
+    // [[clang::annotate("Movable")]]
+    // [[clang::annotate("Movable")]]
+    // [[clang::annotate("Initialisable")]]
     Printer {
         std::string text = "ERROR!";
     public:
         Printer();
         Printer(const std::string& text);
+        [[clang::annotate("Initialisable")]]
         void SetText(const std::string& text);
         std::string GetText() const;
         void Print() const;
-        static void doThing();
+        static void doThing() {
+            struct InnerStruct {
+            };
+            auto _ptr = new InnerStruct;
+            delete _ptr;
+        }
     };
+    #pragma clang attribute pop
     static void doOtherThing();
     struct Other {
         bool bool1 = false;
