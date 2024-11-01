@@ -335,6 +335,8 @@ namespace Fenton::Minrzbas {
                 );
                 break;
             }
+            case CXCursor_FieldDecl:
+            case CXCursor_VarDecl:
         }
         return CXChildVisit_Continue;
     }

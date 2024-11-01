@@ -1,11 +1,50 @@
 #include <string>
 #include <cstdint>
+#include <memory>
+#include <type_traits>
 
 [[clang::annotate("minr::ignored")]];
 
+namespace Attrs {
+    class Attribute {
+    };
+    class Entity {
+    };
+    class OtherKind {
+    };
+    class [[clang::annotate(R"(minr::attrdecl("custom_thing"))")]] CustomAttr
+     : public Attribute, private Entity, virtual public OtherKind {
+        CustomAttr();
+    };
+}
+class PrinterWrapper {
+    void* obj = nullptr;
+    void (*printFunc)(void* obj) = nullptr;
+    void Print() const {
+        printFunc(obj);
+    }
+    template<typename T> void Init(T&) {
+        obj = const_cast<std::remove_cv_t<T>*>(std::addressof(v));
+        printFunc = [](void* obj)->void {
+            static_cast<T*>(obj)->Print();
+        };
+    }
+    template<typename T> PrinterWrapper(T& v) {
+        Init(v);
+    }
+    template<typename T> PrinterWrapper(T&& v) {
+        Init(v);
+    }
+};
+void doPrint(PrinterWrapper v) {
+    v.Print();
+}
+
 std::int64_t var = -9808;
 namespace Test1 {
-    #pragma clang attribute push ([[clang::annotate("minr::ignored")]], apply_to = any(function, record))
+    #pragma clang attribute push \
+        ([[clang::annotate("minrattr::custom_thing")]],\
+        apply_to = any(function, record))
     struct Empty;
     class
     // [[clang::annotate("Printable")]]
@@ -26,10 +65,13 @@ namespace Test1 {
         void SetText(const std::string& text);
         std::string GetText() const;
         void Print() const;
+        // Empty statement.
+        ;
         static void doThing() {
             struct InnerStruct {
             };
             auto _ptr = new InnerStruct;
+            ;
             delete _ptr;
         }
     };
