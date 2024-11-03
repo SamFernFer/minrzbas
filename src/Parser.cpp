@@ -289,22 +289,15 @@ namespace Fenton::Minrzbas {
 
         json::object* _nss = nullptr;
         json::object* _types = nullptr;
-
-        auto _getNss = [&_obj, &_nss]()->void {
-            if (!_nss) {
-                _nss = &atOrInsertObject(_obj, "namespaces");
-            }
-        };
-        auto _getTypes = [&_obj, &_types]()->void {
-            if (!_types) {
-                _types = &atOrInsertObject(_obj, "types");
-            }
-        };
+        json::object* _fields = nullptr;
+        json::object* _vars = nullptr;
         
         const std::string _cursorName = to_string(c);
         switch(clang_getCursorKind(c)) {
             case CXCursor_Namespace:
-                _getNss();
+                if (!_nss)
+                    _nss = &atOrInsertObject(_obj, "namespaces");
+
                 // Visits the children recursively.
                 clang_visitChildren(
                     c, reflVisitor,
@@ -316,17 +309,34 @@ namespace Fenton::Minrzbas {
             // system.
             case CXCursor_ClassDecl:
             case CXCursor_StructDecl: {
-                _getTypes();
+                if (!_types)
+                    _types = &atOrInsertObject(_obj, "types");
+
                 json::object& _type = atOrInsertObject(*_types, _cursorName);
 
                 bool _isDef = clang_isCursorDefinition(c);
-                if (json::value* _isDefPtr = _type.if_contains("isDefined")) {
-                    // Make sure that there's no undefining if a non-defining declaration comes 
-                    // after a definition.
-                    if (_isDef)
-                        *_isDefPtr = true;
+
+                json::value& _isDefVal = _type["isDefined"];
+                if (_isDef) {
+                    if (_isDefVal.is_bool()) {
+                        if (bool& _isDefBoolRef = _isDefVal.as_bool()) {
+                            // You cannot redefine a class, so we're skipping if the class 
+                            // has already been defined.
+                            return CXChildVisit_Continue;
+                        } else {
+                            _isDefBoolRef = true;
+                        }
+                    } else {
+                        _isDefVal = true;
+                    }
+                    
                 } else {
-                    _type["isDefined"] = _isDef;
+                    // Only set it to false if the value is not a boolean already, to prevent 
+                    // setting it from true to false, which would mark a defined class undefined.
+                    if (!_isDefVal.is_bool())
+                        _isDefVal = false;
+                    // This is not a definition, so we're skipping it.
+                    return CXChildVisit_Continue;
                 }
 
                 clang_visitChildren(
@@ -335,8 +345,26 @@ namespace Fenton::Minrzbas {
                 );
                 break;
             }
-            case CXCursor_FieldDecl:
-            case CXCursor_VarDecl:
+            case CXCursor_FieldDecl: {
+                if (!_fields)
+                    _fields = &atOrInsertObject(_obj, "fields");
+                
+                json::value& _fieldVal = (*_fields)[_cursorName];
+
+                if (_fieldVal.is_object()) {
+                    json::object& _field = to_string(clang_getCursorType(c));
+                } else {
+                    d
+                }
+                break;
+            }
+            case CXCursor_VarDecl: {
+                if (!_vars)
+                    _vars = &atOrInsertObject(_obj, "variables");
+                
+                json::object& _var = atOrInsertObject(*_vars, _cursorName);
+                break;
+            }
         }
         return CXChildVisit_Continue;
     }
