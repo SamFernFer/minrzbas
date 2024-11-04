@@ -240,6 +240,8 @@ namespace Fenton::Minrzbas {
         return CXChildVisit_Continue;
     }
 #endif
+    static CXChildVisitResult reflVisitor(CXCursor c, CXCursor parent, CXClientData client_data);
+
     static json::object& atOrInsertObject(json::object& obj, std::string_view key) {
         if (json::value* vPtr = obj.if_contains(key)) {
             return vPtr->as_object();
@@ -281,18 +283,81 @@ namespace Fenton::Minrzbas {
 
         return CXChildVisit_Continue;
     }
+    template<bool isClass, bool isStruct, bool isUnion> static void addRecord(
+        json::object& obj, json::object*& typesPtr, CXCursor c, std::string_view name
+    ) {
+        if (!typesPtr)
+            typesPtr = &atOrInsertObject(obj, "types");
+        
+        json::object& _type = atOrInsertObject(*typesPtr, name);
+
+        bool _isDef = clang_isCursorDefinition(c);
+
+        json::value& _isDefVal = _type["isDefined"];
+        if (_isDef) {
+            if (bool* _isDefPtr = _isDefVal.if_bool()) {
+                if (*_isDefPtr) {
+                    // Prevents redefining.
+                    return;
+                } else {
+                    *_isDefPtr = true;
+                }
+            } else {
+                _isDefVal = true;
+            }
+        } else {
+            // Prevents undefining if already defined.
+            if (!_isDefVal.is_bool())
+                _isDefVal = false;
+            // It's not a definition, so we skip it.
+            return;
+        }
+
+        _type["isClass"] = isClass;
+        _type["isStruct"] = isStruct;
+        _type["isUnion"] = isUnion;
+
+        _type["isBitField"] = clang_Cursor_isBitField(c);
+
+        clang_visitChildren(
+            c, reflVisitor,
+            &_type
+        );
+    }
+    static bool isTypeKindUnsigned() {
+        
+    }
+    static CXChildVisitResult visitEnum(CXCursor c, CXCursor parent, CXClientData client_data) {
+        switch(clang_getCursorKind(c)) {
+            case CXCursor_EnumConstantDecl:
+
+        json::object& _values = *static_cast<json::object*>(client_data);
+
+            clang_getEnumConstantDeclValue()
+
+            clang_getEnumConstantDeclUnsignedValue
+        }
+    }
     static CXChildVisitResult reflVisitor(CXCursor c, CXCursor parent, CXClientData client_data) {
         if (!clang_Location_isFromMainFile(clang_getCursorLocation(c)))
             return CXChildVisit_Continue;
+        
+        // An anonymous declaration cannot be referenced elsewhere, so we skip it.
+        if (clang_Cursor_isAnonymousRecordDecl(c)) {
+            return CXChildVisit_Continue;
+        }
         
         json::object& _obj = *static_cast<json::object*>(client_data);
 
         json::object* _nss = nullptr;
         json::object* _types = nullptr;
+        json::object* _enums = nullptr;
         json::object* _fields = nullptr;
         json::object* _vars = nullptr;
+        json::object* _values = nullptr;
         
         const std::string _cursorName = to_string(c);
+
         switch(clang_getCursorKind(c)) {
             case CXCursor_Namespace:
                 if (!_nss)
@@ -305,44 +370,46 @@ namespace Fenton::Minrzbas {
                     &atOrInsertObject(*_nss, _cursorName)
                 );
                 break;
-            // NOTE: Currently, there's no distiction between classes and structs in the reflection 
-            // system.
             case CXCursor_ClassDecl:
-            case CXCursor_StructDecl: {
-                if (!_types)
-                    _types = &atOrInsertObject(_obj, "types");
-
-                json::object& _type = atOrInsertObject(*_types, _cursorName);
-
+                addRecord<true, false, false>(_obj, _types, c, _cursorName);
+                break;
+            case CXCursor_StructDecl:
+                addRecord<false, true, false>(_obj, _types, c, _cursorName);
+                break;
+            case CXCursor_UnionDecl:
+                addRecord<false, false, true>(_obj, _types, c, _cursorName);
+                break;
+            case CXCursor_EnumDecl: {
+                if (!_enums)
+                    _enums = &atOrInsertObject(_obj, "enums");
+                
+                json::object& _enum = atOrInsertObject(*_enums, _cursorName);
+                json::value& _isDefVal = _enum["isDefined"];
+                bool* _isAlreadyDef = _isDefVal.if_bool();
                 bool _isDef = clang_isCursorDefinition(c);
 
-                json::value& _isDefVal = _type["isDefined"];
                 if (_isDef) {
-                    if (_isDefVal.is_bool()) {
-                        if (bool& _isDefBoolRef = _isDefVal.as_bool()) {
-                            // You cannot redefine a class, so we're skipping if the class 
-                            // has already been defined.
-                            return CXChildVisit_Continue;
+                    if (bool* _isDefPtr = _isDefVal.if_bool()) {
+                        if (*_isDefPtr) {
+                            // Prevents redefining.
+                            break;
                         } else {
-                            _isDefBoolRef = true;
+                            *_isDefPtr = true;
                         }
                     } else {
                         _isDefVal = true;
                     }
-                    
                 } else {
-                    // Only set it to false if the value is not a boolean already, to prevent 
-                    // setting it from true to false, which would mark a defined class undefined.
+                    // Prevents undefining if already defined.
                     if (!_isDefVal.is_bool())
                         _isDefVal = false;
-                    // This is not a definition, so we're skipping it.
-                    return CXChildVisit_Continue;
+                    // It's not a definition, so we skip it.
+                    break;
                 }
-
-                clang_visitChildren(
-                    c, reflVisitor,
-                    &_type
-                );
+                
+                _enum["isScoped"] = clang_EnumDecl_isScoped(c);
+                _enum["underlyingType"] = clang_getEnumDeclIntegerType(c);
+                
                 break;
             }
             case CXCursor_FieldDecl: {
@@ -351,10 +418,10 @@ namespace Fenton::Minrzbas {
                 
                 json::value& _fieldVal = (*_fields)[_cursorName];
 
-                if (_fieldVal.is_object()) {
-                    json::object& _field = to_string(clang_getCursorType(c));
-                } else {
-                    d
+                // Makes sure fields are not redefined.
+                if (!_fieldVal.is_object()) {
+                    json::object& _field = _fieldVal.emplace_object();
+                    _field["type"] = to_string(clang_getCursorType(c));
                 }
                 break;
             }
@@ -362,7 +429,13 @@ namespace Fenton::Minrzbas {
                 if (!_vars)
                     _vars = &atOrInsertObject(_obj, "variables");
                 
-                json::object& _var = atOrInsertObject(*_vars, _cursorName);
+                json::value& _varVal = (*_vars)[_cursorName];
+
+                // Makes sure variables are not redefined.
+                if (!_varVal.is_object()) {
+                    json::object& _var = _varVal.emplace_object();
+                    _var["type"] = to_string(clang_getCursorType(c));
+                }
                 break;
             }
         }

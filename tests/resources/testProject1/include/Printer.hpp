@@ -45,6 +45,7 @@ namespace Test1 {
     #pragma clang attribute push \
         ([[clang::annotate("minrattr::custom_thing")]],\
         apply_to = any(function, record))
+    constexpr int val = 5;
     struct Empty;
     class
     // [[clang::annotate("Printable")]]
@@ -57,12 +58,15 @@ namespace Test1 {
     // [[clang::annotate("Movable")]]
     // [[clang::annotate("Initialisable")]]
     Printer {
+        static std::string defaultText = "default";
+        static std::int8_t defaultChar = 7i8;
         std::string text = "ERROR!";
     public:
         Printer();
         Printer(const std::string& text);
         [[clang::annotate("Initialisable")]]
         void SetText(const std::string& text);
+        void SetText(const std::string& text, std::int8_t char_);
         std::string GetText() const;
         void Print() const;
         // Empty statement.
@@ -74,6 +78,7 @@ namespace Test1 {
             ;
             delete _ptr;
         }
+        constexpr static const char* staticStr = "Static text.";
     };
     #pragma clang attribute pop
     static void doOtherThing();
@@ -114,3 +119,33 @@ namespace Aliases::Internal {
 namespace Aliases::Internal::Even {
     std::string otherNames = "John and Elise.";
 }
+namespace NS::NS2 {
+    struct ClassThing {
+        long l;
+        int i;
+    }* varPtr;
+}
+namespace Enums {
+    enum class MyEnum;
+    enum class MyEnum {
+        Val1,
+        Val2,
+        Val3
+    };
+    enum class OtherEnum {
+        Val1 = -90,
+        Val2 = 0,
+        Val3 = -29383423
+    };
+    enum class OtherEnum;
+    enum class UdeclaredEnum;
+
+    enum class DirectEnum {
+        Value1 = 9,
+        Value2 = 8,
+        Value3 = 7
+    };
+}
+struct {
+    int i, j;
+} anoVar;
