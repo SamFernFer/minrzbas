@@ -82,7 +82,9 @@ namespace Test1 {
     };
     #pragma clang attribute pop
     static void doOtherThing();
-    struct Other {
+    struct BaseClass {
+    };
+    struct Other : [[minrattr::custom_attr]] BaseClass {
         bool bool1 = false;
         std::string name = "Harold";
         int i = -10;
@@ -102,7 +104,7 @@ namespace Test1 {
         constexpr const char* _str = "Another";
         char c = '^';
     }
-    using TheThing = Printer;
+    using TheThing [[minr::ignored]] = Printer;
     using Other = ::Test1::Other;
 }
 namespace Aliases {
@@ -149,3 +151,15 @@ namespace Enums {
 struct {
     int i, j;
 } anoVar;
+
+namespace Unions {
+    union MyUnion {
+        Test1::Printer printer;
+        long myLong;
+    };
+}
+union MyUnion {
+    int intVal;
+    long longVal;
+    char charVal;
+};
