@@ -289,9 +289,10 @@ namespace Fenton::Minrzbas {
         if (!typesPtr)
             typesPtr = &atOrInsertObject(obj, "types");
         
-        json::object& _type = atOrInsertObject(*typesPtr, name);
-
+        bool _isAnonymous = clang_Cursor_isAnonymousRecordDecl(c);
         bool _isDef = clang_isCursorDefinition(c);
+        
+        json::object& _type = atOrInsertObject(*typesPtr, _isAnonymous? "" : name);
 
         json::value& _isDefVal = _type["isDefined"];
         if (_isDef) {
@@ -316,8 +317,10 @@ namespace Fenton::Minrzbas {
         _type["isClass"] = isClass;
         _type["isStruct"] = isStruct;
         _type["isUnion"] = isUnion;
+        _type["isAnonoymous"] = _isAnonymous;
 
-        _type["isBitField"] = clang_Cursor_isBitField(c);
+        // TODO: Implement it for the memebers.
+        // _type["isBitField"] = clang_Cursor_isBitField(c);
 
         clang_visitChildren(
             c, reflVisitor,
@@ -325,18 +328,23 @@ namespace Fenton::Minrzbas {
         );
     }
     static bool isTypeKindUnsigned() {
-        
+        return false;
     }
+    template<bool isUnsigned>
     static CXChildVisitResult visitEnum(CXCursor c, CXCursor parent, CXClientData client_data) {
-        switch(clang_getCursorKind(c)) {
-            case CXCursor_EnumConstantDecl:
+        // Only consider enum elements.
+        if(clang_getCursorKind(c) != CXCursor_EnumConstantDecl)
+            return CXChildVisit_Continue;
 
         json::object& _values = *static_cast<json::object*>(client_data);
+        const std::string _cursorName = to_string(c);
 
-            clang_getEnumConstantDeclValue()
-
-            clang_getEnumConstantDeclUnsignedValue
+        if constexpr (isUnsigned) {
+            _values[_cursorName] = clang_getEnumConstantDeclUnsignedValue(c);
+        } else {
+            _values[_cursorName] = clang_getEnumConstantDeclValue(c);
         }
+        return CXChildVisit_Continue;
     }
     static CXChildVisitResult reflVisitor(CXCursor c, CXCursor parent, CXClientData client_data) {
         if (!clang_Location_isFromMainFile(clang_getCursorLocation(c)))
@@ -408,7 +416,10 @@ namespace Fenton::Minrzbas {
                 }
                 
                 _enum["isScoped"] = clang_EnumDecl_isScoped(c);
-                _enum["underlyingType"] = clang_getEnumDeclIntegerType(c);
+                _enum["underlyingType"] = to_string(clang_getEnumDeclIntegerType(c));
+
+                clang_visitChildren(c, visitEnum<false>, &_enum["signedValues"].emplace_object());
+                clang_visitChildren(c, visitEnum<true>, &_enum["unsignedValues"].emplace_object());
                 
                 break;
             }

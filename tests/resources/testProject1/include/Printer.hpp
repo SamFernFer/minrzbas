@@ -153,6 +153,7 @@ struct {
 } anoVar;
 
 namespace Unions {
+    union MyUnion;
     union MyUnion {
         Test1::Printer printer;
         long myLong;
@@ -163,3 +164,5 @@ union MyUnion {
     long longVal;
     char charVal;
 };
+union MyUnion;
+union SimpleUnion {};
