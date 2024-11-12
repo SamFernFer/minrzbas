@@ -327,8 +327,21 @@ namespace Fenton::Minrzbas {
             &_type
         );
     }
-    static bool isTypeKindUnsigned() {
-        return false;
+    static bool isTypeUnsigned(CXType type) {
+        switch (type.kind) {
+            case CXType_UChar:
+            case CXType_UShort:
+            case CXType_UInt:
+            case CXType_ULong:
+            case CXType_ULongLong:
+            case CXType_UInt128:
+            case CXType_UShortAccum:
+            case CXType_UAccum:
+            case CXType_ULongAccum:
+                return true;
+            default:
+                return false;
+        }
     }
     template<bool isUnsigned>
     static CXChildVisitResult visitEnum(CXCursor c, CXCursor parent, CXClientData client_data) {
@@ -416,11 +429,15 @@ namespace Fenton::Minrzbas {
                 }
                 
                 _enum["isScoped"] = clang_EnumDecl_isScoped(c);
-                _enum["underlyingType"] = to_string(clang_getEnumDeclIntegerType(c));
 
-                clang_visitChildren(c, visitEnum<false>, &_enum["signedValues"].emplace_object());
-                clang_visitChildren(c, visitEnum<true>, &_enum["unsignedValues"].emplace_object());
-                
+                CXType _enumType = clang_getEnumDeclIntegerType(c);
+                _enum["underlyingType"] = to_string(_enumType);
+
+                if (isTypeUnsigned(_enumType)) {
+                    clang_visitChildren(c, visitEnum<false>, &_enum["values"].emplace_object());
+                } else {
+                    clang_visitChildren(c, visitEnum<false>, &_enum["values"].emplace_object());
+                }
                 break;
             }
             case CXCursor_FieldDecl: {
