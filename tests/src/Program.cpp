@@ -1,11 +1,8 @@
 #include <utils/Misc.hpp>
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wgnu-anonymous-struct"
-#pragma clang diagnostic ignored "-Wlanguage-extension-token"
-#pragma clang diagnostic ignored "-Wmicrosoft-cpp-macro"
-#include <boost/locale.hpp>
-#pragma clang diagnostic pop
+#ifdef _WIN32
+#include <Windows.h>
+#endif
 
 #include <iostream>
 #include <locale>
@@ -18,29 +15,9 @@ namespace Fenton::Minrzbas::Tests {
 int main() {
     using namespace Fenton::Minrzbas::Tests;
 
-    boost::locale::generator _gen;
-    using facets = boost::locale::category_t;
-    using chars = boost::locale::char_facet_t;
-    _gen.categories(
-        facets::convert
-        | facets::collation
-        | facets::message
-        | facets::codepage
-        | facets::boundary
-        | facets::information
-    );
-    _gen.characters(
-        // chars::char32_f
-        // | chars::char16_f
-        chars::wchar_f
-        | chars::char_f
-    );
-
-    // std::locale::global(std::locale(".UTF-8"));
-    std::locale::global(_gen.generate(".UTF-8"));
-
-    std::cout.imbue(std::locale(""));
-    std::wcout.imbue(std::locale(""));
+#ifdef _WIN32
+    SetConsoleOutputCP(CP_UTF8);
+#endif
 
     std::ostream& _out = std::cout;
 
@@ -54,9 +31,11 @@ int main() {
 
     std::cout << 1123123 << std::endl;
 
-    std::wstring wstr = L"Привет, мир!";  // "Hello, world!" in Russian
+    Fenton::println(CP_UTF8);
 
-    std::wcout << wstr << std::endl;
+    std::string rareLatinCharacters = "ÀÁÂÃÄÅĀĂĄǍǞǠǺȀȂȦȨɅƁƂƄƆƇƉƊƋƌƎƏƐƑƓƔƖƘǶǷƜƞƟƠƢƤƦƬƮƯƱƲƳƵȜȝȢȤȥȦȧȨȩȪȫȬȭȮȯȰȱȲȳȴȵȶȷɀɁɂɃɄɆɇɈɉɊɋɌɍɎɏʙʛʞʠʬʰʲʳʴʵʶʷʸʹʺʻʼʽʾʿˀˁ˂˃˄˅ˇˈˉˊˋˌˍˎˏːˑ˒˓˔˕˖˗˘˙˚˛˜˝˞˟ˠˡˢˣˤ˥˦˧˨˩˪˫ˬ˭ˮ˯˰˱˲˳˴˵˶˷˸˹˺˻˼˽˾˿";
+
+    std::cout << rareLatinCharacters << std::endl;
 
     std::cin.get();
 

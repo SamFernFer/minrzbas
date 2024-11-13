@@ -6,10 +6,11 @@
 #include <iterator>
 #include <sstream>
 #include <iomanip>
+#include <memory>
 
 using namespace std::string_literals;
 namespace Fenton {
-    std::ostream* out = &std::cout;
+    std::ostream* out = std::addressof(std::cout);
 
     void setDefaultOutput(std::ostream& newOut) {
         out = &newOut;
