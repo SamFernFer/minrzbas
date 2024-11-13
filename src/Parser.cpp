@@ -374,7 +374,8 @@ namespace Fenton::Minrzbas {
         if (!clang_Location_isFromMainFile(clang_getCursorLocation(c)))
             return CXChildVisit_Continue;
         
-        // An anonymous declaration cannot be referenced elsewhere, so we skip it.
+        // At this point, it is not known whether the declaration is associated with another 
+        // entity or not, so we skip it.
         if (
             // clang_Cursor_isAnonymousRecordDecl(c) ||
             clang_Cursor_isAnonymous(c)

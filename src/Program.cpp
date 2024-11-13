@@ -12,14 +12,11 @@ namespace Fenton::Minrzbas {
         _desc.add_options()
             ("help,h", "Displays help information.")
             ("version,V", "Displays the program's version.")
-            ("include,I", po::value<std::vector<std::string>>(),
-                "Adds a path to the \"include\" class.")
-            ("src,S", po::value<std::vector<std::string>>(),
-                "Adds a path to the \"src\" class.")
-            ("srcdir", po::value<std::string>(), 
-                "Sets the current directory for relative directory paths.")
-            ("resdir", po::value<std::string>(), 
-                "Sets the current directory for relative script paths.")
+            ("I", po::value<std::vector<std::string>>(),
+                "Adds an include path to be used for dependency-checking and "
+                "to be passed as an argument to libclang."
+            )
+            // TODO: positional arguments to be passed to libclang.
         ;
         return _desc;
     }
@@ -46,7 +43,7 @@ namespace Fenton::Minrzbas {
                 std::cout << versionString << "\n";
                 return 1;
             }
-            getContext(_vm);
+            // getContext(_vm);
             return 0;
         } catch (const std::exception& e) {
             std::cout << "[Exception] " << e.what() << "\n\n";

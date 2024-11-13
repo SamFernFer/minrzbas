@@ -167,7 +167,7 @@ struct {
 namespace AnyOther {
     struct {
         int a, b, *c;
-    }
+    };
 }
 
 // namespace Unions {
