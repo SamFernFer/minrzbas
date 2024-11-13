@@ -65,7 +65,15 @@ namespace Fenton::Minrzbas {
         return to_string(clang_getCursorSpelling(cursor));
     }
     std::string to_string(const CXType& type) {
-        return to_string(clang_getTypeSpelling(clang_getCanonicalType(type)));
+        CXType _canonType = clang_getCanonicalType(type);
+        CXCursor _cursor = clang_getTypeDeclaration(_canonType);
+        
+        bool _isAnonymous = 
+            // clang_Cursor_isAnonymousRecordDecl(_cursor) || 
+            clang_Cursor_isAnonymous(_cursor)
+        ;
+        // Returns an empty name if the type is anonymous.
+        return _isAnonymous? "" : to_string(clang_getTypeSpelling(_canonType));
         //return to_string(/*clang_getTypeSpelling(clang_getCanonicalType(type))*/clang_getTypeSpelling(type));
     }
     std::string to_string(const CXCursorKind& kind) {
@@ -327,6 +335,9 @@ namespace Fenton::Minrzbas {
             &_type
         );
     }
+    // Returns true is the type is unsigned and false if the type is not. Uses the type's kind.
+    // NOTE: Evaluating std::is_signed<std::underlying_type<type>> with type being the enum's
+    // type could theoretically be more assertive, but certainly way slower.
     static bool isTypeUnsigned(CXType type) {
         switch (type.kind) {
             case CXType_UChar:
@@ -364,7 +375,10 @@ namespace Fenton::Minrzbas {
             return CXChildVisit_Continue;
         
         // An anonymous declaration cannot be referenced elsewhere, so we skip it.
-        if (clang_Cursor_isAnonymousRecordDecl(c)) {
+        if (
+            // clang_Cursor_isAnonymousRecordDecl(c) ||
+            clang_Cursor_isAnonymous(c)
+        ) {
             return CXChildVisit_Continue;
         }
         
@@ -428,13 +442,14 @@ namespace Fenton::Minrzbas {
                     break;
                 }
                 
-                _enum["isScoped"] = clang_EnumDecl_isScoped(c);
+                _enum["isScoped"] = static_cast<bool>(clang_EnumDecl_isScoped(c));
 
-                CXType _enumType = clang_getEnumDeclIntegerType(c);
-                _enum["underlyingType"] = to_string(_enumType);
+                CXType _enumType = clang_getCanonicalType(clang_getEnumDeclIntegerType(c));
+                
+                _enum["type"] = to_string(_enumType);
 
                 if (isTypeUnsigned(_enumType)) {
-                    clang_visitChildren(c, visitEnum<false>, &_enum["values"].emplace_object());
+                    clang_visitChildren(c, visitEnum<true>, &_enum["values"].emplace_object());
                 } else {
                     clang_visitChildren(c, visitEnum<false>, &_enum["values"].emplace_object());
                 }
