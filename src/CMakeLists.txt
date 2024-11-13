@@ -16,7 +16,9 @@ target_compile_definitions(minrzbas PUBLIC
 )
 
 if(MSVC)
-	target_compile_options(minrzbas PUBLIC /Zc:preprocessor)
+	target_compile_options(minrzbas PUBLIC
+		/Zc:preprocessor
+	)
 else()
 	target_compile_options(minrzbas PUBLIC
 		-Wpedantic

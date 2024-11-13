@@ -12,7 +12,9 @@ target_compile_definitions(tests PUBLIC
 )
 
 if(MSVC)
-	target_compile_options(tests PRIVATE /Zc:preprocessor)
+	target_compile_options(tests PRIVATE
+		/Zc:preprocessor
+	)
 else()
 	target_compile_options(tests PRIVATE
 		--static
