@@ -69,7 +69,7 @@ namespace Fenton::Minrzbas {
         CXCursor _cursor = clang_getTypeDeclaration(_canonType);
         
         bool _isAnonymous = 
-            // clang_Cursor_isAnonymousRecordDecl(_cursor) || 
+            clang_Cursor_isAnonymousRecordDecl(_cursor) || 
             clang_Cursor_isAnonymous(_cursor)
         ;
         // Returns an empty name if the type is anonymous.
@@ -325,7 +325,7 @@ namespace Fenton::Minrzbas {
         _type["isClass"] = isClass;
         _type["isStruct"] = isStruct;
         _type["isUnion"] = isUnion;
-        _type["isAnonoymous"] = _isAnonymous;
+        _type["isAnonymous"] = _isAnonymous;
 
         // TODO: Implement it for the memebers.
         // _type["isBitField"] = clang_Cursor_isBitField(c);
@@ -377,7 +377,7 @@ namespace Fenton::Minrzbas {
         // At this point, it is not known whether the declaration is associated with another 
         // entity or not, so we skip it.
         if (
-            // clang_Cursor_isAnonymousRecordDecl(c) ||
+            clang_Cursor_isAnonymousRecordDecl(c) ||
             clang_Cursor_isAnonymous(c)
         ) {
             return CXChildVisit_Continue;
@@ -388,14 +388,17 @@ namespace Fenton::Minrzbas {
         json::object* _nss = nullptr;
         json::object* _types = nullptr;
         json::object* _enums = nullptr;
+        json::object* _values = nullptr;
         json::object* _fields = nullptr;
         json::object* _vars = nullptr;
-        json::object* _values = nullptr;
+        json::object* _funcs = nullptr;
+        json::object* _methods = nullptr;
         
         const std::string _cursorName = to_string(c);
 
         switch(clang_getCursorKind(c)) {
-            case CXCursor_Namespace:
+            // Namespace.
+            case CXCursor_Namespace: {
                 if (!_nss)
                     _nss = &atOrInsertObject(_obj, "namespaces");
 
@@ -406,6 +409,8 @@ namespace Fenton::Minrzbas {
                     &atOrInsertObject(*_nss, _cursorName)
                 );
                 break;
+            }
+            // Type declarations.
             case CXCursor_ClassDecl:
                 addRecord<true, false, false>(_obj, _types, c, _cursorName);
                 break;
@@ -456,13 +461,14 @@ namespace Fenton::Minrzbas {
                 }
                 break;
             }
+            // Variables and fields.
             case CXCursor_FieldDecl: {
                 if (!_fields)
                     _fields = &atOrInsertObject(_obj, "fields");
                 
                 json::value& _fieldVal = (*_fields)[_cursorName];
 
-                // Makes sure fields are not redefined.
+                // Makes sure the field is not redefined.
                 if (!_fieldVal.is_object()) {
                     json::object& _field = _fieldVal.emplace_object();
                     _field["type"] = to_string(clang_getCursorType(c));
@@ -475,11 +481,59 @@ namespace Fenton::Minrzbas {
                 
                 json::value& _varVal = (*_vars)[_cursorName];
 
-                // Makes sure variables are not redefined.
+                // Makes sure the variable is not redefined.
                 if (!_varVal.is_object()) {
                     json::object& _var = _varVal.emplace_object();
                     _var["type"] = to_string(clang_getCursorType(c));
                 }
+                break;
+            }
+            // Callables.
+            case CXCursor_FunctionDecl: {
+                if (!_funcs)
+                    _funcs = &atOrInsertObject(_obj, "functions");
+                
+                json::object& _overloads = atOrInsertObject(*_funcs, _cursorName);
+                std::string _type = to_string(clang_getCursorType(c));
+
+                json::value& _funcVal = _overloads[_type];
+
+                // Makes sure variables are not redefined.
+                if (!_funcVal.is_object()) {
+                    json::object& _func = _funcVal.emplace_object();
+                    // Stores the callable's return type.
+                    _func["returnType"] = to_string(clang_getCursorResultType(c));
+
+                    json::array& _params = _func["parameters"].emplace_array();
+
+                    int _paramCount = clang_Cursor_getNumArguments(c);
+                    for (int i = 0; i < _paramCount; ++i) {
+                        // Gets the cursor corresponding to the argument.
+                        CXCursor _argCursor = clang_Cursor_getArgument(c, i);
+                        // Stores the argument's name and type.
+                        _params.emplace_back(json::object{
+                            { "name", to_string(_argCursor) },
+                            { "type", to_string(clang_getCursorType(_argCursor)) }
+                        });
+                    }
+                }
+                break;
+            }
+            case CXCursor_CXXMethod: {
+
+                break;
+            }
+            case CXCursor_Constructor: {
+                break;
+            }
+            case CXCursor_Destructor: {
+                break;
+            }
+            // Aliases.
+            case CXCursor_TypeAliasDecl: {
+                break;
+            }
+            case CXCursor_TypedefDecl: {
                 break;
             }
         }
@@ -549,6 +603,6 @@ namespace Fenton::Minrzbas {
         clang_disposeTranslationUnit(unit);
         clang_disposeIndex(index);
 
-        return _rootObj;
+        return std::move(_rootObj);
     }
 }

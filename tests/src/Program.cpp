@@ -16,6 +16,7 @@ int main() {
     using namespace Fenton::Minrzbas::Tests;
 
 #ifdef _WIN32
+    const auto _lastCP = GetConsoleOutputCP();
     SetConsoleOutputCP(CP_UTF8);
 #endif
 
@@ -35,6 +36,11 @@ int main() {
         Fenton::printlnf("[UNKNOWN EXCEPTION]");
     }
     Fenton::printlnf("[FINAL]: {}", _pass? "PASS" : "FAIL");
+
+#ifdef _WIN32
+    SetConsoleOutputCP(_lastCP);
+#endif
+
     std::cin.get();
     return 0;
 }

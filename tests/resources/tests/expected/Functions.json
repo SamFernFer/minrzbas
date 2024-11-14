@@ -1,5 +1,19 @@
 {
     "functions": {
-        
+        "sum": {
+            "int(int,int)": {
+                "returnType": "int",
+                "parameters": [
+                    {
+                        "name": "a",
+                        "type": "int"
+                    },
+                    {
+                        "name": "b",
+                        "type": "int"
+                    }
+                ]
+            }
+        }
     }
 }
