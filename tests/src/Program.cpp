@@ -19,27 +19,8 @@ int main() {
     SetConsoleOutputCP(CP_UTF8);
 #endif
 
-    std::ostream& _out = std::cout;
-
-    std::cout << "Não." << std::endl;
-
-    // Changes the default output stream.
-    Fenton::setDefaultOutput(_out);
-
-    Fenton::println("Desde já, olá! こんにちは！");
-    Fenton::println(2349.92304);
-
-    std::cout << 1123123 << std::endl;
-
-    Fenton::println(CP_UTF8);
-
-    std::string rareLatinCharacters = "ÀÁÂÃÄÅĀĂĄǍǞǠǺȀȂȦȨɅƁƂƄƆƇƉƊƋƌƎƏƐƑƓƔƖƘǶǷƜƞƟƠƢƤƦƬƮƯƱƲƳƵȜȝȢȤȥȦȧȨȩȪȫȬȭȮȯȰȱȲȳȴȵȶȷɀɁɂɃɄɆɇɈɉɊɋɌɍɎɏʙʛʞʠʬʰʲʳʴʵʶʷʸʹʺʻʼʽʾʿˀˁ˂˃˄˅ˇˈˉˊˋˌˍˎˏːˑ˒˓˔˕˖˗˘˙˚˛˜˝˞˟ˠˡˢˣˤ˥˦˧˨˩˪˫ˬ˭ˮ˯˰˱˲˳˴˵˶˷˸˹˺˻˼˽˾˿";
-
-    std::cout << rareLatinCharacters << std::endl;
-
-    std::cin.get();
-
-    return 0;
+    // Changes the default output stream (we're using std::cout for the tests).
+    // Fenton::setDefaultOutput(_out);
 
     bool _pass = true;
     try {
