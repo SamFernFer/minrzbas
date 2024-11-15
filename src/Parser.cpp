@@ -335,6 +335,32 @@ namespace Fenton::Minrzbas {
             &_type
         );
     }
+    static void addCallable(json::object& callables, CXCursor c, std::string_view name) {
+        json::object& _overloads = atOrInsertObject(callables, name);
+        std::string _type = to_string(clang_getCursorType(c));
+
+        json::value& _callableVal = _overloads[_type];
+
+        // Makes sure variables are not redefined.
+        if (!_callableVal.is_object()) {
+            json::object& _callable = _callableVal.emplace_object();
+            // Stores the callable's return type.
+            _callable["returnType"] = to_string(clang_getCursorResultType(c));
+
+            json::array& _params = _callable["parameters"].emplace_array();
+
+            int _paramCount = clang_Cursor_getNumArguments(c);
+            for (int i = 0; i < _paramCount; ++i) {
+                // Gets the cursor corresponding to the argument.
+                CXCursor _argCursor = clang_Cursor_getArgument(c, i);
+                // Stores the argument's name and type.
+                _params.emplace_back(json::object{
+                    { "name", to_string(_argCursor) },
+                    { "type", to_string(clang_getCursorType(_argCursor)) }
+                });
+            }
+        }
+    }
     // Returns true is the type is unsigned and false if the type is not. Uses the type's kind.
     // NOTE: Evaluating std::is_signed<std::underlying_type<type>> with type being the enum's
     // type could theoretically be more assertive, but certainly way slower.
@@ -493,34 +519,14 @@ namespace Fenton::Minrzbas {
                 if (!_funcs)
                     _funcs = &atOrInsertObject(_obj, "functions");
                 
-                json::object& _overloads = atOrInsertObject(*_funcs, _cursorName);
-                std::string _type = to_string(clang_getCursorType(c));
-
-                json::value& _funcVal = _overloads[_type];
-
-                // Makes sure variables are not redefined.
-                if (!_funcVal.is_object()) {
-                    json::object& _func = _funcVal.emplace_object();
-                    // Stores the callable's return type.
-                    _func["returnType"] = to_string(clang_getCursorResultType(c));
-
-                    json::array& _params = _func["parameters"].emplace_array();
-
-                    int _paramCount = clang_Cursor_getNumArguments(c);
-                    for (int i = 0; i < _paramCount; ++i) {
-                        // Gets the cursor corresponding to the argument.
-                        CXCursor _argCursor = clang_Cursor_getArgument(c, i);
-                        // Stores the argument's name and type.
-                        _params.emplace_back(json::object{
-                            { "name", to_string(_argCursor) },
-                            { "type", to_string(clang_getCursorType(_argCursor)) }
-                        });
-                    }
-                }
+                addCallable(*_funcs, c, _cursorName);
                 break;
             }
             case CXCursor_CXXMethod: {
-
+                if (!_methods)
+                    _methods = &atOrInsertObject(_obj, "methods");
+                
+                addCallable(*_methods, c, _cursorName);
                 break;
             }
             case CXCursor_Constructor: {

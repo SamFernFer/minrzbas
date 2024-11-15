@@ -18,7 +18,12 @@ auto templSum(auto a, auto b) {
 
 namespace ThingNS {
     struct Thing1 {
-        std::vector<int> ints;
+        static std::vector<int> ints;
+        long myLong = 1<<4;
+
+        static void function() {
+            ints.emplace_back(ints.size());
+        }
     };
     struct NonAnonymous { long long_ = 90; };
     Thing1 getThing(Thing1 t1, NonAnonymous t2 = { 90 }) {
