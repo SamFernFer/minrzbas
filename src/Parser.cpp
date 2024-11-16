@@ -6,6 +6,9 @@
 #include <filesystem>
 #include <stdexcept>
 #include <format>
+#include <sstream>
+#include <list>
+#include <iterator>
 
 namespace json = boost::json;
 namespace fs = std::filesystem;
@@ -270,6 +273,15 @@ namespace Fenton::Minrzbas {
 
         // Prints the cursor's name.
         Fenton::println(*_indent + "<" + to_string(clang_getCursorKind(c)) + ">: " + to_string(c));
+        // Fenton::println(*_indent + "< PARENT = " + to_string(clang_getCursorKind(parent)) + ">: " + to_string(c));
+        // Fenton::println(*_indent + "< SEMANTIC PARENT = "
+        //     + to_string(clang_getCursorKind(clang_getCursorSemanticParent(c)))
+        //     + ">: " + to_string(c)
+        // );
+        // Fenton::println(*_indent + "< LEXICAL PARENT = "
+        //     + to_string(clang_getCursorKind(clang_getCursorLexicalParent(c)))
+        //     + ">: " + to_string(c)
+        // );
         if (clang_getCursorKind(c) == CXCursor_InclusionDirective) {
             // Prints the included file.
             Fenton::println(
@@ -335,31 +347,132 @@ namespace Fenton::Minrzbas {
             &_type
         );
     }
-    static void addCallable(json::object& callables, CXCursor c, std::string_view name) {
-        json::object& _overloads = atOrInsertObject(callables, name);
-        std::string _type = to_string(clang_getCursorType(c));
+    static CXChildVisitResult paramVisitor(CXCursor c, CXCursor parent, CXClientData client_data) {
+        if (clang_getCursorKind(c) != CXCursor_ParmDecl)
+            return CXChildVisit_Continue;
+        
+        json::array& _params = *static_cast<json::array*>(client_data);
 
-        json::value& _callableVal = _overloads[_type];
+        _params.emplace_back(json::object{
+            { "name", to_string(c) },
+            { "type", to_string(clang_getCursorType(c)) }
+        });
+        return CXChildVisit_Continue;
+    }
+    // Used when building the "signature" of a destructor from its parameters.
+    static CXChildVisitResult signatureParamVisitor(
+        CXCursor c, CXCursor parent, CXClientData client_data
+    ) {
+        if (clang_getCursorKind(c) != CXCursor_ParmDecl)
+            return CXChildVisit_Continue;
+        
+        // Unpacks the parameter list.
+        std::list<std::string>& _params = *static_cast<std::list<std::string>*>(client_data);
+        // Emplaces the string representation of the parameter's type.
+        _params.emplace_back(to_string(clang_getCursorType(c)));
+
+        return CXChildVisit_Continue;
+    }
+    template<
+        bool isMethod = false, bool isCtor = false,
+        bool hasReturnType = true, bool mustVisitForParams = false
+    >
+    static void addOverload(json::object& overloads, CXCursor c) {
+        std::string _type;
+        // If we must visit for retrieving the parameters, then simply using the 
+        // entity's type is not enough for disambiguating it from other overloads.
+        // Actually, only destructors have this problem.
+        if constexpr (mustVisitForParams) {
+            std::list<std::string> _params;
+            // Visits the children to retrieve the parameters.
+            clang_visitChildren(
+                c, signatureParamVisitor,
+                // Adds the namespace if it hadn't been already.
+                &_params
+            );
+            _type = "void (";
+            if (!_params.empty()) {
+                // Not using indexes because it's a list.
+                _type.append(*_params.cbegin());
+                for (auto it = std::next(_params.cbegin()); it != _params.cend(); ++it) {
+                    // Using std::string::append here is fast enough.
+                    _type.append(", " + *it);
+                }
+            }
+            _type.append(")");
+
+            // Checks if a noexcept at the end is necessary.
+            // NOTE: Does not handle complex noexcept specifiers.
+            if (
+                clang_getCursorExceptionSpecificationType(c)
+                == CXCursor_ExceptionSpecificationKind_BasicNoexcept
+            ) {
+                _type.append(" noexcept");
+            }
+        } else {
+            _type = to_string(clang_getCursorType(c));
+        }
+
+        json::value& _callableVal = overloads[_type];
 
         // Makes sure variables are not redefined.
         if (!_callableVal.is_object()) {
             json::object& _callable = _callableVal.emplace_object();
-            // Stores the callable's return type.
-            _callable["returnType"] = to_string(clang_getCursorResultType(c));
 
+            if constexpr (hasReturnType) {
+                // Stores the callable's return type.
+                _callable["returnType"] = to_string(clang_getCursorResultType(c));
+            }
+        
+            if constexpr (isMethod) {
+                json::array& _mods = _callable["methodSpecifiers"].emplace_array();
+
+                if (clang_CXXMethod_isDefaulted(c))              _mods.emplace_back("defaulted");
+                if (clang_CXXMethod_isDeleted(c))                _mods.emplace_back("deleted");
+                if (clang_CXXMethod_isPureVirtual(c))            _mods.emplace_back("pure");
+                if (clang_CXXMethod_isStatic(c))                 _mods.emplace_back("static");
+                if (clang_CXXMethod_isVirtual(c))                _mods.emplace_back("virtual");
+                if (clang_CXXMethod_isCopyAssignmentOperator(c)) _mods.emplace_back("copy");
+                if (clang_CXXMethod_isMoveAssignmentOperator(c)) _mods.emplace_back("move");
+                if (clang_CXXMethod_isExplicit(c))               _mods.emplace_back("explicit");
+                if (clang_CXXMethod_isConst(c))                  _mods.emplace_back("const");
+            }
+            if constexpr (isCtor) {
+                json::array& _mods = _callable["constructorSpecifiers"].emplace_array();
+
+                if (clang_CXXConstructor_isConvertingConstructor(c)) _mods.emplace_back("converting");
+                if (clang_CXXConstructor_isCopyConstructor(c))       _mods.emplace_back("copy");
+                if (clang_CXXConstructor_isDefaultConstructor(c))    _mods.emplace_back("default");
+                if (clang_CXXConstructor_isMoveConstructor(c))       _mods.emplace_back("move");
+            }
             json::array& _params = _callable["parameters"].emplace_array();
-
-            int _paramCount = clang_Cursor_getNumArguments(c);
-            for (int i = 0; i < _paramCount; ++i) {
-                // Gets the cursor corresponding to the argument.
-                CXCursor _argCursor = clang_Cursor_getArgument(c, i);
-                // Stores the argument's name and type.
-                _params.emplace_back(json::object{
-                    { "name", to_string(_argCursor) },
-                    { "type", to_string(clang_getCursorType(_argCursor)) }
-                });
+            // libclang does not expose the parameters directly through the specific functions, 
+            // so an explicit visit is necessary.
+            if constexpr (mustVisitForParams) {
+                // Visits the children to build the parameter array.
+                clang_visitChildren(
+                    c, paramVisitor,
+                    // Adds the namespace if it hadn't been already.
+                    &_params
+                );
+            } else {
+                int _paramCount = clang_Cursor_getNumArguments(c);
+                for (int i = 0; i < _paramCount; ++i) {
+                    // Gets the cursor corresponding to the argument.
+                    CXCursor _argCursor = clang_Cursor_getArgument(c, i);
+                    // Stores the argument's name and type.
+                    _params.emplace_back(json::object{
+                        { "name", to_string(_argCursor) },
+                        { "type", to_string(clang_getCursorType(_argCursor)) }
+                    });
+                }
             }
         }
+    }
+    template<bool isMethod = false, bool isCtor = false>
+    static void addCallable(json::object& callables, CXCursor c, std::string_view name) {
+        json::object& _overloads = atOrInsertObject(callables, name);
+        addOverload<isMethod>(_overloads, c);
     }
     // Returns true is the type is unsigned and false if the type is not. Uses the type's kind.
     // NOTE: Evaluating std::is_signed<std::underlying_type<type>> with type being the enum's
@@ -408,6 +521,16 @@ namespace Fenton::Minrzbas {
         ) {
             return CXChildVisit_Continue;
         }
+
+        // Only registers entities when the semantic and lexical parents are the same.
+        // This avoids error with out-of-line definitions.
+        if (!clang_equalCursors(
+            // Semantic parent.
+            clang_getCursorSemanticParent(c),
+            // Lexical parent.
+            parent
+        ))
+            return CXChildVisit_Continue; 
         
         json::object& _obj = *static_cast<json::object*>(client_data);
 
@@ -419,7 +542,9 @@ namespace Fenton::Minrzbas {
         json::object* _vars = nullptr;
         json::object* _funcs = nullptr;
         json::object* _methods = nullptr;
-        
+        json::object* _ctors = nullptr;
+        json::object* _dtors = nullptr;
+
         const std::string _cursorName = to_string(c);
 
         switch(clang_getCursorKind(c)) {
@@ -519,6 +644,7 @@ namespace Fenton::Minrzbas {
                 if (!_funcs)
                     _funcs = &atOrInsertObject(_obj, "functions");
                 
+                // It's not a method.
                 addCallable(*_funcs, c, _cursorName);
                 break;
             }
@@ -526,13 +652,36 @@ namespace Fenton::Minrzbas {
                 if (!_methods)
                     _methods = &atOrInsertObject(_obj, "methods");
                 
-                addCallable(*_methods, c, _cursorName);
+                // It's a method.
+                addCallable<true>(*_methods, c, _cursorName);
                 break;
             }
             case CXCursor_Constructor: {
+                if (!_ctors)
+                    _ctors = &atOrInsertObject(_obj, "constructors");
+                
+                addOverload<
+                    // May have method and/or constructor modifiers.
+                    true, true,
+                    // Technically has no return type.
+                    true
+                >(*_ctors, c);
                 break;
             }
             case CXCursor_Destructor: {
+                if (!_dtors)
+                    _dtors = &atOrInsertObject(_obj, "destructors");
+                
+                addOverload<
+                    // May have method modifiers.
+                    true,
+                    // Is not a constructor.
+                    false,
+                    // Always has the same return type (void), so need not have it as a field.
+                    false,
+                    // An explicit visit is needed to retrieve a destructor's parameters.
+                    true
+                >(*_dtors, c);
                 break;
             }
             // Aliases.

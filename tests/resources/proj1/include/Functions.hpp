@@ -17,14 +17,37 @@ auto templSum(auto a, auto b) {
 }
 
 namespace ThingNS {
+    enum class ThingType {
+    };
     struct Thing1 {
         static std::vector<int> ints;
         long myLong = 1<<4;
 
-        static void function() {
+        static void function() noexcept {
             ints.emplace_back(ints.size());
         }
+        static Thing1 New(long myLong);
+
+        long getLong() {
+            return myLong;
+        }
+
+        Thing1() = default;
+        Thing1(long myLong);
+        explicit Thing1(ThingType type) noexcept;
+
+        ~Thing1() noexcept;
+        ~Thing1(int i);
+        ~Thing1(int i) noexcept;
+        virtual ~Thing1(Thing1* ptr);
     };
+    Thing1 Thing1::New(long myLong) {
+        return Thing1(myLong);
+    }
+    Thing1::Thing1(long myLong) {
+        this->myLong = myLong;
+    }
+
     struct NonAnonymous { long long_ = 90; };
     Thing1 getThing(Thing1 t1, NonAnonymous t2 = { 90 }) {
         return {};
