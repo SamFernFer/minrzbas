@@ -1,6 +1,10 @@
 #include <minrzbas/Program.hpp>
 #include <minrzbas/Thing.hpp>
 
+#ifdef _WIN32
+#include <Windows.h>
+#endif
+
 #include <iostream>
 
 namespace po = boost::program_options;
@@ -22,13 +26,8 @@ namespace Fenton::Minrzbas {
             ),
             (
                 "output,o",
-                "The output JSON file to generate from the input file's instrospected data."
-                "I ommited, equals the standard output."
-            ),
-            (
-                "input-list",
-                "A list of files in JSON format. The JSON should be an array, with each field's "
-                "name being a file's full path, with its value the file's modification date."
+                "The output file to store the introspected data in JSON format in. "
+                "Ommiting it means sending the data to standard output."
             )
         ;
         return _desc;
@@ -55,6 +54,24 @@ namespace Fenton::Minrzbas {
         return std::move(_vm);
     }
     int main(int argc, const char** argv) {
+
+#ifdef _WIN32
+        // Uses RAII to make sure the codepage is reset to the previous one before the program 
+        // exits.
+        const struct CPSetter {
+            const decltype(GetConsoleOutputCP()) lastCP;
+            // Saves the previous codepage.
+            CPSetter() : lastCP(GetConsoleOutputCP()) {
+                // Changes the console's codepage to support UTF-8.
+                SetConsoleOutputCP(CP_UTF8);
+            }
+            ~CPSetter() {
+                // Reverts the console's codepage to the previous one.
+                SetConsoleOutputCP(lastCP);
+            }
+        } _cpSetter;
+#endif
+
         po::options_description _desc = getOptionsDesc();
         po::positinal_options_description _posDesc = getPosOptionsDesc();
         // Displays help information when no arguments are passed.
@@ -72,7 +89,11 @@ namespace Fenton::Minrzbas {
                 std::cout << versionString << "\n";
                 return 1;
             }
-            // getContext(_vm);
+            if (vm.count("input") == 0) {
+                std::cout << "Missing \"input\" option." << std::endl;
+                return -1;
+            }
+            thing(_vm);
             return 0;
         } catch (const std::exception& e) {
             std::cout << "[Exception] " << e.what() << "\n\n";

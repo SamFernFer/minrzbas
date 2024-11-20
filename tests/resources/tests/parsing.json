@@ -1,25 +1,26 @@
 [
     {
         "in": {
-            "args"
-            // Include directories for libclang.
-            "includeDirs": [
-                "include"
+            "args": [
+                // Include directory for libclang.
+                "-Iinclude",
+                "--input=include/Printer.hpp"
             ],
-            "file": "generalProject1/include/Printer.hpp"
+            // The working directory to use when calling libclang.
+            "cwd": "tests/resources/generalProject1"
         },
-        // The output JSON.
+        // The expected output JSON file inside the "expected" directory.
         "out": "Printer.json"
-    },
-    {
-        "in": {
-            // Include directories for libclang.
-            "includeDirs": [
-                "include"
-            ],
-            "file": "proj1/include/Functions.hpp"
-        },
-        // The output JSON.
-        "out": "Printer.json"
-    }
+    }//,
+    // {
+    //     "in": {
+    //         // Include directories for libclang.
+    //         "includeDirs": [
+    //             "include"
+    //         ],
+    //         "file": "proj1/include/Functions.hpp"
+    //     },
+    //     // The output JSON.
+    //     "out": "Printer.json"
+    // }
 ]
