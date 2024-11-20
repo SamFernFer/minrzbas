@@ -116,40 +116,6 @@ namespace Fenton::Minrzbas {
             ptr<Namespace> _paren = std::static_pointer_cast<Namespace>(_scope->inner);
 
             switch (clang_getCursorKind(c)) {
-            case CXCursor_VarDecl:
-            {
-                addVariable<ptr<Variable>>(*_scope, c, _cursorName, _paren->vars, _paren->varMap, true,
-                    [](ReflVisitData& visitData, const CXCursor& c, const std::string& cursorName,bool)->ptr<Variable> {
-                    return std::make_shared<Variable>(cursorName, to_string(clang_getCursorType(c)));
-                });
-                break;
-            }
-            case CXCursor_FunctionDecl:
-            {
-                addFunction<ptr<Function>>(*_scope, c, _cursorName, _paren->funcs, _paren->funcMap,
-                    [](ReflVisitData& visitData, const CXCursor& c, 
-                        const std::string& cursorName, const std::string& cursorType)->ptr<Function> {
-                    return std::make_shared<Function>(cursorName, cursorType, getParams(c));
-                });
-                break;
-            }
-            case CXCursor_Namespace:
-            {
-                ptr<Namespace> _ns;
-                auto it = _paren->nsMap.find(_cursorName);
-                if (it == _paren->nsMap.end()) {
-                    _ns = std::make_shared<Namespace>(_cursorName);
-                    _paren->namespaces.push_back(_ns);
-                    _paren->nsMap[_cursorName] = _ns;
-                }
-                else {
-                    _ns = it->second;
-                }
-                // It's a namespace, so there are no access modifiers.
-                ReflVisitData _newScope(_scope->unit, true, _ns, Access::None, _scope->indent + 1);
-                clang_visitChildren(c, reflVisitor, &_newScope);
-                break;
-            }
             }
         }
         // If the scope is a class.
@@ -184,51 +150,6 @@ namespace Fenton::Minrzbas {
 
                 break;
             }
-            case CXCursor_CXXAccessSpecifier:
-            {
-                switch (clang_getCXXAccessSpecifier(c)) {
-                case CX_CXXPrivate:
-                    _scope->currAcc = Access::Private;
-                    break;
-                case CX_CXXProtected:
-                    _scope->currAcc = Access::Protected;
-                    break;
-                case CX_CXXPublic:
-                    _scope->currAcc = Access::Public;
-                    break;
-                }
-                break;
-            }
-            case CXCursor_VarDecl:
-                // The only difference is that this one is static.
-                _isStatic = true;
-                [[fallthrough]];
-            case CXCursor_FieldDecl:
-            {
-                addVariable<ptr<Field>>(*_scope, c, _cursorName, _paren->fields, _paren->fieldMap, _isStatic,
-                    [](ReflVisitData& visitData, const CXCursor& c, const std::string& cursorName, bool isStatic)->ptr<Field> {
-                    return std::make_shared<Field>(
-                        cursorName,
-                        to_string(clang_getCursorType(c)),
-                        // Current access.
-                        visitData.currAcc, 
-                        // Non-static.
-                        isStatic);
-                });
-                break;
-            }
-            case CXCursor_CXXMethod:
-            {
-                addFunction<ptr<Method>>(*_scope, c, _cursorName, _paren->methods, _paren->methodMap,
-                    [](ReflVisitData& visitData, const CXCursor& c, 
-                        const std::string& cursorName, const std::string& cursorType)->ptr<Method> {
-                        return std::make_shared<Method>(
-                            cursorName, cursorType, getParams(c), visitData.currAcc,
-                            clang_CXXMethod_isStatic(c), clang_CXXMethod_isVirtual(c), clang_CXXMethod_isConst(c)
-                        );
-                });
-                break;
-            }
             }
         }
 
@@ -237,13 +158,6 @@ namespace Fenton::Minrzbas {
         {
             ptr<Alias> _alias = std::make_shared<Alias>(to_string(c), to_string(clang_getCursorType(c)));
             _scope->inner->aliases.push_back(_alias);
-            break;
-        }
-        case CXCursor_MacroExpansion:
-        {
-            std::cout << std::endl << "#### " << to_string(c) << " ####" << std::endl;
-            tokeniseMacro(_scope->unit, c);
-            std::cout << "####" << std::endl;
             break;
         }
         }

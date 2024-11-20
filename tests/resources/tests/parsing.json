@@ -1,15 +1,16 @@
 [
-    // {
-    //     "in": {
-    //         // Include directories for libclang.
-    //         "includeDirs": [
-    //             "include"
-    //         ],
-    //         "file": "generalProject1/include/Printer.hpp"
-    //     },
-    //     // The output JSON.
-    //     "out": "Printer.json"
-    // },
+    {
+        "in": {
+            "args"
+            // Include directories for libclang.
+            "includeDirs": [
+                "include"
+            ],
+            "file": "generalProject1/include/Printer.hpp"
+        },
+        // The output JSON.
+        "out": "Printer.json"
+    },
     {
         "in": {
             // Include directories for libclang.

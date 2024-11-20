@@ -7,7 +7,7 @@ namespace po = boost::program_options;
 namespace Fenton::Minrzbas {
     constexpr const char* versionString = "1.0.0";
 
-    po::options_description getOptionsDesc() {
+    po::options_description getPosOptionsDesc() {
         po::options_description _desc("Allowed options");
         _desc.add_options()
             ("help,h", "Displays help information.")
@@ -15,19 +15,48 @@ namespace Fenton::Minrzbas {
             ("I", po::value<std::vector<std::string>>(),
                 "Adds an include path to be used for dependency-checking and "
                 "to be passed as an argument to libclang."
+            ),
+            (
+                "input,i",
+                "The input file to instrospect."
+            ),
+            (
+                "output,o",
+                "The output JSON file to generate from the input file's instrospected data."
+                "I ommited, equals the standard output."
+            ),
+            (
+                "input-list",
+                "A list of files in JSON format. The JSON should be an array, with each field's "
+                "name being a file's full path, with its value the file's modification date."
             )
-            // TODO: positional arguments to be passed to libclang.
         ;
         return _desc;
     }
-    po::variables_map getVarMap(const po::options_description& desc, int argc, const char** argv) {
+    po::positional_options_description getOptionsDesc() {
+        po::positional_options_description _posDesc;
+        _posDesc.add("libclang-arg", -1);
+        return _posDesc;
+    }
+    boost::program_options::variables_map getVarMap(
+        const boost::program_options::options_description& desc,
+        const boost::program_options::positional_options_description& posDesc,
+        int argc,
+        const char** argv
+    ) {
         po::variables_map _vm;
-        po::store(po::parse_command_line(argc, argv, desc), _vm);
+        po::store(
+            po::command_line_parser(argc, argv)
+            .options(_desc)
+            .positional(_posDesc).run(),
+            vm
+        );
         po::notify(_vm);
         return std::move(_vm);
     }
     int main(int argc, const char** argv) {
         po::options_description _desc = getOptionsDesc();
+        po::positinal_options_description _posDesc = getPosOptionsDesc();
         // Displays help information when no arguments are passed.
         if (argc <= 1) {
             std::cout << _desc << "\n";
