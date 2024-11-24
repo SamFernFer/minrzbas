@@ -198,11 +198,14 @@ namespace Fenton::Minrzbas {
         //     + ">: " + to_string(c)
         // );
         if (clang_getCursorKind(c) == CXCursor_InclusionDirective) {
-            // Prints the included file.
-            Fenton::println(
-                *_indent + "    "
-                + quote(to_string(clang_getFileName(clang_getIncludedFile(c))))
-            );
+            CXFile _file = clang_getIncludedFile(c);
+
+            if (_file) {
+                // Prints the included file.
+                Fenton::println(*_indent + "    " + quote(to_string(clang_getFileName(_file))));
+            } else {
+                Fenton::println(*_indent + "    " + to_string(c));
+            }
         }
         // if (clang_Cursor_hasAttrs(c)) {
         //     // Prints if it has attributes.
@@ -634,8 +637,6 @@ namespace Fenton::Minrzbas {
             return;
         }
         // Retrieves the source location corresponding to the file.
-        // Any line and collumn number should do, but the very first positions are used 
-        // for consistency.
         CXSourceLocation _loc = clang_getLocation(_incData.first, included_file, 0, 0);
         // Ignores inclusion directives which expand to system headers.
         if (clang_Location_isInSystemHeader(_loc))
@@ -754,7 +755,14 @@ namespace Fenton::Minrzbas {
         // Include directories.
         std::vector<std::string> _incs = [&vm]()->std::vector<std::string>{
             auto _find = vm.find("include");
-            return _find == vm.end()?
+            return _find != vm.end()?
+                _find->second.as<std::vector<std::string>>() : std::vector<std::string>{}
+            ;
+        }();
+        // System include directories.
+        std::vector<std::string> _sysIncs = [&vm]()->std::vector<std::string>{
+            auto _find = vm.find("isystem");
+            return _find != vm.end()?
                 _find->second.as<std::vector<std::string>>() : std::vector<std::string>{}
             ;
         }();
@@ -770,9 +778,15 @@ namespace Fenton::Minrzbas {
             _args.emplace_back("-I");
             _args.emplace_back(i);
         }
+        // Adds the system include options.
+        for (const std::string& i : _sysIncs) {
+            _args.emplace_back("-isystem");
+            _args.emplace_back(i);
+        }
         std::vector<const char*> _argv;
+        // Generates the vector of C-strings necessary for using with libclang.
         for (const std::string& s : _args) {
-            _args.emplace_back(s.c_str());
+            _argv.emplace_back(s.c_str());
         }
         return {
             .input = std::move(_input),

@@ -20,13 +20,16 @@ namespace Fenton::Minrzbas {
                 "include,I", po::value<std::vector<std::string>>(),
                 "Adds an include path."
             )(
+                "isystem", po::value<std::vector<std::string>>(),
+                "Adds a system include path (will not be used for dependency-checking)."
+            )(
                 "define,D", po::value<std::vector<std::string>>(),
                 "Adds a compilation definition."
             )(
-                "input,i", po::value<std::string>(),
+                "input", po::value<std::string>(),
                 "The input file to instrospect."
             )(
-                "output,o", po::value<std::string>(),
+                "output", po::value<std::string>(),
                 "The output file. Defaults to standard output if not specified."
             )
         ;

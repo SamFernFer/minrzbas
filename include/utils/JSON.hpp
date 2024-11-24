@@ -1,12 +1,7 @@
 #ifndef FENTON_JSON_HPP
 #define FENTON_JSON_HPP
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wgnu-anonymous-struct"
-#pragma clang diagnostic ignored "-Wlanguage-extension-token"
 #include <boost/json.hpp>
-#pragma clang diagnostic pop
-
 #include <filesystem>
 #include <iostream>
 #include <string>

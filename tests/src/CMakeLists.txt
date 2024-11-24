@@ -27,8 +27,10 @@ else()
 	)
 endif()
 
-target_include_directories(tests PRIVATE
+target_include_directories(tests SYSTEM PRIVATE
 	"${BOOST_ROOT}"
+)
+target_include_directories(tests PRIVATE
 	"${PROJECT_SOURCE_DIR}/include"
 	"${PROJECT_SOURCE_DIR}/tests/include"
 )

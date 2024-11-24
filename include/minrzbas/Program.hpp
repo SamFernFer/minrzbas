@@ -1,12 +1,8 @@
 // This is the code which handles the processing of command-line arguments.
 #ifndef FENTON_MINRZBAS_PROGRAM_HPP
 #define FENTON_MINRZBAS_PROGRAM_HPP
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wmicrosoft-cpp-macro"
-#pragma clang diagnostic ignored "-Wgnu-anonymous-struct"
-#pragma clang diagnostic ignored "-Wlanguage-extension-token"
+
 #include <boost/program_options.hpp>
-#pragma clang diagnostic pop
 
 namespace Fenton::Minrzbas {
     // Gets the list of named options.

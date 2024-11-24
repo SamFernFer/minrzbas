@@ -30,8 +30,10 @@ else()
 	)
 endif()
 
-target_include_directories(minrzbas PUBLIC
+target_include_directories(minrzbas SYSTEM PUBLIC
 	"${BOOST_ROOT}"
+)
+target_include_directories(minrzbas PUBLIC
 	"${LIBCLANG_INCLUDE}"
     "${PROJECT_SOURCE_DIR}/external/whereami/src"
     "${PROJECT_SOURCE_DIR}/include"
