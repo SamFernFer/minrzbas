@@ -22,7 +22,8 @@
     }\
     /*Builds the argument vector.*/\
     std::vector<std::string> _args;\
-    std::vector<const char*> _cArgs;\
+    /*Initialises the vector with a c-string in it already, to */\
+    std::vector<const char*> _cArgs { "" };\
     for (const json::value& v : _in.at("args").as_array()) {\
         const char* _str = v.as_string().c_str();\
         _args.emplace_back(_str);\

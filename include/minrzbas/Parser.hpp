@@ -18,6 +18,8 @@ namespace Fenton::Minrzbas {
     struct OptionsDecomposition {
         // The input and output paths. Output might be empty.
         std::string input, output;
+        // The include directories.
+        std::vector<std::string> includeDirs;
         // The vector storing the arguments.
         std::vector<std::string> args;
         // The arguments to be passed to libclang.

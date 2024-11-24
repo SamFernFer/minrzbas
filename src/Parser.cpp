@@ -9,6 +9,7 @@
 #include <sstream>
 #include <list>
 #include <iterator>
+#include <set>
 
 namespace json = boost::json;
 namespace fs = std::filesystem;
@@ -608,6 +609,47 @@ namespace Fenton::Minrzbas {
         }
         return CXChildVisit_Continue;
     }
+    // Visitor function for retrieving all dependencies.
+    static void inclusionVisitor(
+        CXFile included_file,
+        CXSourceLocation *inclusion_stack,
+        unsigned include_len,
+        CXClientData client_data
+    ) {
+        // Ignores invalid inclusion directives.
+        // TODO: Test it.
+        if (!included_file)
+            return;
+
+        std::pair<CXTranslationUnit, std::set<json::string>>& _incData =
+            *static_cast<std::pair<CXTranslationUnit, std::set<json::string>>*>(client_data)
+        ;
+
+        if (include_len > 0) {
+            CXSourceLocation _loc = inclusion_stack[0];
+            // Ignore anything included by a system header.
+            if (clang_Location_isInSystemHeader(_loc))
+                return;
+        } else {
+            return;
+        }
+        // Retrieves the source location corresponding to the file.
+        // Any line and collumn number should do, but the very first positions are used 
+        // for consistency.
+        CXSourceLocation _loc = clang_getLocation(_incData.first, included_file, 0, 0);
+        // Ignores inclusion directives which expand to system headers.
+        if (clang_Location_isInSystemHeader(_loc))
+            return;
+
+        // Gets the file's name, allocating a new CXString.
+        CXString _cxstr = clang_getFileName(included_file);
+        // Gets the c-string from the CXString.
+        const char* _fileName = clang_getCString(_cxstr);
+        // Inserts the file's name, automatically rejecting duplicates.
+        _incData.second.insert(_fileName);
+        // Disposes the CXString.
+        clang_disposeString(_cxstr);
+    }
 
     boost::json::object unitToJSON(
         const std::string& filePath,
@@ -661,6 +703,10 @@ namespace Fenton::Minrzbas {
             &_indent
         );
 
+        std::pair<CXTranslationUnit, std::set<json::string>> _incData;
+        // Visits the children and builds the list of included files.
+        clang_getInclusions(unit, inclusionVisitor, &_incData);
+
         json::object _rootObj;
         // Visits the children, building the JSON AST.
         clang_visitChildren(
@@ -669,6 +715,19 @@ namespace Fenton::Minrzbas {
             reflVisitor,
             &_rootObj
         );
+        json::array _incs;
+        // Resizes the array once.
+        _incs.resize(_incData.second.size());
+        {
+            // The iterator to be beginning of the JSON array.
+            auto _incsIt = _incs.begin();
+            // Moves each element from the set into the array.
+            for (auto it = _incData.second.begin(); it != _incData.second.end(); ++it, ++_incsIt) {
+                *_incsIt = std::move(*it);
+            }
+        }
+        // Moves the JSON array of inclusion directives into the JSON AST.
+        _rootObj["inclusions"] = std::move(_incs);
 
         clang_disposeTranslationUnit(unit);
         clang_disposeIndex(index);
@@ -718,6 +777,7 @@ namespace Fenton::Minrzbas {
         return {
             .input = std::move(_input),
             .output = std::move(_output),
+            .includeDirs = std::move(_incs),
             .args = std::move(_args),
             .argv = std::move(_argv)
         };

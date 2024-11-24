@@ -1,27 +1,41 @@
 [
+    // {
+    //     "in": {
+    //         "args": [
+    //             // Include directory for libclang.
+    //             "-I=.",
+    //             "--input=Printer.hpp"
+    //         ],
+    //         // The working directory inside "resources" to use when calling libclang.
+    //         "cwd": "generalProject1/include"
+    //     },
+    //     // The expected output JSON file inside the "resources/expected" directory.
+    //     "out": "Printer.json"
+    // },
+    // {
+    //     "in": {
+    //         "args": [
+    //             // Include directory for libclang.
+    //             "-I=.",
+    //             "--input=Functions.hpp"
+    //         ],
+    //         // The working directory inside "resources" to use when calling libclang.
+    //         "cwd": "proj1/include"
+    //     },
+    //     // The expected output JSON file inside the "resources/expected" directory.
+    //     "out": "Printer.json"
+    // },
     {
         "in": {
             "args": [
-                "",
                 // Include directory for libclang.
                 "-I=.",
-                "--input=Printer.hpp"
+                "--input=Includes.hpp"
             ],
             // The working directory inside "resources" to use when calling libclang.
-            "cwd": "generalProject1/include"
+            "cwd": "proj1/include"
         },
         // The expected output JSON file inside the "resources/expected" directory.
         "out": "Printer.json"
-    }//,
-    // {
-    //     "in": {
-    //         // Include directories for libclang.
-    //         "includeDirs": [
-    //             "include"
-    //         ],
-    //         "file": "proj1/include/Functions.hpp"
-    //     },
-    //     // The output JSON.
-    //     "out": "Printer.json"
-    // }
+    }
 ]
