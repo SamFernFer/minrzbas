@@ -611,7 +611,7 @@ namespace Fenton::Minrzbas {
 
     boost::json::object unitToJSON(
         const std::string& filePath,
-        const std::vector<std::string>& args
+        const std::vector<const char*>& args
     ) {
         if (!fs::exists(filePath)) {
             throw std::runtime_error(std::format(
@@ -619,13 +619,14 @@ namespace Fenton::Minrzbas {
             ));
         }
 
-        std::vector<const char*> _args {
-            "-std=c++23"
-        };
-        // Prepares the arguments.
-        for (auto& a : args) {
-            _args.emplace_back(a.c_str());
-        }
+        // std::vector<const char*> _args {
+        //     "-std=latest"
+        //     // "-std=c++23"
+        // };
+        // // Prepares the arguments.
+        // for (auto& a : args) {
+        //     _args.emplace_back(a.c_str());
+        // }
         CXIndex index = clang_createIndex(
             0,
             // Does display diagnostics.
@@ -634,7 +635,7 @@ namespace Fenton::Minrzbas {
         CXTranslationUnit unit;
         CXErrorCode _errorCode = clang_parseTranslationUnit2(
             index,
-            filePath.c_str(), _args.data(), static_cast<int>(_args.size()),
+            filePath.c_str(), args.data(), static_cast<int>(args.size()),
             nullptr, 0,
             CXTranslationUnit_DetailedPreprocessingRecord
             | CXTranslationUnit_SkipFunctionBodies
@@ -673,5 +674,52 @@ namespace Fenton::Minrzbas {
         clang_disposeIndex(index);
 
         return std::move(_rootObj);
+    }
+    OptionsDecomposition decomposeOptions(const boost::program_options::variables_map& vm) {
+        // The input path.
+        std::string _input = vm["input"].as<std::string>();
+        // The optional output path.
+        std::string _output = [&vm]()->std::string{
+            auto _find = vm.find("output");
+            return _find != vm.end()?
+                _find->second.as<std::string>() : std::string{}
+            ;
+        }();
+        // Compilation definitions.
+        std::vector<std::string> _defs = [&vm]()->std::vector<std::string>{
+            auto _find = vm.find("define");
+            return _find != vm.end()?
+                _find->second.as<std::vector<std::string>>() : std::vector<std::string>{}
+            ;
+        }();
+        // Include directories.
+        std::vector<std::string> _incs = [&vm]()->std::vector<std::string>{
+            auto _find = vm.find("include");
+            return _find == vm.end()?
+                _find->second.as<std::vector<std::string>>() : std::vector<std::string>{}
+            ;
+        }();
+
+        std::vector<std::string> _args;
+        // Adds the define options.
+        for (const std::string& d : _defs) {
+            _args.emplace_back("-D");
+            _args.emplace_back(d);
+        }
+        // Adds the include options.
+        for (const std::string& i : _incs) {
+            _args.emplace_back("-I");
+            _args.emplace_back(i);
+        }
+        std::vector<const char*> _argv;
+        for (const std::string& s : _args) {
+            _args.emplace_back(s.c_str());
+        }
+        return {
+            .input = std::move(_input),
+            .output = std::move(_output),
+            .args = std::move(_args),
+            .argv = std::move(_argv)
+        };
     }
 }

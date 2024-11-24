@@ -8,13 +8,11 @@
 #include <boost/program_options.hpp>
 #pragma clang diagnostic pop
 #include <string>
-#include <map>
-#include <list>
-#include <set>
-#include <set>
 #include <filesystem>
+#include <memory>
+#include <vector>
 
 namespace Fenton::Minrzbas {
-    
+    void generate(const boost::program_options::variables_map& vm);
 }
 #endif

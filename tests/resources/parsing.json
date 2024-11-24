@@ -2,14 +2,15 @@
     {
         "in": {
             "args": [
+                "",
                 // Include directory for libclang.
-                "-Iinclude",
-                "--input=include/Printer.hpp"
+                "-I=.",
+                "--input=Printer.hpp"
             ],
-            // The working directory to use when calling libclang.
-            "cwd": "tests/resources/generalProject1"
+            // The working directory inside "resources" to use when calling libclang.
+            "cwd": "generalProject1/include"
         },
-        // The expected output JSON file inside the "expected" directory.
+        // The expected output JSON file inside the "resources/expected" directory.
         "out": "Printer.json"
     }//,
     // {

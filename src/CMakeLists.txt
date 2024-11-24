@@ -8,7 +8,7 @@ add_library(minrzbas STATIC
 	"utils/JSON.cpp"
 	"utils/Misc.cpp"
 	"Program.cpp"
-	"Thing.cpp"
+	"Generator.cpp"
 	"Parser.cpp"
 )
 

@@ -9,7 +9,7 @@
 #pragma clang diagnostic pop
 
 namespace Fenton::Minrzbas {
-    // Gets the list of options.
+    // Gets the list of named options.
     boost::program_options::options_description getOptionsDesc();
     // Gets the list of positinal options to be passed to libclang.
     boost::program_options::positional_options_description getPosOptionsDesc();
