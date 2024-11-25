@@ -1,3 +1,6 @@
+#ifndef FENTON_OTTER_HPP
+#define FENTON_OTTER_HPP
+
 #include <acs/Animal.hpp>
 #include <iostream>
 
@@ -10,3 +13,4 @@ namespace Animals {
 		}
 	};
 }
+#endif

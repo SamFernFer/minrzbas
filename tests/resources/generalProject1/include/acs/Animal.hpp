@@ -1,3 +1,6 @@
+#ifndef FENTON_ANIMAL_HPP
+#define FENTON_ANIMAL_HPP
+
 #include <Printer.hpp>
 // Animal Component System.
 namespace ACS {
@@ -6,3 +9,4 @@ namespace ACS {
 		virtual bool Moo() = 0;
 	};
 }
+#endif

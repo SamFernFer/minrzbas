@@ -1,3 +1,6 @@
+#ifndef FENTON_HUMAN_HPP
+#define FENTON_HUMAN_HPP
+
 #include <vegetables/Cabbage.hpp>
 #include <acs/Animal.hpp>
 #include <iostream>
@@ -13,3 +16,4 @@ namespace Animals {
 		}
 	};
 }
+#endif

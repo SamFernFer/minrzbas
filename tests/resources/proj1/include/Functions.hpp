@@ -1,3 +1,6 @@
+#ifndef FENTON_FUNCTIONS_HPP
+#define FENTON_FUNCTIONS_HPP
+
 #include <vector>
 
 int sum(int a, int b) {
@@ -56,3 +59,5 @@ namespace ThingNS {
         return sizeof(Thing1) * d * t1.ints.size();
     }
 }
+
+#endif

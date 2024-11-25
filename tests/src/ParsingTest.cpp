@@ -1,6 +1,14 @@
 #define FENTON_TESTS_PROJECT Minrzbas
 #define FENTON_TESTS_FUNC_NAME parsing
 #define FENTON_TESTS_FILE_NAME "parsing.json"
+#define FENTON_TESTS_INIT std::unordered_map<std::string, std::string> _formatVars = {\
+    { "resDir", \
+        (fs::path(FileUtils::getExecutablePath())\
+        .parent_path()\
+        .parent_path()\
+        / "resources").string()\
+    }\
+};
 #define FENTON_TESTS_INPUT\
     using namespace Fenton::Minrzbas;\
     using namespace std::string_literals;\
@@ -17,6 +25,8 @@
         }\
     };\
     std::unique_ptr<CwdReverter> _cwdReverter = nullptr;\
+    /*The work directory might change with each case.*/\
+    _formatVars["workDir"] = fs::current_path().string();\
     if (const json::value* _cwdPtr = _in.if_contains("cwd")) {\
         _cwdReverter = std::make_unique<CwdReverter>(pathInRes(_cwdPtr->as_string().c_str()));\
     }\
@@ -25,9 +35,9 @@
     /*Initialises the vector with a c-string in it already, to */\
     std::vector<const char*> _cArgs { "" };\
     for (const json::value& v : _in.at("args").as_array()) {\
-        const char* _str = v.as_string().c_str();\
-        _args.emplace_back(_str);\
-        _cArgs.emplace_back(_str);\
+        std::string _str = map_format(v.as_string().c_str(), _formatVars);\
+        _cArgs.emplace_back(_str.c_str()); /*Safe, as the string will be moved.*/\
+        _args.emplace_back(std::move(_str));\
     }\
     po::options_description _desc = getOptionsDesc();\
     po::positional_options_description _posDesc = getPosOptionsDesc();\
@@ -45,6 +55,7 @@
 
 #include <minrzbas/Parser.hpp>
 #include <minrzbas/Program.hpp>
+#include <utils/FileUtils.hpp>
 #include <memory>
 
 namespace fs = std::filesystem;

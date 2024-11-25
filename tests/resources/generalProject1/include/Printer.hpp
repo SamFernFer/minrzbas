@@ -1,3 +1,6 @@
+#ifndef FENTON_PRINTER_HPP
+#define FENTON_PRINTER_HPP
+
 #include <string>
 #include <cstdint>
 #include <memory>
@@ -197,3 +200,5 @@ enum class {
 enum class {
     Should, Not, Appear
 } howShouldIt;
+
+#endif

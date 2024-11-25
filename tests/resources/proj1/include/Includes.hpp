@@ -1,3 +1,6 @@
+#ifndef FENTON_INCLUDES_HPP
+#define FENTON_INCLUDES_HPP
+
 #include <Functions.hpp>
 #include <SaintsRow21.hpp>
 #include <vector>
@@ -13,3 +16,5 @@
 int moo() {
     return -9;
 }
+
+#endif

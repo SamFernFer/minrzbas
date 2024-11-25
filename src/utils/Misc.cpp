@@ -111,7 +111,10 @@ namespace Fenton {
     std::string quote(std::string_view str) {
         return "\"" + escape(str) + "\"";
     }
-    std::string map_format(std::string_view fmt, const std::map<std::string, std::string>& vars) {
+    std::string map_format(
+        std::string_view fmt,
+        const std::unordered_map<std::string, std::string>& vars
+    ) {
         constexpr auto throwError = [](std::string_view errorText, std::size_t pos)->void {
             throw std::runtime_error(std::vformat(
                 "{0} Pos: {1}."s, std::make_format_args(errorText, pos)

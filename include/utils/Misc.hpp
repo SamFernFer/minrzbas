@@ -2,11 +2,10 @@
 #define FENTON_UTILS_MISC_HPP
 
 #include <format>
-#include <map>
 #include <functional>
 #include <string>
 #include <iostream>
-//#include <unordered_map>
+#include <unordered_map>
 
 namespace Fenton {
     extern std::ostream* out;
@@ -75,8 +74,11 @@ namespace Fenton {
     // to use a variable not present in the variable map. To escape the the '$' character, use "$$". Curly 
     // brackets ("{" and "}") need no escaping if they do not have an unescaped '$' character right before 
     // them.
-    std::string map_format(std::string_view fmt, const std::map<std::string, std::string>& vars);
-    std::string map_format_visit(std::string_view fmt, const std::map<std::string, std::string>& vars, 
-        std::function<std::string(std::string_view name, std::size_t pos, bool& success)> visitor);
+    std::string map_format(
+        std::string_view fmt,
+        const std::unordered_map<std::string, std::string>& vars
+    );
+    // std::string map_format_visit(std::string_view fmt, const std::map<std::string, std::string>& vars, 
+    //     std::function<std::string(std::string_view name, std::size_t pos, bool& success)> visitor);
 }
 #endif

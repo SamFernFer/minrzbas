@@ -7,6 +7,7 @@
 
 FENTON_TESTS_PROJECT
 FENTON_TESTS_FUNC_NAME
+FENTON_TESTS_INIT
 FENTON_TESTS_FILE_NAME
 FENTON_TESTS_INPUT
 FENTON_TESTS_ERROR
@@ -26,6 +27,10 @@ namespace json = boost::json;
 namespace Fenton::FENTON_TESTS_PROJECT::Tests {
     bool FENTON_TESTS_FUNC_NAME() {
         bool _pass = true;
+
+        #ifdef FENTON_TESTS_INIT
+        FENTON_TESTS_INIT
+        #endif
 
         // Remember not to use a reference, because the original value will get 
         // destroyed.
