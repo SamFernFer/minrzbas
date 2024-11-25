@@ -31,6 +31,9 @@ namespace Fenton::Minrzbas {
             )(
                 "output", po::value<std::string>(),
                 "The output file. Defaults to standard output if not specified."
+            )(
+                "libclang-arg", po::value<std::vector<std::string>>(),
+                "Adds an argument to be passed directly to libclang."
             )
         ;
         return _desc;

@@ -7,6 +7,7 @@
 namespace Fenton::Minrzbas {
     boost::json::object unitToJSON(
         const std::string& filePath,
+        const std::vector<std::string>& includeDirs,
         const std::vector<const char*>& args
     );
     struct OptionsDecomposition {

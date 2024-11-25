@@ -1,5 +1,5 @@
 namespace MyUtils {
-    constexpr char myChar = 'h'
+    constexpr char myChar = 'h';
     template<typename T> struct Property {
         T& parent;
     };

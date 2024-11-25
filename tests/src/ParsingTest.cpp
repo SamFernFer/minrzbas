@@ -36,7 +36,8 @@
 #define FENTON_TESTS_ERROR
 #define FENTON_TESTS_PRINT_INPUT pretty_print(Fenton::getDefaultOutput(), _in);
 #define FENTON_TESTS_EXPECTED //json::object _expected = _case.at("out").as_object();
-#define FENTON_TESTS_ACTUAL json::object _actual = unitToJSON(_opts.input, _opts.argv);
+#define FENTON_TESTS_ACTUAL\
+    json::object _actual = unitToJSON(_opts.input, _opts.includeDirs, _opts.argv);
 #define FENTON_TESTS_UNEQUAL true //_actual != _expected
 #define FENTON_TESTS_PRINT_EXPECTED //pretty_print(Fenton::getDefaultOutput(), _expected);
 #define FENTON_TESTS_PRINT_ACTUAL pretty_print(Fenton::getDefaultOutput(), _actual);

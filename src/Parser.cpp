@@ -612,6 +612,13 @@ namespace Fenton::Minrzbas {
         }
         return CXChildVisit_Continue;
     }
+    // Returns true if path is a subpath of base, meaning path is inside the base directory.
+    static bool is_subpath(const fs::path& path, const fs::path& base) {
+        const auto mismatch_pair = std::mismatch(
+            path.begin(), path.end(), base.begin(), base.end()
+        );
+        return mismatch_pair.second == base.end();
+    }
     // Visitor function for retrieving all dependencies.
     static void inclusionVisitor(
         CXFile included_file,
@@ -620,13 +627,13 @@ namespace Fenton::Minrzbas {
         CXClientData client_data
     ) {
         // Ignores invalid inclusion directives.
-        // TODO: Test it.
         if (!included_file)
             return;
 
-        std::pair<CXTranslationUnit, std::set<json::string>>& _incData =
-            *static_cast<std::pair<CXTranslationUnit, std::set<json::string>>*>(client_data)
-        ;
+        // The pair is (inputIncludeDirs, outputIncludeDirs).
+        auto& _incData = *static_cast<
+            std::pair<const std::vector<std::string>*, std::set<json::string>>*
+        >(client_data);
 
         if (include_len > 0) {
             CXSourceLocation _loc = inclusion_stack[0];
@@ -636,24 +643,36 @@ namespace Fenton::Minrzbas {
         } else {
             return;
         }
-        // Retrieves the source location corresponding to the file.
-        CXSourceLocation _loc = clang_getLocation(_incData.first, included_file, 0, 0);
-        // Ignores inclusion directives which expand to system headers.
-        if (clang_Location_isInSystemHeader(_loc))
-            return;
 
         // Gets the file's name, allocating a new CXString.
         CXString _cxstr = clang_getFileName(included_file);
-        // Gets the c-string from the CXString.
-        const char* _fileName = clang_getCString(_cxstr);
+        // Gets the c-string from the CXString and immediately converts it to json::string.
+        json::string _fileName = clang_getCString(_cxstr);
+        // Disposes the CXString to prevent a memory leak.
+        clang_disposeString(_cxstr);
+
+        // Iterates over the non-system include directories and checks whether.
+        bool _isSubpath = false;
+        for (const std::string& d : *_incData.first) {
+            if (is_subpath(_fileName.c_str(), d.c_str())) {
+                _isSubpath = true;
+                break;
+            }
+        }
+        if (!_isSubpath) {
+            // _fileName.insert(0, "[NOT SUBPATH] ");
+            return;
+        }
+
         // Inserts the file's name, automatically rejecting duplicates.
-        _incData.second.insert(_fileName);
+        _incData.second.emplace(std::move(_fileName));
         // Disposes the CXString.
         clang_disposeString(_cxstr);
     }
 
     boost::json::object unitToJSON(
         const std::string& filePath,
+        const std::vector<std::string>& includeDirs,
         const std::vector<const char*>& args
     ) {
         if (!fs::exists(filePath)) {
@@ -661,15 +680,6 @@ namespace Fenton::Minrzbas {
                 "The file {0} could not be found.", quote(filePath)
             ));
         }
-
-        // std::vector<const char*> _args {
-        //     "-std=latest"
-        //     // "-std=c++23"
-        // };
-        // // Prepares the arguments.
-        // for (auto& a : args) {
-        //     _args.emplace_back(a.c_str());
-        // }
         CXIndex index = clang_createIndex(
             0,
             // Does display diagnostics.
@@ -704,7 +714,12 @@ namespace Fenton::Minrzbas {
             &_indent
         );
 
-        std::pair<CXTranslationUnit, std::set<json::string>> _incData;
+        std::pair<const std::vector<std::string>*, std::set<json::string>> _incData = {
+            // Passing as a pointer to prevent copying. Moving the vector could make 
+            // displying information for the tests more troublesome later.
+            &includeDirs,
+            {}
+        };
         // Visits the children and builds the list of included files.
         clang_getInclusions(unit, inclusionVisitor, &_incData);
 
@@ -766,6 +781,13 @@ namespace Fenton::Minrzbas {
                 _find->second.as<std::vector<std::string>>() : std::vector<std::string>{}
             ;
         }();
+        // Positional arguments.
+        std::vector<std::string> _posArgs = [&vm]()->std::vector<std::string>{
+            auto _find = vm.find("libclang-arg");
+            return _find != vm.end()?
+                _find->second.as<std::vector<std::string>>() : std::vector<std::string>{}
+            ;
+        }();
 
         std::vector<std::string> _args;
         // Adds the define options.
@@ -783,6 +805,11 @@ namespace Fenton::Minrzbas {
             _args.emplace_back("-isystem");
             _args.emplace_back(i);
         }
+        // Adds the positional arguments.
+        for (const std::string& a : _posArgs) {
+            _args.emplace_back(a);
+        }
+        // Makes sure libclang uses the most recent standards.
         std::vector<const char*> _argv;
         // Generates the vector of C-strings necessary for using with libclang.
         for (const std::string& s : _args) {

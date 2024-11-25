@@ -31,7 +31,10 @@
                 // Include directory for libclang.
                 "-Iinclude",
                 "--isystem=sys",
-                "--input=include/Includes.hpp"
+                "--input=include/Includes.hpp",
+                "-I../generalProject1/include",
+                "--",
+                "--std=c++23"
             ],
             // The working directory inside "resources" to use when calling libclang.
             "cwd": "proj1"
