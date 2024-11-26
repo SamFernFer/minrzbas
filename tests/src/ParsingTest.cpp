@@ -54,20 +54,31 @@
     fs::path _expectedPath = _resPath / "expected" / _case.at("out").as_string().c_str();\
     if (fs::exists(_expectedPath))\
         _expected = parseFromPath(_expectedPath).as_object();\
-        if (json::value* _incs = _expected.if_contains("inclusions")) {\
-            json::array& _incsArr = _incs->as_array();\
+        /*It is not necessary to test absolute inclusions.*/\
+        /*if (json::value* _incs = _expected.if_contains("inclusions")) {\
+            json::array& _incsArr = _incs->as_array();*/\
             /*Converts the relative paths to absolute ones.*/\
-            for (auto it = _incsArr.begin(); it != _incsArr.end(); ++it) {\
+            /*for (auto it = _incsArr.begin(); it != _incsArr.end(); ++it) {\
                 *it = fs::absolute(it->as_string().c_str()).generic_string();\
             }\
-        }\
+        }*/\
     else\
         Fenton::printlnf("[ERROR] The file \"{0}\" could not be found.", _expectedPath.string());
 #define FENTON_TESTS_ACTUAL\
     json::object _actual;\
-    if (_opts.output.empty())\
-        _actual = unitToJSON(_opts.input, _opts.includeDirs, _opts.argv, _opts.dumpAST);\
-    else {\
+    if (_opts.output.empty()) {\
+        std::stringstream _ss;\
+        std::ostream& _lastStream = Fenton::getDefaultOutput();\
+        Fenton::setDefaultOutput(_ss);\
+        generate(_opts);\
+        Fenton::setDefaultOutput(_lastStream);\
+        \
+        json::parse_options _opts;\
+        _opts.allow_comments = true;\
+        _opts.allow_trailing_commas = true;\
+        /*The output of the generate method is turned into a JSON value again.*/\
+        _actual = json::parse(_ss.str(), {}, _opts).as_object();\
+    } else {\
         generate(_opts);\
         fs::path _outPath = fs::canonical(_opts.output);\
         /*Emplaces the output path in canonical form, as the work directory might change.*/\

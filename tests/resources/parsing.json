@@ -80,5 +80,21 @@
         },
         // The expected output JSON file inside the "resources/expected" directory.
         "out": "Human.json"
+    },
+    {
+        "in": {
+            "args": [
+                // Include directory for libclang.
+                "-Iinclude",
+                "-Isys",
+                "--input=include/MultipleIncludeDirs.hpp",
+                "--",
+                "--std=c++23"
+            ],
+            // The working directory inside "resources" to use when calling libclang.
+            "cwd": "proj1"
+        },
+        // The expected output JSON file inside the "resources/expected" directory.
+        "out": "MultipleIncludeDirs.json"
     }
 ]

@@ -1,0 +1,8 @@
+{
+    "inclusions" : [
+        "include/1.hpp",
+        "include/Functions.hpp",
+        "sys/NonEmpty.hpp",
+        "sys/Sys.hpp"
+    ]
+}

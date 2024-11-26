@@ -1,3 +1,6 @@
+#ifndef FENTON_PRINTER_HPP
+#define FENTON_PRINTER_HPP
+
 #include <string>
 #include <cstdint>
 
@@ -12,3 +15,4 @@ namespace Test1 {
         void Print() const;
     };
 }
+#endif
