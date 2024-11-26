@@ -17,15 +17,18 @@ namespace Fenton::Minrzbas {
     void generate(const boost::program_options::variables_map& vm) {
         // Decomposes the options.
         OptionsDecomposition _opts = decomposeOptions(vm);
+        generate(_opts);
+    }
+    void generate(const OptionsDecomposition& opts) {
         std::ofstream _file;
         // Only creates the file if the output path is not empty.
-        if (!_opts.output.empty()) {
+        if (!opts.output.empty()) {
             _file.exceptions(std::ios::badbit | std::ios::failbit);
-            _file.open(_opts.output);
+            _file.open(opts.output);
         }
         // NOTE: For now, only generating a JSON AST is supported.
-        json::object _obj = unitToJSON(_opts.input, _opts.includeDirs, _opts.argv);
-        if (_opts.output.empty()) {
+        json::object _obj = unitToJSON(opts.input, opts.includeDirs, opts.argv);
+        if (opts.output.empty()) {
             pretty_print(Fenton::getDefaultOutput(), _obj);
         } else {
             // Writes the data to the file.

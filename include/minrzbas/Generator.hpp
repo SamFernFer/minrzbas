@@ -8,6 +8,9 @@
 #include <vector>
 
 namespace Fenton::Minrzbas {
+    struct OptionsDecomposition;
+    
     void generate(const boost::program_options::variables_map& vm);
+    void generate(const OptionsDecomposition& opts);
 }
 #endif

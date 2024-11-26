@@ -91,6 +91,23 @@
     //     // The expected output JSON file inside the "resources/expected" directory.
     //     "out": "Printer.json"
     // }
+    // {
+    //     "in": {
+    //         "args": [
+    //             // Include directory for libclang.
+    //             "-I${resDir}/proj1/include",
+    //             "--isystem=${resDir}/proj1/sys",
+    //             "--input=${resDir}/proj1/include/Includes.hpp",
+    //             "-I${resDir}/generalProject1/include",
+    //             "--",
+    //             "--std=c++23"
+    //         ],
+    //         // Changes the work directory to an unrelated one.
+    //         "cwd": "expected"
+    //     },
+    //     // The expected output JSON file inside the "resources/expected" directory.
+    //     "out": "Printer.json"
+    // },
     {
         "in": {
             "args": [
@@ -98,6 +115,7 @@
                 "-I${resDir}/proj1/include",
                 "--isystem=${resDir}/proj1/sys",
                 "--input=${resDir}/proj1/include/Includes.hpp",
+                "--output=${resDir}/out/abs/Includes.json",
                 "-I${resDir}/generalProject1/include",
                 "--",
                 "--std=c++23"

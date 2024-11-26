@@ -17,6 +17,7 @@ FENTON_TESTS_ACTUAL
 FENTON_TESTS_UNEQUAL
 FENTON_TESTS_PRINT_EXPECTED
 FENTON_TESTS_PRINT_ACTUAL
+FENTON_TESTS_FINISH
 FENTON_TESTS_TEST_NAME
 */
 
@@ -28,26 +29,26 @@ namespace Fenton::FENTON_TESTS_PROJECT::Tests {
     bool FENTON_TESTS_FUNC_NAME() {
         bool _pass = true;
 
-        #ifdef FENTON_TESTS_INIT
+#ifdef FENTON_TESTS_INIT
         FENTON_TESTS_INIT
-        #endif
+#endif
 
         // Remember not to use a reference, because the original value will get 
         // destroyed.
-        const json::array _cases = loadJSONFile(FENTON_TESTS_FILE_NAME).as_array();
+        json::array _cases = loadJSONFile(FENTON_TESTS_FILE_NAME).as_array();
 
         std::string_view _title = "?";
 
         for (std::size_t i = 0; i < _cases.size(); ++i) {
-            const json::value& _val = _cases[i];
+            json::value& _val = _cases[i];
             // Using a reference to avoid copying.
-            const json::object& _case = _val.as_object();
+            json::object& _case = _val.as_object();
 
             // Sets the title.
             if (const json::value* _vPtr = _case.if_contains("title"))
                 _title = _vPtr->as_string().c_str();
             // This case has a test.
-            if (const json::value* _vPtr = _case.if_contains("in")) {
+            if (json::value* _vPtr = _case.if_contains("in")) {
                 try {
                     FENTON_TESTS_INPUT
 
@@ -115,6 +116,9 @@ namespace Fenton::FENTON_TESTS_PROJECT::Tests {
                 }
             }
         }
+#ifdef FENTON_TESTS_FINISH
+        FENTON_TESTS_FINISH
+#endif
         Fenton::printlnf("[{}] " FENTON_TESTS_TEST_NAME, _pass? "PASS" : "FAIL");
         return _pass;
     }
