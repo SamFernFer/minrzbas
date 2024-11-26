@@ -1,129 +1,84 @@
 [
-    // {
-    //     "in": {
-    //         "args": [
-    //             // Include directory for libclang.
-    //             "-I=.",
-    //             "--input=Printer.hpp"
-    //         ],
-    //         // The working directory inside "resources" to use when calling libclang.
-    //         "cwd": "generalProject1/include"
-    //     },
-    //     // The expected output JSON file inside the "resources/expected" directory.
-    //     "out": "Printer.json"
-    // },
-    // {
-    //     "in": {
-    //         "args": [
-    //             // Include directory for libclang.
-    //             "-I=.",
-    //             "--input=Functions.hpp"
-    //         ],
-    //         // The working directory inside "resources" to use when calling libclang.
-    //         "cwd": "proj1/include"
-    //     },
-    //     // The expected output JSON file inside the "resources/expected" directory.
-    //     "out": "Printer.json"
-    // },
-    // {
-    //     "in": {
-    //         "args": [
-    //             // Include directory for libclang.
-    //             "-Iinclude",
-    //             "--isystem=sys",
-    //             "--input=include/Includes.hpp",
-    //             "-I../generalProject1/include",
-    //             "--",
-    //             "--std=c++23"
-    //         ],
-    //         // The working directory inside "resources" to use when calling libclang.
-    //         "cwd": "proj1"
-    //     },
-    //     // The expected output JSON file inside the "resources/expected" directory.
-    //     "out": "Printer.json"
-    // },
-    // {
-    //     "in": {
-    //         "args": [
-    //             // Include directory for libclang.
-    //             "-Iinclude",
-    //             "--input=include/animals/Human.hpp",
-    //             "--",
-    //             "--std=c++23"
-    //         ],
-    //         // The working directory inside "resources" to use when calling libclang.
-    //         "cwd": "generalProject1"
-    //     },
-    //     // The expected output JSON file inside the "resources/expected" directory.
-    //     "out": "Printer.json"
-    // },
-    // {
-    //     "in": {
-    //         "args": [
-    //             // Include directory for libclang.
-    //             "-Iinclude",
-    //             "--isystem=sys",
-    //             "--input=include/RelIncludes.hpp",
-    //             "-I../generalProject1/include",
-    //             "--",
-    //             "--std=c++23"
-    //         ],
-    //         // The working directory inside "resources" to use when calling libclang.
-    //         "cwd": "proj1"
-    //     },
-    //     // The expected output JSON file inside the "resources/expected" directory.
-    //     "out": "Printer.json"
-    // }
-    // {
-    //     "in": {
-    //         "args": [
-    //             // Include directory for libclang.
-    //             "-Iinclude",
-    //             "--isystem=sys",
-    //             "--input=include/RelIndirectIncludes.hpp",
-    //             "-I../generalProject1/include",
-    //             "--",
-    //             "--std=c++23"
-    //         ],
-    //         // The working directory inside "resources" to use when calling libclang.
-    //         "cwd": "proj1"
-    //     },
-    //     // The expected output JSON file inside the "resources/expected" directory.
-    //     "out": "Printer.json"
-    // }
-    // {
-    //     "in": {
-    //         "args": [
-    //             // Include directory for libclang.
-    //             "-I${resDir}/proj1/include",
-    //             "--isystem=${resDir}/proj1/sys",
-    //             "--input=${resDir}/proj1/include/Includes.hpp",
-    //             "-I${resDir}/generalProject1/include",
-    //             "--",
-    //             "--std=c++23"
-    //         ],
-    //         // Changes the work directory to an unrelated one.
-    //         "cwd": "expected"
-    //     },
-    //     // The expected output JSON file inside the "resources/expected" directory.
-    //     "out": "Printer.json"
-    // },
+    {
+        "title": "Includes",
+        "in": {
+            "args": [
+                // Include directory for libclang.
+                "-Iinclude",
+                "--isystem=sys",
+                "--input=include/Includes.hpp",
+                "-I../generalProject1/include",
+                "--",
+                "--std=c++23"
+            ],
+            // The working directory inside "resources" to use when calling libclang.
+            "cwd": "proj1"
+        },
+        // The expected output JSON file inside the "resources/expected" directory.
+        "out": "Includes.json"
+    },
     {
         "in": {
             "args": [
                 // Include directory for libclang.
-                "-I${resDir}/proj1/include",
-                "--isystem=${resDir}/proj1/sys",
-                "--input=${resDir}/proj1/include/Includes.hpp",
-                "--output=${resDir}/out/abs/Includes.json",
-                "-I${resDir}/generalProject1/include",
+                "-Iinclude",
+                "--isystem=sys",
+                "--input=include/RelIncludes.hpp",
+                "-I../generalProject1/include",
                 "--",
                 "--std=c++23"
             ],
-            // Changes the work directory to an unrelated one.
-            "cwd": "expected"
+            // The working directory inside "resources" to use when calling libclang.
+            "cwd": "proj1"
         },
         // The expected output JSON file inside the "resources/expected" directory.
-        "out": "Printer.json"
+        "out": "RelIncludes.json"
+    },
+    {
+        "in": {
+            "args": [
+                // Include directory for libclang.
+                "-Iinclude",
+                "--isystem=sys",
+                "--input=include/RelIndirectIncludes.hpp",
+                "-I../generalProject1/include",
+                "--",
+                "--std=c++23"
+            ],
+            // The working directory inside "resources" to use when calling libclang.
+            "cwd": "proj1"
+        },
+        // The expected output JSON file inside the "resources/expected" directory.
+        "out": "RelIndirectIncludes.json"
+    },
+    {
+        "in": {
+            "args": [
+                // Include directory for libclang.
+                "-I=.",
+                "--input=Functions.hpp",
+                "--",
+                "--std=c++23"
+            ],
+            // The working directory inside "resources" to use when calling libclang.
+            "cwd": "proj1/include"
+        },
+        // The expected output JSON file inside the "resources/expected" directory.
+        "out": "Functions.json"
+    },
+    {
+        "in": {
+            "args": [
+                // Include directory for libclang.
+                "-Iinclude",
+                "--input=include/animals/Human.hpp",
+                "--",
+                "--std=c++23"
+            ],
+            // The working directory inside "resources" to use when calling libclang.
+            "cwd": "generalProject1"
+        },
+        // The expected output JSON file inside the "resources/expected" directory.
+        "out": "Human.json"
     }
 ]

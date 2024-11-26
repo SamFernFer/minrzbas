@@ -86,86 +86,6 @@ namespace Fenton::Minrzbas {
     std::string to_string(bool v) {
         return v ? "true" : "false";
     }
-
-#if 0
-    static CXChildVisitResult reflVisitor(CXCursor c, CXCursor parent, CXClientData client_data) {
-        if (!clang_Location_isFromMainFile(clang_getCursorLocation(c)))
-            return CXChildVisit_Continue;
-
-        ReflVisitData* _scope = static_cast<ReflVisitData*>(client_data);
-        std::string _cursorName = to_string(c);
-
-        // Print the cursor.
-
-        switch (clang_getCursorKind(c)) {
-        case CXCursor_TypeAliasDecl:
-        case CXCursor_MacroExpansion:
-            std::cout << std::string(_scope->indent * 2, ' ')
-                << to_string(c) << "->" << to_string(clang_getCursorKind(c)) << std::endl;
-        }
-        // Independent of the scope's type.
-        switch (clang_getCursorKind(c)) {
-        case CXCursor_ClassDecl:
-            addClass(*_scope, c, _cursorName, false);
-            break;
-        case CXCursor_StructDecl:
-            addClass(*_scope, c, _cursorName, true);
-            break;
-        }
-        // If the scope is a namespace.
-        if (_scope->isNS) {
-            ptr<Namespace> _paren = std::static_pointer_cast<Namespace>(_scope->inner);
-
-            switch (clang_getCursorKind(c)) {
-            }
-        }
-        // If the scope is a class.
-        else {
-            ptr<Class> _paren = std::static_pointer_cast<Class>(_scope->inner);
-            bool _isStatic = false;
-
-            switch (clang_getCursorKind(c)) {
-            case CXCursor_CXXBaseSpecifier:
-            {
-                Access _acc = Access::None;
-                switch (clang_getCXXAccessSpecifier(c)) {
-                case CX_CXXPrivate:
-                    _acc = Access::Private;
-                    break;
-                case CX_CXXProtected:
-                    _acc = Access::Protected;
-                    break;
-                case CX_CXXPublic:
-                    _acc = Access::Public;
-                    break;
-                }
-                // TODO: Get the virtual specifier.
-                ptr<Base> _base = std::make_shared<Base>(to_string(c), _acc, clang_isVirtualBase(c));
-                _paren->bases.push_back(_base);
-
-                /*clang_visitChildren(c, [](CXCursor c, CXCursor parent, CXClientData client_data) {
-                    std::cout << "PARENT: " << to_string(parent) << "; " << to_string(c)
-                        << "->" << to_string(clang_getCursorKind(c)) << std::endl;
-                    return CXChildVisit_Recurse;
-                }, nullptr);*/
-
-                break;
-            }
-            }
-        }
-
-        switch (clang_getCursorKind(c)) {
-        case CXCursor_TypeAliasDecl:
-        {
-            ptr<Alias> _alias = std::make_shared<Alias>(to_string(c), to_string(clang_getCursorType(c)));
-            _scope->inner->aliases.push_back(_alias);
-            break;
-        }
-        }
-
-        return CXChildVisit_Continue;
-    }
-#endif
     static CXChildVisitResult reflVisitor(CXCursor c, CXCursor parent, CXClientData client_data);
 
     static json::object& atOrInsertObject(json::object& obj, std::string_view key) {
@@ -251,11 +171,18 @@ namespace Fenton::Minrzbas {
             // It's not a definition, so we skip it.
             return;
         }
-
-        _type["isClass"] = isClass;
-        _type["isStruct"] = isStruct;
-        _type["isUnion"] = isUnion;
         _type["isAnonymous"] = _isAnonymous;
+
+        json::string& _recordType = _type["recordType"].emplace_string();
+        if constexpr (isClass)
+            _recordType = "class";
+        else if constexpr (isStruct)
+            _recordType = "struct";
+        else if constexpr (isUnion)
+            _recordType = "union";
+        else
+            // Should never happen, actually.
+            _recordType = "unknown";
 
         // TODO: Implement it for the memebers.
         // _type["isBitField"] = clang_Cursor_isBitField(c);
@@ -291,6 +218,20 @@ namespace Fenton::Minrzbas {
 
         return CXChildVisit_Continue;
     }
+    static CXChildVisitResult methodAttrsVisitor(
+        CXCursor c, CXCursor parent, CXClientData client_data
+    ) {
+        json::array& _attrs = *static_cast<json::array*>(client_data);
+        switch (clang_getCursorKind(c)) {
+            case CXCursor_CXXOverrideAttr:
+                _attrs.emplace_back("override");
+                break;
+            case CXCursor_CXXFinalAttr:
+                _attrs.emplace_back("final");
+                break;
+        }
+        return CXChildVisit_Continue;
+    }
     template<
         bool isMethod = false, bool isCtor = false,
         bool hasReturnType = true, bool mustVisitForParams = false
@@ -303,11 +244,7 @@ namespace Fenton::Minrzbas {
         if constexpr (mustVisitForParams) {
             std::list<std::string> _params;
             // Visits the children to retrieve the parameters.
-            clang_visitChildren(
-                c, signatureParamVisitor,
-                // Adds the namespace if it hadn't been already.
-                &_params
-            );
+            clang_visitChildren(c, signatureParamVisitor, &_params);
             _type = "void (";
             if (!_params.empty()) {
                 // Not using indexes because it's a list.
@@ -343,25 +280,41 @@ namespace Fenton::Minrzbas {
             }
         
             if constexpr (isMethod) {
-                json::array& _mods = _callable["methodSpecifiers"].emplace_array();
+                json::array& _specs = _callable["methodSpecifiers"].emplace_array();
 
-                if (clang_CXXMethod_isDefaulted(c))              _mods.emplace_back("defaulted");
-                if (clang_CXXMethod_isDeleted(c))                _mods.emplace_back("deleted");
-                if (clang_CXXMethod_isPureVirtual(c))            _mods.emplace_back("pure");
-                if (clang_CXXMethod_isStatic(c))                 _mods.emplace_back("static");
-                if (clang_CXXMethod_isVirtual(c))                _mods.emplace_back("virtual");
-                if (clang_CXXMethod_isCopyAssignmentOperator(c)) _mods.emplace_back("copy");
-                if (clang_CXXMethod_isMoveAssignmentOperator(c)) _mods.emplace_back("move");
-                if (clang_CXXMethod_isExplicit(c))               _mods.emplace_back("explicit");
-                if (clang_CXXMethod_isConst(c))                  _mods.emplace_back("const");
+                if (clang_CXXMethod_isDefaulted(c))              _specs.emplace_back("defaulted");
+                if (clang_CXXMethod_isDeleted(c))                _specs.emplace_back("deleted");
+                if (clang_CXXMethod_isPureVirtual(c))            _specs.emplace_back("pure");
+                if (clang_CXXMethod_isStatic(c))                 _specs.emplace_back("static");
+                if (clang_CXXMethod_isVirtual(c))                _specs.emplace_back("virtual");
+                if (clang_CXXMethod_isExplicit(c))               _specs.emplace_back("explicit");
+                if (clang_CXXMethod_isConst(c))                  _specs.emplace_back("const");
+
+                // NOTE: Those are technically not specifiers, but would take too much space on 
+                // their own.
+
+                if (clang_CXXMethod_isCopyAssignmentOperator(c)) _specs.emplace_back("copy");
+                if (clang_CXXMethod_isMoveAssignmentOperator(c)) _specs.emplace_back("move");
+
+                // Retrieves the override and final attributes, if present.
+                if (clang_Cursor_hasAttrs(c)) {
+                    // Visits the cursor to retrieve the attributes.
+                    clang_visitChildren(c, methodAttrsVisitor, &_specs);
+                }
             }
             if constexpr (isCtor) {
-                json::array& _mods = _callable["constructorSpecifiers"].emplace_array();
+                json::string& _ctorType = _callable["constructorType"].emplace_string();
 
-                if (clang_CXXConstructor_isConvertingConstructor(c)) _mods.emplace_back("converting");
-                if (clang_CXXConstructor_isCopyConstructor(c))       _mods.emplace_back("copy");
-                if (clang_CXXConstructor_isDefaultConstructor(c))    _mods.emplace_back("default");
-                if (clang_CXXConstructor_isMoveConstructor(c))       _mods.emplace_back("move");
+                if (clang_CXXConstructor_isConvertingConstructor(c))
+                    _ctorType = "converting";
+                else if (clang_CXXConstructor_isCopyConstructor(c))
+                    _ctorType = "copy";
+                else if (clang_CXXConstructor_isDefaultConstructor(c))
+                    _ctorType = "default";
+                else if (clang_CXXConstructor_isMoveConstructor(c))
+                    _ctorType = "move";
+                else
+                    _ctorType = "general";
             }
             json::array& _params = _callable["parameters"].emplace_array();
             // libclang does not expose the parameters directly through the specific functions, 
@@ -582,7 +535,7 @@ namespace Fenton::Minrzbas {
                     // May have method and/or constructor modifiers.
                     true, true,
                     // Technically has no return type.
-                    true
+                    false
                 >(*_ctors, c);
                 break;
             }
@@ -646,26 +599,25 @@ namespace Fenton::Minrzbas {
 
         // Gets the file's name, allocating a new CXString.
         CXString _cxstr = clang_getFileName(included_file);
-        // Gets the c-string from the CXString and immediately converts it to json::string.
-        json::string _fileName = clang_getCString(_cxstr);
+        // Constructs an std::filesystem::path from the CXString so that we can dispose it.
+        fs::path _filePath = clang_getCString(_cxstr);
         // Disposes the CXString to prevent a memory leak.
         clang_disposeString(_cxstr);
 
         // Iterates over the non-system include directories and checks whether.
         bool _isSubpath = false;
         for (const std::string& d : *_incData.first) {
-            if (is_subpath(_fileName.c_str(), d.c_str())) {
+            if (is_subpath(_filePath, d.c_str())) {
                 _isSubpath = true;
                 break;
             }
         }
         if (!_isSubpath) {
-            // _fileName.insert(0, "[NOT SUBPATH] ");
             return;
         }
 
-        // Inserts the file's name, automatically rejecting duplicates.
-        _incData.second.emplace(std::move(_fileName));
+        // Inserts the file's name in POSIX format while automatically rejecting duplicates.
+        _incData.second.emplace(_filePath.generic_string());
         // Disposes the CXString.
         clang_disposeString(_cxstr);
     }
@@ -673,7 +625,8 @@ namespace Fenton::Minrzbas {
     boost::json::object unitToJSON(
         const std::string& filePath,
         const std::vector<std::string>& includeDirs,
-        const std::vector<const char*>& args
+        const std::vector<const char*>& args,
+        bool dumpAST
     ) {
         if (!fs::exists(filePath)) {
             throw std::runtime_error(std::format(
@@ -706,13 +659,15 @@ namespace Fenton::Minrzbas {
 
         CXCursor cursor = clang_getTranslationUnitCursor(unit);
 
-        std::string _indent;
-        // DEBUG - Visits the children recursively.
-        clang_visitChildren(
-            cursor,
-            debugReflVisitor,
-            &_indent
-        );
+        if (dumpAST) {
+            std::string _indent;
+            // DEBUG - Visits the children recursively.
+            clang_visitChildren(
+                cursor,
+                debugReflVisitor,
+                &_indent
+            );
+        }
 
         std::pair<const std::vector<std::string>*, std::set<json::string>> _incData = {
             // Passing as a pointer to prevent copying. Moving the vector could make 
@@ -788,6 +743,8 @@ namespace Fenton::Minrzbas {
                 _find->second.as<std::vector<std::string>>() : std::vector<std::string>{}
             ;
         }();
+        // Whether the AST should be displayed before the output.
+        bool _dumpAST = vm.count("dump-ast");
 
         std::vector<std::string> _args;
         // Adds the define options.
@@ -820,7 +777,8 @@ namespace Fenton::Minrzbas {
             .output = std::move(_output),
             .includeDirs = std::move(_incs),
             .args = std::move(_args),
-            .argv = std::move(_argv)
+            .argv = std::move(_argv),
+            .dumpAST = _dumpAST
         };
     }
 }

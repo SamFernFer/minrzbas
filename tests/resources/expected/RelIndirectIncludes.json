@@ -1,0 +1,23 @@
+{
+    "functions" : {
+        "myOtherFunc" : {
+            "int (bool)" : {
+                "returnType" : "int",
+                "parameters" : [
+                    {
+                        "name" : "b",
+                        "type" : "bool"
+                    }
+                ]
+            }
+        }
+    },
+    "inclusions" : [
+        "../generalProject1/include/Printer.hpp",
+        "../generalProject1/include/acs/Animal.hpp",
+        "../generalProject1/include/animals/Human.hpp",
+        "../generalProject1/include/vegetables/Cabbage.hpp",
+        "include/Functions.hpp",
+        "include/Includes.hpp"
+    ]
+}

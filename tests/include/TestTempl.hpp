@@ -9,6 +9,7 @@ FENTON_TESTS_PROJECT
 FENTON_TESTS_FUNC_NAME
 FENTON_TESTS_INIT
 FENTON_TESTS_FILE_NAME
+FENTON_TESTS_CASES_INIT
 FENTON_TESTS_INPUT
 FENTON_TESTS_ERROR
 FENTON_TESTS_PRINT_INPUT
@@ -36,6 +37,10 @@ namespace Fenton::FENTON_TESTS_PROJECT::Tests {
         // Remember not to use a reference, because the original value will get 
         // destroyed.
         json::array _cases = loadJSONFile(FENTON_TESTS_FILE_NAME).as_array();
+
+#ifdef FENTON_TESTS_CASES_INIT
+        FENTON_TESTS_CASES_INIT
+#endif
 
         std::string_view _title = "?";
 

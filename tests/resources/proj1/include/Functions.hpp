@@ -1,6 +1,10 @@
 #ifndef FENTON_FUNCTIONS_HPP
 #define FENTON_FUNCTIONS_HPP
 
+// Tests functions with simple parameters, enum classes with values which refer to one 
+// another, static and non-static methods, constructors, destructors (with parameters too) and
+// ignoring out-of-line definitions.
+
 #include <vector>
 
 int sum(int a, int b) {
@@ -21,6 +25,15 @@ auto templSum(auto a, auto b) {
 
 namespace ThingNS {
     enum class ThingType {
+        Value1 = 1,
+        Value2 = 2,
+        Value3 = Value1 + Value2 + 2
+    };
+    class MyClass {
+        ThingType thingType;
+        MyClass() {
+            thingType = ThingType::Value2;
+        };
     };
     struct Thing1 {
         static std::vector<int> ints;

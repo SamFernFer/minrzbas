@@ -1,0 +1,19 @@
+{
+    "functions" : {
+        "myOtherFunc" : {
+            "int (bool)" : {
+                "returnType" : "int",
+                "parameters" : [
+                    {
+                        "name" : "b",
+                        "type" : "bool"
+                    }
+                ]
+            }
+        }
+    },
+    "inclusions" : [
+        "include/1.hpp",
+        "include/2.hpp"
+    ]
+}

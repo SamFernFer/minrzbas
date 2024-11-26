@@ -27,7 +27,7 @@ namespace Fenton::Minrzbas {
             _file.open(opts.output);
         }
         // NOTE: For now, only generating a JSON AST is supported.
-        json::object _obj = unitToJSON(opts.input, opts.includeDirs, opts.argv);
+        json::object _obj = unitToJSON(opts.input, opts.includeDirs, opts.argv, opts.dumpAST);
         if (opts.output.empty()) {
             pretty_print(Fenton::getDefaultOutput(), _obj);
         } else {

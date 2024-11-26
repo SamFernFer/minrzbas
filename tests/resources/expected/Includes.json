@@ -1,0 +1,14 @@
+{
+    "functions" : {
+        "moo" : {
+            "int ()" : {
+                "returnType" : "int",
+                "parameters" : []
+            }
+        }
+    },
+    "inclusions" : [
+        "../generalProject1/include/Printer.hpp",
+        "include/Functions.hpp"
+    ]
+}

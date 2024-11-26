@@ -1,0 +1,103 @@
+{
+    "namespaces" : {
+        "Animals" : {
+            "types" : {
+                "Special" : {
+                    "isDefined" : true,
+                    "isAnonymous" : false,
+                    "recordType" : "class",
+                    "fields" : {
+                        "specialID" : {
+                            "type" : "std::basic_string<char>"
+                        }
+                    },
+                    "methods" : {
+                        "retrieve" : {
+                            "Animals::Special &()" : {
+                                "returnType" : "Animals::Special &",
+                                "methodSpecifiers" : [
+                                    "pure",
+                                    "virtual"
+                                ],
+                                "parameters" : []
+                            }
+                        },
+                        "getID" : {
+                            "std::basic_string<char> ()" : {
+                                "returnType" : "std::basic_string<char>",
+                                "methodSpecifiers" : [
+                                    "virtual"
+                                ],
+                                "parameters" : []
+                            }
+                        }
+                    }
+                },
+                "Intermediate" : {
+                    "isDefined" : true,
+                    "isAnonymous" : false,
+                    "recordType" : "class",
+                    "fields" : {
+                        "intermediateID" : {
+                            "type" : "std::basic_string<char>"
+                        }
+                    },
+                    "methods" : {
+                        "retrieve" : {
+                            "Animals::Special &()" : {
+                                "returnType" : "Animals::Special &",
+                                "methodSpecifiers" : [
+                                    "virtual",
+                                    "override"
+                                ],
+                                "parameters" : []
+                            }
+                        },
+                        "getID" : {
+                            "std::basic_string<char> ()" : {
+                                "returnType" : "std::basic_string<char>",
+                                "methodSpecifiers" : [
+                                    "virtual",
+                                    "override"
+                                ],
+                                "parameters" : []
+                            }
+                        }
+                    }
+                },
+                "Human" : {
+                    "isDefined" : true,
+                    "isAnonymous" : false,
+                    "recordType" : "class",
+                    "methods" : {
+                        "retrieve" : {
+                            "Animals::Special &()" : {
+                                "returnType" : "Animals::Special &",
+                                "methodSpecifiers" : [
+                                    "virtual",
+                                    "final"
+                                ],
+                                "parameters" : []
+                            }
+                        },
+                        "Moo" : {
+                            "bool ()" : {
+                                "returnType" : "bool",
+                                "methodSpecifiers" : [
+                                    "virtual",
+                                    "override"
+                                ],
+                                "parameters" : []
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "inclusions" : [
+        "include/Printer.hpp",
+        "include/acs/Animal.hpp",
+        "include/vegetables/Cabbage.hpp"
+    ]
+}

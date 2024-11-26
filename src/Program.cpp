@@ -12,7 +12,7 @@ namespace Fenton::Minrzbas {
     constexpr const char* versionString = "1.0.0";
 
     boost::program_options::options_description getOptionsDesc() {
-        po::options_description _desc("Allowed options");
+        po::options_description _desc("Allowed options (positional arguments are passed to libclang directly)");
         _desc.add_options()
             ("help,h", "Displays help information.")
             ("version,V", "Displays the program's version.")
@@ -34,6 +34,9 @@ namespace Fenton::Minrzbas {
             )(
                 "libclang-arg", po::value<std::vector<std::string>>(),
                 "Adds an argument to be passed directly to libclang."
+            )(
+                "dump-ast",
+                "Whether the AST should be displayed before the output."
             )
         ;
         return _desc;

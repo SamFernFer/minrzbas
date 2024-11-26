@@ -1,6 +1,5 @@
 #define FENTON_TESTS_PROJECT Minrzbas
 #define FENTON_TESTS_FUNC_NAME parsing
-#define FENTON_TESTS_FILE_NAME "parsing.json"
 #define FENTON_TESTS_INIT\
     fs::path _resPath = fs::path(FileUtils::getExecutablePath())\
         .parent_path()\
@@ -10,7 +9,10 @@
     std::unordered_map<std::string, std::string> _formatVars = {\
         { "resDir", _resPath.string() }\
     };\
-std::list<fs::path> _createdFiles;
+    std::list<fs::path> _createdFiles;
+#define FENTON_TESTS_FILE_NAME "parsing.json"
+#define FENTON_TESTS_CASES_INIT
+    /*Generates the versions of the test cases with the "--output" option.*/\
 #define FENTON_TESTS_INPUT\
     using namespace Fenton::Minrzbas;\
     using namespace std::string_literals;\
@@ -52,12 +54,19 @@ std::list<fs::path> _createdFiles;
     fs::path _expectedPath = _resPath / "expected" / _case.at("out").as_string().c_str();\
     if (fs::exists(_expectedPath))\
         _expected = parseFromPath(_expectedPath).as_object();\
+        if (json::value* _incs = _expected.if_contains("inclusions")) {\
+            json::array& _incsArr = _incs->as_array();\
+            /*Converts the relative paths to absolute ones.*/\
+            for (auto it = _incsArr.begin(); it != _incsArr.end(); ++it) {\
+                *it = fs::absolute(it->as_string().c_str()).generic_string();\
+            }\
+        }\
     else\
         Fenton::printlnf("[ERROR] The file \"{0}\" could not be found.", _expectedPath.string());
 #define FENTON_TESTS_ACTUAL\
     json::object _actual;\
     if (_opts.output.empty())\
-        _actual = unitToJSON(_opts.input, _opts.includeDirs, _opts.argv);\
+        _actual = unitToJSON(_opts.input, _opts.includeDirs, _opts.argv, _opts.dumpAST);\
     else {\
         generate(_opts);\
         fs::path _outPath = fs::canonical(_opts.output);\

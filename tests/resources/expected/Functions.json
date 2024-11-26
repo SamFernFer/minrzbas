@@ -1,19 +1,247 @@
 {
-    "functions": {
-        "sum": {
-            "int(int,int)": {
-                "returnType": "int",
-                "parameters": [
+    "functions" : {
+        "sum" : {
+            "int (int, int)" : {
+                "returnType" : "int",
+                "parameters" : [
                     {
-                        "name": "a",
-                        "type": "int"
+                        "name" : "a",
+                        "type" : "int"
                     },
                     {
-                        "name": "b",
-                        "type": "int"
+                        "name" : "b",
+                        "type" : "int"
+                    }
+                ]
+            },
+            "float (float, float)" : {
+                "returnType" : "float",
+                "parameters" : [
+                    {
+                        "name" : "a",
+                        "type" : "float"
+                    },
+                    {
+                        "name" : "b",
+                        "type" : "float"
+                    }
+                ]
+            }
+        },
+        "sub" : {
+            "int (int, int)" : {
+                "returnType" : "int",
+                "parameters" : [
+                    {
+                        "name" : "a",
+                        "type" : "int"
+                    },
+                    {
+                        "name" : "b",
+                        "type" : "int"
+                    }
+                ]
+            },
+            "long long (long long, long long)" : {
+                "returnType" : "long long",
+                "parameters" : [
+                    {
+                        "name" : "a",
+                        "type" : "long long"
+                    },
+                    {
+                        "name" : "b",
+                        "type" : "long long"
                     }
                 ]
             }
         }
-    }
+    },
+    "namespaces" : {
+        "ThingNS" : {
+            "enums" : {
+                "ThingType" : {
+                    "isDefined" : true,
+                    "isScoped" : true,
+                    "type" : "int",
+                    "values" : {
+                        "Value1" : 1,
+                        "Value2" : 2,
+                        "Value3" : 5
+                    }
+                }
+            },
+            "types" : {
+                "MyClass" : {
+                    "isDefined" : true,
+                    "recordType" : "class",
+                    "isAnonymous" : false,
+                    "fields" : {
+                        "thingType" : {
+                            "type" : "ThingNS::ThingType"
+                        }
+                    },
+                    "constructors" : {
+                        "void ()" : {
+                            "methodSpecifiers" : [],
+                            "constructorType" : "default",
+                            "parameters" : []
+                        }
+                    }
+                },
+                "Thing1" : {
+                    "isDefined" : true,
+                    "recordType" : "struct",
+                    "isAnonymous" : false,
+                    "variables" : {
+                        "ints" : {
+                            "type" : "std::vector<int>"
+                        }
+                    },
+                    "fields" : {
+                        "myLong" : {
+                            "type" : "long"
+                        }
+                    },
+                    "methods" : {
+                        "function" : {
+                            "void () noexcept" : {
+                                "returnType" : "void",
+                                "methodSpecifiers" : [
+                                    "static"
+                                ],
+                                "parameters" : []
+                            }
+                        },
+                        "New" : {
+                            "ThingNS::Thing1 (long)" : {
+                                "returnType" : "ThingNS::Thing1",
+                                "methodSpecifiers" : [
+                                    "static"
+                                ],
+                                "parameters" : [
+                                    {
+                                        "name" : "myLong",
+                                        "type" : "long"
+                                    }
+                                ]
+                            }
+                        },
+                        "getLong" : {
+                            "long ()" : {
+                                "returnType" : "long",
+                                "methodSpecifiers" : [],
+                                "parameters" : []
+                            }
+                        }
+                    },
+                    "constructors" : {
+                        "void ()" : {
+                            "methodSpecifiers" : [
+                                "defaulted"
+                            ],
+                            "constructorType" : "default",
+                            "parameters" : []
+                        },
+                        "void (long)" : {
+                            "methodSpecifiers" : [],
+                            "constructorType" : "converting",
+                            "parameters" : [
+                                {
+                                    "name" : "myLong",
+                                    "type" : "long"
+                                }
+                            ]
+                        },
+                        "void (ThingNS::ThingType) noexcept" : {
+                            "methodSpecifiers" : [
+                                "explicit"
+                            ],
+                            "constructorType" : "general",
+                            "parameters" : [
+                                {
+                                    "name" : "type",
+                                    "type" : "ThingNS::ThingType"
+                                }
+                            ]
+                        }
+                    },
+                    "destructors" : {
+                        "void () noexcept" : {
+                            "methodSpecifiers" : [],
+                            "parameters" : []
+                        },
+                        "void (int)" : {
+                            "methodSpecifiers" : [],
+                            "parameters" : [
+                                {
+                                    "name" : "i",
+                                    "type" : "int"
+                                }
+                            ]
+                        },
+                        "void (int) noexcept" : {
+                            "methodSpecifiers" : [],
+                            "parameters" : [
+                                {
+                                    "name" : "i",
+                                    "type" : "int"
+                                }
+                            ]
+                        },
+                        "void (ThingNS::Thing1 *)" : {
+                            "methodSpecifiers" : [],
+                            "parameters" : [
+                                {
+                                    "name" : "ptr",
+                                    "type" : "ThingNS::Thing1 *"
+                                }
+                            ]
+                        }
+                    }
+                },
+                "NonAnonymous" : {
+                    "isDefined" : true,
+                    "recordType" : "struct",
+                    "isAnonymous" : false,
+                    "fields" : {
+                        "long_" : {
+                            "type" : "long"
+                        }
+                    }
+                }
+            },
+            "functions" : {
+                "getThing" : {
+                    "ThingNS::Thing1 (ThingNS::Thing1, ThingNS::NonAnonymous)" : {
+                        "returnType" : "ThingNS::Thing1",
+                        "parameters" : [
+                            {
+                                "name" : "t1",
+                                "type" : "ThingNS::Thing1"
+                            },
+                            {
+                                "name" : "t2",
+                                "type" : "ThingNS::NonAnonymous"
+                            }
+                        ]
+                    },
+                    "ThingNS::Thing1 (ThingNS::Thing1, double)" : {
+                        "returnType" : "ThingNS::Thing1",
+                        "parameters" : [
+                            {
+                                "name" : "t1",
+                                "type" : "ThingNS::Thing1"
+                            },
+                            {
+                                "name" : "d",
+                                "type" : "double"
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    },
+    "inclusions" : []
 }
