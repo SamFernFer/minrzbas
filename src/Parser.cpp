@@ -68,20 +68,51 @@ namespace Fenton::Minrzbas {
     std::string to_string(const CXCursor& cursor) {
         return to_string(clang_getCursorSpelling(cursor));
     }
-    std::string to_string(const CXType& type) {
-        CXType _canonType = clang_getCanonicalType(type);
-        CXCursor _cursor = clang_getTypeDeclaration(_canonType);
-        
-        bool _isAnonymous = 
-            clang_Cursor_isAnonymousRecordDecl(_cursor) || 
-            clang_Cursor_isAnonymous(_cursor)
-        ;
-        // Returns an empty name if the type is anonymous.
-        // return _isAnonymous? "" : to_string(clang_getTypeSpelling(_canonType));
 
-        // Returns the name of the type visually used, not the canonical type.
-        return _isAnonymous? "" : to_string(clang_getTypeSpelling(type));
+    // Returns the string representation of the type. If cannonical is true, returns 
+    // the fully-qualified version of the type with any aliases or typedefs removed, 
+    // else returns the fully-qualified version of the type, but keeping aliases and 
+    // typedefs.
+    template<bool canonical>
+    static std::string typeToString(CXType type) {
+        CXCursor _decl = clang_getTypeDeclaration(type);
+
+        // Returns an empty string if the type is anonymous.
+        if (clang_Cursor_isAnonymousRecordDecl(_decl) || 
+            clang_Cursor_isAnonymous(_decl)) {
+            return "";
+        }
+
+        if constexpr (canonical) {
+            // Returns the spelling of the canonical version of the type.
+            return to_string(clang_getTypeSpelling(clang_getCanonicalType(type)));
+        } else {
+            // Returns the spelling of the type's declaration.
+            return to_string(clang_getTypeSpelling(clang_getCursorType(_decl)));
+        }
     }
+    // Shortcut to `typeToString<canonical>(clang_getCursorType(c))`.
+    template<bool canonical>
+    static std::string cursorTypeToString(CXCursor c) {
+        return typeToString<canonical>(clang_getCursorType(c));
+    }
+
+    // std::string to_string(const CXType& type) {
+    //     CXType _canonType = clang_getCanonicalType(type);
+    //     CXCursor _cursor = clang_getTypeDeclaration(_canonType);
+    //     clang_getCursorType();
+        
+    //     bool _isAnonymous = 
+    //         clang_Cursor_isAnonymousRecordDecl(_cursor) || 
+    //         clang_Cursor_isAnonymous(_cursor)
+    //     ;
+    //     // Returns an empty name if the type is anonymous.
+    //     // return _isAnonymous? "" : to_string(clang_getTypeSpelling(_canonType));
+
+    //     // Returns the name of the type visually used, not the canonical type.
+    //     // return _isAnonymous? "" : to_string(clang_getTypeSpelling(type));
+    //     return _isAnonymous? "" : to_string(clang_getTypeSpelling(clang_getTypeDeclaration(type)));
+    // }
     std::string to_string(const CXCursorKind& kind) {
         return to_string(clang_getCursorKindSpelling(kind));
     }
@@ -143,57 +174,6 @@ namespace Fenton::Minrzbas {
 
         return CXChildVisit_Continue;
     }
-    template<bool isClass, bool isStruct, bool isUnion> static void addRecord(
-        json::object& obj, json::object*& typesPtr, CXCursor c, std::string_view name
-    ) {
-        if (!typesPtr)
-            typesPtr = &atOrInsertObject(obj, "types");
-        
-        bool _isAnonymous = clang_Cursor_isAnonymousRecordDecl(c);
-        bool _isDef = clang_isCursorDefinition(c);
-        
-        json::object& _type = atOrInsertObject(*typesPtr, _isAnonymous? "" : name);
-
-        json::value& _isDefVal = _type["isDefined"];
-        if (_isDef) {
-            if (bool* _isDefPtr = _isDefVal.if_bool()) {
-                if (*_isDefPtr) {
-                    // Prevents redefining.
-                    return;
-                } else {
-                    *_isDefPtr = true;
-                }
-            } else {
-                _isDefVal = true;
-            }
-        } else {
-            // Prevents undefining if already defined.
-            if (!_isDefVal.is_bool())
-                _isDefVal = false;
-            // It's not a definition, so we skip it.
-            return;
-        }
-        _type["isAnonymous"] = _isAnonymous;
-
-        json::string& _recordType = _type["recordType"].emplace_string();
-        if constexpr (isClass)
-            _recordType = "class";
-        else if constexpr (isStruct)
-            _recordType = "struct";
-        else if constexpr (isUnion)
-            _recordType = "union";
-        else
-            // Should never happen, actually.
-            _recordType = "unknown";
-
-        // TODO: Implement it for the memebers.
-        // _type["isBitField"] = clang_Cursor_isBitField(c);
-
-        clang_visitChildren(
-            c, reflVisitor,
-            &_type
-        );
-    }
     static CXChildVisitResult paramVisitor(CXCursor c, CXCursor parent, CXClientData client_data) {
         if (clang_getCursorKind(c) != CXCursor_ParmDecl)
             return CXChildVisit_Continue;
@@ -202,7 +182,8 @@ namespace Fenton::Minrzbas {
 
         _params.emplace_back(json::object{
             { "name", to_string(c) },
-            { "type", to_string(clang_getCursorType(c)) }
+            { "type", cursorTypeToString<false>(c) },
+            { "canonicalType", cursorTypeToString<true>(c) }
         });
         return CXChildVisit_Continue;
     }
@@ -216,7 +197,7 @@ namespace Fenton::Minrzbas {
         // Unpacks the parameter list.
         std::list<std::string>& _params = *static_cast<std::list<std::string>*>(client_data);
         // Emplaces the string representation of the parameter's type.
-        _params.emplace_back(to_string(clang_getCursorType(c)));
+        _params.emplace_back(cursorTypeToString<true>(c));
 
         return CXChildVisit_Continue;
     }
@@ -267,7 +248,7 @@ namespace Fenton::Minrzbas {
                 _type.append(" noexcept");
             }
         } else {
-            _type = to_string(clang_getCursorType(c));
+            _type = cursorTypeToString<true>(c);
         }
 
         json::value& _callableVal = overloads[_type];
@@ -278,7 +259,10 @@ namespace Fenton::Minrzbas {
 
             if constexpr (hasReturnType) {
                 // Stores the callable's return type.
-                _callable["returnType"] = to_string(clang_getCursorResultType(c));
+                _callable["returnType"] = typeToString<>(clang_getCursorResultType(c));
+                _callable["canonicalReturnType"] = 
+                    to_string(clang_getCanonicalType(clang_getCursorResultType(c)))
+                ;
             }
         
             if constexpr (isMethod) {
@@ -336,7 +320,10 @@ namespace Fenton::Minrzbas {
                     // Stores the argument's name and type.
                     _params.emplace_back(json::object{
                         { "name", to_string(_argCursor) },
-                        { "type", to_string(clang_getCursorType(_argCursor)) }
+                        { "type", to_string(clang_getCursorType(_argCursor)) },
+                        { "canonicalType", to_string(clang_getCanonicalType(
+                            clang_getCursorType(_argCursor)
+                        )) }
                     });
                 }
             }
@@ -346,6 +333,57 @@ namespace Fenton::Minrzbas {
     static void addCallable(json::object& callables, CXCursor c, std::string_view name) {
         json::object& _overloads = atOrInsertObject(callables, name);
         addOverload<isMethod>(_overloads, c);
+    }
+    template<bool isClass, bool isStruct, bool isUnion> static void addRecord(
+        json::object& obj, json::object*& typesPtr, CXCursor c, std::string_view name
+    ) {
+        if (!typesPtr)
+            typesPtr = &atOrInsertObject(obj, "types");
+        
+        bool _isAnonymous = clang_Cursor_isAnonymousRecordDecl(c);
+        bool _isDef = clang_isCursorDefinition(c);
+        
+        json::object& _type = atOrInsertObject(*typesPtr, _isAnonymous? "" : name);
+
+        json::value& _isDefVal = _type["isDefined"];
+        if (_isDef) {
+            if (bool* _isDefPtr = _isDefVal.if_bool()) {
+                if (*_isDefPtr) {
+                    // Prevents redefining.
+                    return;
+                } else {
+                    *_isDefPtr = true;
+                }
+            } else {
+                _isDefVal = true;
+            }
+        } else {
+            // Prevents undefining if already defined.
+            if (!_isDefVal.is_bool())
+                _isDefVal = false;
+            // It's not a definition, so we skip it.
+            return;
+        }
+        _type["isAnonymous"] = _isAnonymous;
+
+        json::string& _recordType = _type["recordType"].emplace_string();
+        if constexpr (isClass)
+            _recordType = "class";
+        else if constexpr (isStruct)
+            _recordType = "struct";
+        else if constexpr (isUnion)
+            _recordType = "union";
+        else
+            // Should never happen, actually.
+            _recordType = "unknown";
+
+        // TODO: Implement it for the members.
+        // _type["isBitField"] = clang_Cursor_isBitField(c);
+
+        clang_visitChildren(
+            c, reflVisitor,
+            &_type
+        );
     }
     // Returns true is the type is unsigned and false if the type is not. Uses the type's kind.
     // NOTE: Evaluating std::is_signed<std::underlying_type<type>> with type being the enum's
@@ -395,6 +433,27 @@ namespace Fenton::Minrzbas {
             return CXChildVisit_Continue;
         }
 
+        json::object& _obj = *static_cast<json::object*>(client_data);
+        const std::string _cursorName = to_string(c);
+        const CXCursorKind _kind = clang_getCursorKind(c);
+
+        // If the cursor is a base class specifier.
+        if (_kind == CXCursor_CXXBaseSpecifier) {
+            // Makes sure there is a "bases" array.
+            json::array& _bases = [&_obj]()->json::array&{
+                json::value& _v = _obj["bases"];
+                return _v.is_array()? _v.get_array() : _v.emplace_array();
+            }();
+            // Adds the base.
+            _bases.emplace_back(json::object{
+                { "type", to_string(clang_getCursorType(c)) },
+                { "canonicalType", to_string(clang_getCanonicalType(
+                    clang_getCursorType(c)
+                )) }
+            });
+            return CXChildVisit_Continue;
+        }
+
         // Only registers entities when the semantic and lexical parents are the same.
         // This avoids error with out-of-line definitions.
         if (!clang_equalCursors(
@@ -404,8 +463,6 @@ namespace Fenton::Minrzbas {
             parent
         ))
             return CXChildVisit_Continue; 
-        
-        json::object& _obj = *static_cast<json::object*>(client_data);
 
         json::object* _nss = nullptr;
         json::object* _types = nullptr;
@@ -418,9 +475,7 @@ namespace Fenton::Minrzbas {
         json::object* _ctors = nullptr;
         json::object* _dtors = nullptr;
 
-        const std::string _cursorName = to_string(c);
-
-        switch(clang_getCursorKind(c)) {
+        switch(_kind) {
             // Namespace.
             case CXCursor_Namespace: {
                 if (!_nss)
@@ -477,6 +532,7 @@ namespace Fenton::Minrzbas {
                 CXType _enumType = clang_getCanonicalType(clang_getEnumDeclIntegerType(c));
                 
                 _enum["type"] = to_string(_enumType);
+                _enum["canonicalType"] = to_string(clang_getCanonicalType(_enumType));
 
                 if (isTypeUnsigned(_enumType)) {
                     clang_visitChildren(c, visitEnum<true>, &_enum["values"].emplace_object());
@@ -496,6 +552,9 @@ namespace Fenton::Minrzbas {
                 if (!_fieldVal.is_object()) {
                     json::object& _field = _fieldVal.emplace_object();
                     _field["type"] = to_string(clang_getCursorType(c));
+                    _field["canonicalType"] = to_string(clang_getCanonicalType(
+                        clang_getCursorType(c)
+                    ));
                 }
                 break;
             }
@@ -509,6 +568,9 @@ namespace Fenton::Minrzbas {
                 if (!_varVal.is_object()) {
                     json::object& _var = _varVal.emplace_object();
                     _var["type"] = to_string(clang_getCursorType(c));
+                    _var["canonicalType"] = to_string(clang_getCanonicalType(
+                        clang_getCursorType(c)
+                    ));
                 }
                 break;
             }
@@ -556,18 +618,6 @@ namespace Fenton::Minrzbas {
                     true
                 >(*_dtors, c);
                 break;
-            }
-            // Bases.
-            case CXCursor_CXXBaseSpecifier: {
-                // Makes sure there is a "bases" array.
-                json::array& _bases = [&_obj](){
-                    json::value& _v = _obj["bases"];
-                    return _v.is_array()? _v.get_array() : _v.emplace_array();
-                }();
-
-                json::object& _thisBase = _bases.emplace_back(json::object{});
-                
-                _thisBase[""] to_string(clang_getCursorType(c));
             }
             // Aliases.
             case CXCursor_TypeAliasDecl: {

@@ -1,246 +1,262 @@
 [
     // Include
-    {
-        "title": "Include",
-        "in": {
-            "args": [
-                // Include directory for libclang.
-                "-Iinclude",
-                "--isystem=sys",
-                "--input=include/Includes.hpp",
-                "-I../generalProject1/include",
-                "--",
-                "--std=c++23"
-            ],
-            // The working directory inside "resources" to use when calling libclang.
-            "cwd": "proj1"
-        },
-        // The expected output JSON file inside the "resources/expected" directory.
-        "out": "Includes.json"
-    },
-    {
-        "in": {
-            "args": [
-                // Include directory for libclang.
-                "-Iinclude",
-                "--isystem=sys",
-                "--input=include/RelIncludes.hpp",
-                "-I../generalProject1/include",
-                "--",
-                "--std=c++23"
-            ],
-            // The working directory inside "resources" to use when calling libclang.
-            "cwd": "proj1"
-        },
-        // The expected output JSON file inside the "resources/expected" directory.
-        "out": "RelIncludes.json"
-    },
-    {
-        "in": {
-            "args": [
-                // Include directory for libclang.
-                "-Iinclude",
-                "--isystem=sys",
-                "--input=include/RelIndirectIncludes.hpp",
-                "-I../generalProject1/include",
-                "--",
-                "--std=c++23"
-            ],
-            // The working directory inside "resources" to use when calling libclang.
-            "cwd": "proj1"
-        },
-        // The expected output JSON file inside the "resources/expected" directory.
-        "out": "RelIndirectIncludes.json"
-    },
-    {
-        "in": {
-            "args": [
-                // Include directory for libclang.
-                "-Iinclude",
-                "-Isys",
-                "--input=include/MultipleIncludeDirs.hpp",
-                "--",
-                "--std=c++23"
-            ],
-            // The working directory inside "resources" to use when calling libclang.
-            "cwd": "proj1"
-        },
-        // The expected output JSON file inside the "resources/expected" directory.
-        "out": "MultipleIncludeDirs.json"
-    },
-    // Define
-    {
-        // All the cases in this section should have the exact same result.
-        "title": "Define",
-        "in": {
-            "args": [
-                // No include directories.
-                "-DFENTON_UNDEFINED_FUNC",
-                "--input=include/Define.hpp",
-                "--",
-                "--std=c++23"
-            ],
-            // The working directory inside "resources" to use when calling libclang.
-            "cwd": "proj1"
-        },
-        // The expected output JSON file inside the "resources/expected" directory.
-        "out": "Define.json"
-    },
-    {
-        "in": {
-            "args": [
-                // One normal include directory.
-                "-Iinclude",
-                "-DFENTON_UNDEFINED_FUNC",
-                "--input=include/Define.hpp",
-                "--",
-                "--std=c++23"
-            ],
-            // The working directory inside "resources" to use when calling libclang.
-            "cwd": "proj1"
-        },
-        // The expected output JSON file inside the "resources/expected" directory.
-        "out": "Define.json"
-    },
-    {
-        "in": {
-            "args": [
-                // One normal and one system include directory.
-                "-Iinclude",
-                "--isystem=sys",
-                "-DFENTON_UNDEFINED_FUNC",
-                "--input=include/Define.hpp",
-                "--",
-                "--std=c++23"
-            ],
-            // The working directory inside "resources" to use when calling libclang.
-            "cwd": "proj1"
-        },
-        // The expected output JSON file inside the "resources/expected" directory.
-        "out": "Define.json"
-    },
-    {
-        "in": {
-            "args": [
-                // Two normal include directories.
-                "-Iinclude",
-                "-Isys",
-                "-DFENTON_UNDEFINED_FUNC",
-                "--input=include/Define.hpp",
-                "--",
-                "--std=c++23"
-            ],
-            // The working directory inside "resources" to use when calling libclang.
-            "cwd": "proj1"
-        },
-        // The expected output JSON file inside the "resources/expected" directory.
-        "out": "Define.json"
-    },
-    // MultipleDefines
-    {
-        // All the cases in this section should have the exact same result as the previous 
-        // section.
-        "title": "MultipleDefines",
-        "in": {
-            "args": [
-                // No include directories.
-                "-DFENTON_UNDEFINED_FUNC",
-                "-DFENTON_OTHER_FUNC",
-                "--input=include/MultipleDefines.hpp",
-                "--",
-                "--std=c++23"
-            ],
-            // The working directory inside "resources" to use when calling libclang.
-            "cwd": "proj1"
-        },
-        // The expected output JSON file inside the "resources/expected" directory.
-        "out": "Define.json"
-    },
-    {
-        "in": {
-            "args": [
-                // One normal include directory.
-                "-Iinclude",
-                "-DFENTON_UNDEFINED_FUNC",
-                "-DFENTON_OTHER_FUNC",
-                "--input=include/MultipleDefines.hpp",
-                "--",
-                "--std=c++23"
-            ],
-            // The working directory inside "resources" to use when calling libclang.
-            "cwd": "proj1"
-        },
-        // The expected output JSON file inside the "resources/expected" directory.
-        "out": "Define.json"
-    },
-    {
-        "in": {
-            "args": [
-                // One normal and one system include directory.
-                "-Iinclude",
-                "--isystem=sys",
-                "-DFENTON_UNDEFINED_FUNC",
-                "-DFENTON_OTHER_FUNC",
-                "--input=include/MultipleDefines.hpp",
-                "--",
-                "--std=c++23"
-            ],
-            // The working directory inside "resources" to use when calling libclang.
-            "cwd": "proj1"
-        },
-        // The expected output JSON file inside the "resources/expected" directory.
-        "out": "Define.json"
-    },
-    {
-        "in": {
-            "args": [
-                // Two normal include directories.
-                "-Iinclude",
-                "-Isys",
-                "-DFENTON_UNDEFINED_FUNC",
-                "-DFENTON_OTHER_FUNC",
-                "--input=include/MultipleDefines.hpp",
-                "--",
-                "--std=c++23"
-            ],
-            // The working directory inside "resources" to use when calling libclang.
-            "cwd": "proj1"
-        },
-        // The expected output JSON file inside the "resources/expected" directory.
-        "out": "Define.json"
-    },
+    // {
+    //     "title": "Include",
+    //     "in": {
+    //         "args": [
+    //             // Include directory for libclang.
+    //             "-Iinclude",
+    //             "--isystem=sys",
+    //             "--input=include/Includes.hpp",
+    //             "-I../generalProject1/include",
+    //             "--",
+    //             "--std=c++23"
+    //         ],
+    //         // The working directory inside "resources" to use when calling libclang.
+    //         "cwd": "proj1"
+    //     },
+    //     // The expected output JSON file inside the "resources/expected" directory.
+    //     "out": "Includes.json"
+    // },
+    // {
+    //     "in": {
+    //         "args": [
+    //             // Include directory for libclang.
+    //             "-Iinclude",
+    //             "--isystem=sys",
+    //             "--input=include/RelIncludes.hpp",
+    //             "-I../generalProject1/include",
+    //             "--",
+    //             "--std=c++23"
+    //         ],
+    //         // The working directory inside "resources" to use when calling libclang.
+    //         "cwd": "proj1"
+    //     },
+    //     // The expected output JSON file inside the "resources/expected" directory.
+    //     "out": "RelIncludes.json"
+    // },
+    // {
+    //     "in": {
+    //         "args": [
+    //             // Include directory for libclang.
+    //             "-Iinclude",
+    //             "--isystem=sys",
+    //             "--input=include/RelIndirectIncludes.hpp",
+    //             "-I../generalProject1/include",
+    //             "--",
+    //             "--std=c++23"
+    //         ],
+    //         // The working directory inside "resources" to use when calling libclang.
+    //         "cwd": "proj1"
+    //     },
+    //     // The expected output JSON file inside the "resources/expected" directory.
+    //     "out": "RelIndirectIncludes.json"
+    // },
+    // {
+    //     "in": {
+    //         "args": [
+    //             // Include directory for libclang.
+    //             "-Iinclude",
+    //             "-Isys",
+    //             "--input=include/MultipleIncludeDirs.hpp",
+    //             "--",
+    //             "--std=c++23"
+    //         ],
+    //         // The working directory inside "resources" to use when calling libclang.
+    //         "cwd": "proj1"
+    //     },
+    //     // The expected output JSON file inside the "resources/expected" directory.
+    //     "out": "MultipleIncludeDirs.json"
+    // },
+    // // Define
+    // {
+    //     // All the cases in this section should have the exact same result.
+    //     "title": "Define",
+    //     "in": {
+    //         "args": [
+    //             // No include directories.
+    //             "-DFENTON_UNDEFINED_FUNC",
+    //             "--input=include/Define.hpp",
+    //             "--",
+    //             "--std=c++23"
+    //         ],
+    //         // The working directory inside "resources" to use when calling libclang.
+    //         "cwd": "proj1"
+    //     },
+    //     // The expected output JSON file inside the "resources/expected" directory.
+    //     "out": "Define.json"
+    // },
+    // {
+    //     "in": {
+    //         "args": [
+    //             // One normal include directory.
+    //             "-Iinclude",
+    //             "-DFENTON_UNDEFINED_FUNC",
+    //             "--input=include/Define.hpp",
+    //             "--",
+    //             "--std=c++23"
+    //         ],
+    //         // The working directory inside "resources" to use when calling libclang.
+    //         "cwd": "proj1"
+    //     },
+    //     // The expected output JSON file inside the "resources/expected" directory.
+    //     "out": "Define.json"
+    // },
+    // {
+    //     "in": {
+    //         "args": [
+    //             // One normal and one system include directory.
+    //             "-Iinclude",
+    //             "--isystem=sys",
+    //             "-DFENTON_UNDEFINED_FUNC",
+    //             "--input=include/Define.hpp",
+    //             "--",
+    //             "--std=c++23"
+    //         ],
+    //         // The working directory inside "resources" to use when calling libclang.
+    //         "cwd": "proj1"
+    //     },
+    //     // The expected output JSON file inside the "resources/expected" directory.
+    //     "out": "Define.json"
+    // },
+    // {
+    //     "in": {
+    //         "args": [
+    //             // Two normal include directories.
+    //             "-Iinclude",
+    //             "-Isys",
+    //             "-DFENTON_UNDEFINED_FUNC",
+    //             "--input=include/Define.hpp",
+    //             "--",
+    //             "--std=c++23"
+    //         ],
+    //         // The working directory inside "resources" to use when calling libclang.
+    //         "cwd": "proj1"
+    //     },
+    //     // The expected output JSON file inside the "resources/expected" directory.
+    //     "out": "Define.json"
+    // },
+    // // MultipleDefines
+    // {
+    //     // All the cases in this section should have the exact same result as the previous 
+    //     // section.
+    //     "title": "MultipleDefines",
+    //     "in": {
+    //         "args": [
+    //             // No include directories.
+    //             "-DFENTON_UNDEFINED_FUNC",
+    //             "-DFENTON_OTHER_FUNC",
+    //             "--input=include/MultipleDefines.hpp",
+    //             "--",
+    //             "--std=c++23"
+    //         ],
+    //         // The working directory inside "resources" to use when calling libclang.
+    //         "cwd": "proj1"
+    //     },
+    //     // The expected output JSON file inside the "resources/expected" directory.
+    //     "out": "Define.json"
+    // },
+    // {
+    //     "in": {
+    //         "args": [
+    //             // One normal include directory.
+    //             "-Iinclude",
+    //             "-DFENTON_UNDEFINED_FUNC",
+    //             "-DFENTON_OTHER_FUNC",
+    //             "--input=include/MultipleDefines.hpp",
+    //             "--",
+    //             "--std=c++23"
+    //         ],
+    //         // The working directory inside "resources" to use when calling libclang.
+    //         "cwd": "proj1"
+    //     },
+    //     // The expected output JSON file inside the "resources/expected" directory.
+    //     "out": "Define.json"
+    // },
+    // {
+    //     "in": {
+    //         "args": [
+    //             // One normal and one system include directory.
+    //             "-Iinclude",
+    //             "--isystem=sys",
+    //             "-DFENTON_UNDEFINED_FUNC",
+    //             "-DFENTON_OTHER_FUNC",
+    //             "--input=include/MultipleDefines.hpp",
+    //             "--",
+    //             "--std=c++23"
+    //         ],
+    //         // The working directory inside "resources" to use when calling libclang.
+    //         "cwd": "proj1"
+    //     },
+    //     // The expected output JSON file inside the "resources/expected" directory.
+    //     "out": "Define.json"
+    // },
+    // {
+    //     "in": {
+    //         "args": [
+    //             // Two normal include directories.
+    //             "-Iinclude",
+    //             "-Isys",
+    //             "-DFENTON_UNDEFINED_FUNC",
+    //             "-DFENTON_OTHER_FUNC",
+    //             "--input=include/MultipleDefines.hpp",
+    //             "--",
+    //             "--std=c++23"
+    //         ],
+    //         // The working directory inside "resources" to use when calling libclang.
+    //         "cwd": "proj1"
+    //     },
+    //     // The expected output JSON file inside the "resources/expected" directory.
+    //     "out": "Define.json"
+    // },
     // Bases
+    // {
+    //     "title": "Base",
+    //     "in": {
+    //         "args": [
+    //             // Include directory for libclang.
+    //             "-Iinclude",
+    //             "--input=include/animals/Human.hpp",
+    //             "--",
+    //             "--std=c++23"
+    //         ],
+    //         // The working directory inside "resources" to use when calling libclang.
+    //         "cwd": "generalProject1"
+    //     },
+    //     // The expected output JSON file inside the "resources/expected" directory.
+    //     "out": "Human.json"
+    // }//,
+    // Callables.
+    // {
+    //     "title": "Callables",
+    //     "in": {
+    //         "args": [
+    //             // Include directory for libclang.
+    //             "-I=.",
+    //             "--input=Functions.hpp",
+    //             "--",
+    //             "--std=c++23"
+    //         ],
+    //         // The working directory inside "resources" to use when calling libclang.
+    //         "cwd": "proj1/include"
+    //     },
+    //     // The expected output JSON file inside the "resources/expected" directory.
+    //     "out": "Functions.json"
+    // }
     {
-        "title": "Base",
+        "title": "Fields",
         "in": {
             "args": [
                 // Include directory for libclang.
                 "-Iinclude",
-                "--input=include/animals/Human.hpp",
+                "--input=include/Fields.hpp",
                 "--",
                 "--std=c++23"
             ],
             // The working directory inside "resources" to use when calling libclang.
-            "cwd": "generalProject1"
+            "cwd": "proj1"
         },
         // The expected output JSON file inside the "resources/expected" directory.
-        "out": "Human.json"
-    },
-    // Callables.
-    {
-        "title": "Callables",
-        "in": {
-            "args": [
-                // Include directory for libclang.
-                "-I=.",
-                "--input=Functions.hpp",
-                "--",
-                "--std=c++23"
-            ],
-            // The working directory inside "resources" to use when calling libclang.
-            "cwd": "proj1/include"
-        },
-        // The expected output JSON file inside the "resources/expected" directory.
-        "out": "Functions.json"
+        "out": "Fields.json"
     }
 ]

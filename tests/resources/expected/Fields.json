@@ -1,0 +1,43 @@
+{
+    "namespaces" : {
+        "NS" : {
+            "types" : {
+                "OtherStruct" : {
+                    "isDefined" : true,
+                    "isAnonymous" : false,
+                    "recordType" : "struct",
+                    "fields" : {
+                        "b" : {
+                            "type" : "bool",
+                            "canonicalType" : "bool"
+                        },
+                        "c" : {
+                            "type" : "int",
+                            "canonicalType" : "int"
+                        }
+                    }
+                },
+                "MyStruct" : {
+                    "isDefined" : true,
+                    "isAnonymous" : false,
+                    "recordType" : "struct",
+                    "fields" : {
+                        "os" : {
+                            "type" : "ShortName",
+                            "canonicalType" : "NS::OtherStruct"
+                        },
+                        "l" : {
+                            "type" : "int",
+                            "canonicalType" : "int"
+                        },
+                        "myLong" : {
+                            "type" : "long",
+                            "canonicalType" : "long"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "inclusions" : []
+}

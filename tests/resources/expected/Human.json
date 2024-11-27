@@ -8,13 +8,15 @@
                     "recordType" : "class",
                     "fields" : {
                         "specialID" : {
-                            "type" : "std::basic_string<char>"
+                            "type" : "std::string",
+                            "canonicalType" : "std::basic_string<char>"
                         }
                     },
                     "methods" : {
                         "retrieve" : {
-                            "Animals::Special &()" : {
-                                "returnType" : "Animals::Special &",
+                            "Special &()" : {
+                                "returnType" : "Special &",
+                                "canonicalReturnType" : "Animals::Special &",
                                 "methodSpecifiers" : [
                                     "pure",
                                     "virtual"
@@ -23,8 +25,9 @@
                             }
                         },
                         "getID" : {
-                            "std::basic_string<char> ()" : {
-                                "returnType" : "std::basic_string<char>",
+                            "std::string ()" : {
+                                "returnType" : "std::string",
+                                "canonicalReturnType" : "std::basic_string<char>",
                                 "methodSpecifiers" : [
                                     "virtual"
                                 ],
@@ -37,15 +40,23 @@
                     "isDefined" : true,
                     "isAnonymous" : false,
                     "recordType" : "class",
+                    "bases" : [
+                        {
+                            "type" : "Special",
+                            "canonicalType" : "Animals::Special"
+                        }
+                    ],
                     "fields" : {
                         "intermediateID" : {
-                            "type" : "std::basic_string<char>"
+                            "type" : "std::string",
+                            "canonicalType" : "std::basic_string<char>"
                         }
                     },
                     "methods" : {
                         "retrieve" : {
-                            "Animals::Special &()" : {
-                                "returnType" : "Animals::Special &",
+                            "Special &()" : {
+                                "returnType" : "Special &",
+                                "canonicalReturnType" : "Animals::Special &",
                                 "methodSpecifiers" : [
                                     "virtual",
                                     "override"
@@ -54,8 +65,9 @@
                             }
                         },
                         "getID" : {
-                            "std::basic_string<char> ()" : {
-                                "returnType" : "std::basic_string<char>",
+                            "std::string ()" : {
+                                "returnType" : "std::string",
+                                "canonicalReturnType" : "std::basic_string<char>",
                                 "methodSpecifiers" : [
                                     "virtual",
                                     "override"
@@ -69,10 +81,21 @@
                     "isDefined" : true,
                     "isAnonymous" : false,
                     "recordType" : "class",
+                    "bases" : [
+                        {
+                            "type" : "ACS::Animal",
+                            "canonicalType" : "ACS::Animal"
+                        },
+                        {
+                            "type" : "Intermediate",
+                            "canonicalType" : "Animals::Intermediate"
+                        }
+                    ],
                     "methods" : {
                         "retrieve" : {
-                            "Animals::Special &()" : {
-                                "returnType" : "Animals::Special &",
+                            "Special &()" : {
+                                "returnType" : "Special &",
+                                "canonicalReturnType" : "Animals::Special &",
                                 "methodSpecifiers" : [
                                     "virtual",
                                     "final"
@@ -83,6 +106,7 @@
                         "Moo" : {
                             "bool ()" : {
                                 "returnType" : "bool",
+                                "canonicalReturnType" : "bool",
                                 "methodSpecifiers" : [
                                     "virtual",
                                     "override"

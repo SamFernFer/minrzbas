@@ -1,17 +1,4 @@
 {
-    "functions" : {
-        "myOtherFunc" : {
-            "int (bool)" : {
-                "returnType" : "int",
-                "parameters" : [
-                    {
-                        "name" : "b",
-                        "type" : "bool"
-                    }
-                ]
-            }
-        }
-    },
     "inclusions" : [
         "../generalProject1/include/Printer.hpp",
         "../generalProject1/include/acs/Animal.hpp",

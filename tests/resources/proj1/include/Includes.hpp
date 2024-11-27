@@ -13,8 +13,4 @@
 #include <Ímã.hpp>
 #include <Printer.hpp>
 
-int moo() {
-    return -9;
-}
-
 #endif
