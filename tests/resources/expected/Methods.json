@@ -1,0 +1,141 @@
+{
+    "namespaces" : {
+        "ThingNS" : {
+            "types" : {
+                "Base" : {
+                    "isDefined" : true,
+                    "isAnonymous" : false,
+                    "recordType" : "struct",
+                    "methods" : {
+                        "getLong" : {
+                            "long () const" : {
+                                "access" : "public",
+                                "returnType" : "long",
+                                "methodSpecifiers" : [
+                                    "pure",
+                                    "virtual",
+                                    "const"
+                                ],
+                                "parameters" : []
+                            }
+                        },
+                        "getChar" : {
+                            "char ()" : {
+                                "access" : "public",
+                                "returnType" : "char",
+                                "methodSpecifiers" : [
+                                    "virtual"
+                                ],
+                                "parameters" : []
+                            }
+                        },
+                        "getStr" : {
+                            "const char *()" : {
+                                "access" : "public",
+                                "returnType" : "const char *",
+                                "methodSpecifiers" : [
+                                    "virtual"
+                                ],
+                                "parameters" : []
+                            }
+                        }
+                    }
+                },
+                "Thing1" : {
+                    "isDefined" : true,
+                    "isAnonymous" : false,
+                    "recordType" : "struct",
+                    "bases" : [
+                        {
+                            "type" : "ThingNS::Base",
+                            "access" : "public"
+                        }
+                    ],
+                    "methods" : {
+                        "function" : {
+                            "void () noexcept" : {
+                                "access" : "public",
+                                "returnType" : "void",
+                                "methodSpecifiers" : [
+                                    "static"
+                                ],
+                                "parameters" : []
+                            }
+                        },
+                        "New" : {
+                            "ThingNS::Thing1 (long)" : {
+                                "access" : "private",
+                                "returnType" : "ThingNS::Thing1",
+                                "methodSpecifiers" : [
+                                    "static"
+                                ],
+                                "parameters" : [
+                                    {
+                                        "name" : "myLong",
+                                        "type" : "long"
+                                    }
+                                ]
+                            }
+                        },
+                        "getLong" : {
+                            "long () const" : {
+                                "access" : "protected",
+                                "returnType" : "long",
+                                "methodSpecifiers" : [
+                                    "virtual",
+                                    "const",
+                                    "override"
+                                ],
+                                "parameters" : []
+                            }
+                        },
+                        "getChar" : {
+                            "char ()" : {
+                                "access" : "protected",
+                                "returnType" : "char",
+                                "methodSpecifiers" : [
+                                    "virtual"
+                                ],
+                                "parameters" : []
+                            }
+                        },
+                        "getStr" : {
+                            "const char *()" : {
+                                "access" : "protected",
+                                "returnType" : "const char *",
+                                "methodSpecifiers" : [
+                                    "virtual",
+                                    "override"
+                                ],
+                                "parameters" : []
+                            }
+                        },
+                        "doThing" : {
+                            "void (float, double, long long)" : {
+                                "access" : "protected",
+                                "returnType" : "void",
+                                "methodSpecifiers" : [],
+                                "parameters" : [
+                                    {
+                                        "name" : "f",
+                                        "type" : "float"
+                                    },
+                                    {
+                                        "name" : "d",
+                                        "type" : "double"
+                                    },
+                                    {
+                                        "name" : "ll",
+                                        "type" : "long long",
+                                        "hasDefaultValue" : true
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "inclusions" : []
+}

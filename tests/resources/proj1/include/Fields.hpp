@@ -2,13 +2,16 @@
 
 namespace NS {
     struct OtherStruct {
-        // bool b;
-        std::int8_t c;
+        bool b;
+    private:
+        char*const volatile c;
     };
-    // using ShortName = OtherStruct;
-    // struct MyStruct {
-    //     NS::ShortName os;
-    //     std::int64_t l;
-    //     long myLong;
-    // };
+    struct MyStruct {
+        OtherStruct os;
+    protected:
+        OtherStruct*const osPtr;
+        long long l;
+    private:
+        long myLong;
+    };
 }

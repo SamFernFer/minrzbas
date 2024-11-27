@@ -1,0 +1,45 @@
+{
+    "namespaces" : {
+        "Space" : {
+            "types" : {
+                "Base" : {
+                    "isDefined" : true,
+                    "isAnonymous" : false,
+                    "recordType" : "struct"
+                },
+                "InnerBase" : {
+                    "isDefined" : true,
+                    "isAnonymous" : false,
+                    "recordType" : "class"
+                },
+                "SecondBase" : {
+                    "isDefined" : true,
+                    "isAnonymous" : false,
+                    "recordType" : "class",
+                    "bases" : [
+                        {
+                            "type" : "Space::InnerBase",
+                            "access" : "private"
+                        }
+                    ]
+                },
+                "Derived" : {
+                    "isDefined" : true,
+                    "isAnonymous" : false,
+                    "recordType" : "struct",
+                    "bases" : [
+                        {
+                            "type" : "Space::Base",
+                            "access" : "protected"
+                        },
+                        {
+                            "type" : "Space::SecondBase",
+                            "access" : "public"
+                        }
+                    ]
+                }
+            }
+        }
+    },
+    "inclusions" : []
+}

@@ -69,11 +69,7 @@ namespace Fenton::Minrzbas {
         return to_string(clang_getCursorSpelling(cursor));
     }
 
-    // Returns the string representation of the type. If cannonical is true, returns 
-    // the fully-qualified version of the type with any aliases or typedefs removed, 
-    // else returns the fully-qualified version of the type, but keeping aliases and 
-    // typedefs.
-    template<bool canonical>
+    // Returns the string representation of the canonical version of the type.
     static std::string typeToString(CXType type) {
         CXCursor _decl = clang_getTypeDeclaration(type);
 
@@ -83,25 +79,8 @@ namespace Fenton::Minrzbas {
             return "";
         }
 
-        const std::string _parent = to_string(clang_getCursorSemanticParent(_decl));
-        const std::string _cursor = to_string(_decl);
-
-        const std::string
-            _canon = to_string(clang_getTypeSpelling(clang_getCanonicalType(type))),
-            _view = to_string(clang_getTypeSpelling(clang_getCursorType(_decl)))
-        ;
-        if constexpr (canonical) {
-            // Returns the spelling of the canonical version of the type.
-            return _canon;
-        } else {
-            // Returns the spelling of the type's declaration.
-            return _view;
-        }
-    }
-    // Shortcut to `typeToString<canonical>(clang_getCursorType(c))`.
-    template<bool canonical>
-    static std::string cursorTypeToString(CXCursor c) {
-        return typeToString<canonical>(clang_getCursorType(c));
+        // Returns the canonical spelling of the type.
+        return to_string(clang_getTypeSpelling(clang_getCanonicalType(type)));
     }
     std::string to_string(const CXCursorKind& kind) {
         return to_string(clang_getCursorKindSpelling(kind));
@@ -113,13 +92,30 @@ namespace Fenton::Minrzbas {
     // Adds the "type" and "canonicalType" fields with the visual and canonical type spellings 
     // respectively.
     static void addViewAndCanonicalType(json::object& obj, CXType type) {
-        obj["type"] = typeToString<false>(type);
-        obj["canonicalType"] = typeToString<true>(type);
+        obj["type"] = typeToString(type);
+        // obj["canonicalType"] = typeToString<true>(type);
     }
     // Adds the "type" and "canonicalType" fields with the visual and canonical type spellings 
     // of the cursor's type, respectively.
     static void addViewAndCanonicalType(json::object& obj, CXCursor c) {
         addViewAndCanonicalType(obj, clang_getCursorType(c));
+    }
+    // Adds the "access" field containing the entity's access level if it is specified, 
+    // else does nothing.
+    static void addAccess(json::object& obj, CXCursor c) {
+        switch (clang_getCXXAccessSpecifier(c)) {
+            case CX_CXXPublic:
+                obj["access"] = "public";
+                break;
+            case CX_CXXProtected:
+                obj["access"] = "protected";
+                break;
+            case CX_CXXPrivate:
+                obj["access"] = "private";
+                break;
+            default:
+                break;
+        }
     }
     static json::object& atOrInsertObject(json::object& obj, std::string_view key) {
         if (json::value* vPtr = obj.if_contains(key)) {
@@ -129,7 +125,9 @@ namespace Fenton::Minrzbas {
         }
     }
 
-    static CXChildVisitResult debugReflVisitor(CXCursor c, CXCursor parent, CXClientData client_data) {
+    static CXChildVisitResult debugReflVisitor(
+        CXCursor c, CXCursor parent, CXClientData client_data
+    ) {
         if (
             clang_Location_isInSystemHeader(clang_getCursorLocation(c))
             || (!clang_Location_isFromMainFile(clang_getCursorLocation(c))
@@ -174,18 +172,45 @@ namespace Fenton::Minrzbas {
 
         return CXChildVisit_Continue;
     }
-    static CXChildVisitResult paramVisitor(CXCursor c, CXCursor parent, CXClientData client_data) {
-        if (clang_getCursorKind(c) != CXCursor_ParmDecl)
-            return CXChildVisit_Continue;
-        
-        json::array& _params = *static_cast<json::array*>(client_data);
+    // If the parent parameter has an expression inside it, then it has a default value 
+    // and the "hasDefaultValue" is added to the JSON object sent as client_data.
+    static CXChildVisitResult defaultParamValueVisitor(
+        CXCursor c, CXCursor parent, CXClientData client_data
+    ) {
+        CXCursorKind _kind = clang_getCursorKind(c);
+        // If the cursor is an expression, sets the "hasDefaultValue" to true and 
+        // stops the visit.
+        if (
+            _kind >= CXCursor_FirstExpr
+            && _kind <= CXCursor_LastExpr
+        ) {
+            json::object& _param = *static_cast<json::object*>(client_data);
+            _param["hasDefaultValue"] = true;
+            return CXChildVisit_Break;
+        }
+        return CXChildVisit_Continue;
+    }
+    // Creates a JSON object from the parameter represented by the cursor.
+    static json::object getParamFromCursor(CXCursor c) {
         json::object _param = json::object{
             { "name", to_string(c) }
         };
         // Adds the type to the parameter.
         addViewAndCanonicalType(_param, c);
+        // If the parameter has an expression inside it, then it has a default value 
+        // and the "hasDefaultValue" will be added.
+        clang_visitChildren(c, defaultParamValueVisitor, &_param);
+
+        return std::move(_param);
+    }
+    static CXChildVisitResult paramVisitor(CXCursor c, CXCursor parent, CXClientData client_data) {
+        if (clang_getCursorKind(c) != CXCursor_ParmDecl)
+            return CXChildVisit_Continue;
+        
+        json::array& _params = *static_cast<json::array*>(client_data);
+        
         // Moves the parameter into the array.
-        _params.emplace_back(std::move(_param));
+        _params.emplace_back(getParamFromCursor(c));
         return CXChildVisit_Continue;
     }
     // Used when building the "signature" of a destructor from its parameters.
@@ -198,7 +223,7 @@ namespace Fenton::Minrzbas {
         // Unpacks the parameter list.
         std::list<std::string>& _params = *static_cast<std::list<std::string>*>(client_data);
         // Emplaces the string representation of the parameter's type.
-        _params.emplace_back(cursorTypeToString<true>(c));
+        _params.emplace_back(typeToString(clang_getCursorType(c)));
 
         return CXChildVisit_Continue;
     }
@@ -249,7 +274,7 @@ namespace Fenton::Minrzbas {
                 _type.append(" noexcept");
             }
         } else {
-            _type = cursorTypeToString<true>(c);
+            _type = typeToString(clang_getCursorType(c));
         }
 
         json::value& _callableVal = overloads[_type];
@@ -258,10 +283,13 @@ namespace Fenton::Minrzbas {
         if (!_callableVal.is_object()) {
             json::object& _callable = _callableVal.emplace_object();
 
+            // Adds the callable's access level.
+            addAccess(_callable, c);
+
             if constexpr (hasReturnType) {
                 // Stores the callable's return type.
-                _callable["returnType"] = typeToString<false>(clang_getCursorResultType(c));
-                _callable["canonicalReturnType"] = typeToString<true>(clang_getCursorResultType(c));
+                _callable["returnType"] = typeToString(clang_getCursorResultType(c));
+                // _callable["canonicalReturnType"] = typeToString<true>(clang_getCursorResultType(c));
             }
         
             if constexpr (isMethod) {
@@ -316,14 +344,8 @@ namespace Fenton::Minrzbas {
                 for (int i = 0; i < _paramCount; ++i) {
                     // Gets the cursor corresponding to the argument.
                     CXCursor _argCursor = clang_Cursor_getArgument(c, i);
-                    // Creates the parameter.
-                    json::object _param = json::object{
-                        { "name", to_string(_argCursor) }
-                    };
-                    // Adds the parameter's type.
-                    addViewAndCanonicalType(_param, _argCursor);
                     // Moves the parameter into the array.
-                    _params.emplace_back(std::move(_param));
+                    _params.emplace_back(getParamFromCursor(_argCursor));
                 }
             }
         }
@@ -333,7 +355,7 @@ namespace Fenton::Minrzbas {
         json::object& _overloads = atOrInsertObject(callables, name);
         addOverload<isMethod>(_overloads, c);
     }
-    template<bool isClass, bool isStruct, bool isUnion> static void addRecord(
+    template<RecordType recordType> static void addRecord(
         json::object& obj, json::object*& typesPtr, CXCursor c, std::string_view name
     ) {
         if (!typesPtr)
@@ -365,16 +387,22 @@ namespace Fenton::Minrzbas {
         }
         _type["isAnonymous"] = _isAnonymous;
 
+        // Adds the record's access level.
+        addAccess(_type, c);
+        // Adds the record's type.
         json::string& _recordType = _type["recordType"].emplace_string();
-        if constexpr (isClass)
-            _recordType = "class";
-        else if constexpr (isStruct)
-            _recordType = "struct";
-        else if constexpr (isUnion)
-            _recordType = "union";
-        else
-            // Should never happen, actually.
-            _recordType = "unknown";
+
+        switch (recordType) {
+            case RecordType::Class:
+                _recordType = "class";
+                break;
+            case RecordType::Struct:
+                _recordType = "struct";
+                break;
+            case RecordType::Union:
+                _recordType = "union";
+                break;
+        }
 
         // TODO: Implement it for the members.
         // _type["isBitField"] = clang_Cursor_isBitField(c);
@@ -446,6 +474,8 @@ namespace Fenton::Minrzbas {
             json::object _base;
             // Adds the base's type.
             addViewAndCanonicalType(_base, c);
+            // Adds the base's access.
+            addAccess(_base, c);
             // Adds the base.
             _bases.emplace_back(_base);
             return CXChildVisit_Continue;
@@ -488,13 +518,13 @@ namespace Fenton::Minrzbas {
             }
             // Type declarations.
             case CXCursor_ClassDecl:
-                addRecord<true, false, false>(_obj, _types, c, _cursorName);
+                addRecord<RecordType::Class>(_obj, _types, c, _cursorName);
                 break;
             case CXCursor_StructDecl:
-                addRecord<false, true, false>(_obj, _types, c, _cursorName);
+                addRecord<RecordType::Struct>(_obj, _types, c, _cursorName);
                 break;
             case CXCursor_UnionDecl:
-                addRecord<false, false, true>(_obj, _types, c, _cursorName);
+                addRecord<RecordType::Union>(_obj, _types, c, _cursorName);
                 break;
             case CXCursor_EnumDecl: {
                 if (!_enums)
@@ -548,6 +578,8 @@ namespace Fenton::Minrzbas {
                 // Makes sure the field is not redefined.
                 if (!_fieldVal.is_object()) {
                     json::object& _field = _fieldVal.emplace_object();
+                    // Adds the field's access level.
+                    addAccess(_field, c);
                     // Adds the field's type.
                     addViewAndCanonicalType(_field, c);
                 }
@@ -562,6 +594,8 @@ namespace Fenton::Minrzbas {
                 // Makes sure the variable is not redefined.
                 if (!_varVal.is_object()) {
                     json::object& _var = _varVal.emplace_object();
+                    // Adds the variable's access level.
+                    addAccess(_var, c);
                     // Adds the variable's type.
                     addViewAndCanonicalType(_var, c);
                 }

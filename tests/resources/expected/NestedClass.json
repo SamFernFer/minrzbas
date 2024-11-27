@@ -1,0 +1,38 @@
+{
+    "types" : {
+        "Upper" : {
+            "isDefined" : true,
+            "isAnonymous" : false,
+            "recordType" : "struct",
+            "types" : {
+                "NestedPublic" : {
+                    "isDefined" : true,
+                    "isAnonymous" : false,
+                    "access" : "public",
+                    "recordType" : "class",
+                    "types" : {
+                        "InnerPrivate" : {
+                            "isDefined" : true,
+                            "isAnonymous" : false,
+                            "access" : "private",
+                            "recordType" : "class"
+                        }
+                    }
+                },
+                "Private" : {
+                    "isDefined" : true,
+                    "isAnonymous" : false,
+                    "access" : "private",
+                    "recordType" : "struct"
+                },
+                "Protected" : {
+                    "isDefined" : true,
+                    "isAnonymous" : false,
+                    "access" : "protected",
+                    "recordType" : "class"
+                }
+            }
+        }
+    },
+    "inclusions" : []
+}

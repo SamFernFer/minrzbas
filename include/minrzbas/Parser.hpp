@@ -23,6 +23,9 @@ namespace Fenton::Minrzbas {
         // Whether the AST should be displayed before the output.
         bool dumpAST;
     };
+    enum class RecordType {
+        Class, Struct, Union
+    };
     // Decomposes the options in the variables_map so that they can be used more easily elsewhere.
     OptionsDecomposition decomposeOptions(const boost::program_options::variables_map& vm);
 }

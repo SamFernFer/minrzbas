@@ -59,161 +59,37 @@
     },
     "namespaces" : {
         "ThingNS" : {
-            "enums" : {
-                "ThingType" : {
-                    "isDefined" : true,
-                    "isScoped" : true,
-                    "type" : "int",
-                    "values" : {
-                        "Value1" : 1,
-                        "Value2" : 2,
-                        "Value3" : 5
-                    }
-                }
-            },
             "types" : {
-                "MyClass" : {
-                    "isDefined" : true,
-                    "recordType" : "class",
-                    "isAnonymous" : false,
-                    "fields" : {
-                        "thingType" : {
-                            "type" : "ThingNS::ThingType"
-                        }
-                    },
-                    "constructors" : {
-                        "void ()" : {
-                            "methodSpecifiers" : [],
-                            "constructorType" : "default",
-                            "parameters" : []
-                        }
-                    }
-                },
                 "Thing1" : {
-                    "isDefined" : true,
-                    "recordType" : "struct",
-                    "isAnonymous" : false,
-                    "variables" : {
-                        "ints" : {
-                            "type" : "std::vector<int>"
-                        }
-                    },
-                    "fields" : {
-                        "myLong" : {
-                            "type" : "long"
-                        }
-                    },
-                    "methods" : {
-                        "function" : {
-                            "void () noexcept" : {
-                                "returnType" : "void",
-                                "methodSpecifiers" : [
-                                    "static"
-                                ],
-                                "parameters" : []
-                            }
-                        },
-                        "New" : {
-                            "ThingNS::Thing1 (long)" : {
-                                "returnType" : "ThingNS::Thing1",
-                                "methodSpecifiers" : [
-                                    "static"
-                                ],
-                                "parameters" : [
-                                    {
-                                        "name" : "myLong",
-                                        "type" : "long"
-                                    }
-                                ]
-                            }
-                        },
-                        "getLong" : {
-                            "long ()" : {
-                                "returnType" : "long",
-                                "methodSpecifiers" : [],
-                                "parameters" : []
-                            }
-                        }
-                    },
-                    "constructors" : {
-                        "void ()" : {
-                            "methodSpecifiers" : [
-                                "defaulted"
-                            ],
-                            "constructorType" : "default",
-                            "parameters" : []
-                        },
-                        "void (long)" : {
-                            "methodSpecifiers" : [],
-                            "constructorType" : "converting",
-                            "parameters" : [
-                                {
-                                    "name" : "myLong",
-                                    "type" : "long"
-                                }
-                            ]
-                        },
-                        "void (ThingNS::ThingType) noexcept" : {
-                            "methodSpecifiers" : [
-                                "explicit"
-                            ],
-                            "constructorType" : "general",
-                            "parameters" : [
-                                {
-                                    "name" : "type",
-                                    "type" : "ThingNS::ThingType"
-                                }
-                            ]
-                        }
-                    },
-                    "destructors" : {
-                        "void () noexcept" : {
-                            "methodSpecifiers" : [],
-                            "parameters" : []
-                        },
-                        "void (int)" : {
-                            "methodSpecifiers" : [],
-                            "parameters" : [
-                                {
-                                    "name" : "i",
-                                    "type" : "int"
-                                }
-                            ]
-                        },
-                        "void (int) noexcept" : {
-                            "methodSpecifiers" : [],
-                            "parameters" : [
-                                {
-                                    "name" : "i",
-                                    "type" : "int"
-                                }
-                            ]
-                        },
-                        "void (ThingNS::Thing1 *)" : {
-                            "methodSpecifiers" : [],
-                            "parameters" : [
-                                {
-                                    "name" : "ptr",
-                                    "type" : "ThingNS::Thing1 *"
-                                }
-                            ]
-                        }
-                    }
+                    "isDefined" : false
                 },
                 "NonAnonymous" : {
+                    "isDefined" : false
+                },
+                "FullStruct" : {
                     "isDefined" : true,
-                    "recordType" : "struct",
                     "isAnonymous" : false,
-                    "fields" : {
-                        "long_" : {
-                            "type" : "long"
-                        }
-                    }
+                    "recordType" : "struct"
                 }
             },
             "functions" : {
                 "getThing" : {
+                    "ThingNS::Thing1 (ThingNS::Thing1, double)" : {
+                        "returnType" : "ThingNS::Thing1",
+                        "parameters" : [
+                            {
+                                "name" : "t1",
+                                "type" : "ThingNS::Thing1"
+                            },
+                            {
+                                "name" : "d",
+                                "type" : "double",
+                                "hasDefaultValue" : true
+                            }
+                        ]
+                    },
                     "ThingNS::Thing1 (ThingNS::Thing1, ThingNS::NonAnonymous)" : {
+                        "access" : "public",
                         "returnType" : "ThingNS::Thing1",
                         "parameters" : [
                             {
@@ -226,7 +102,22 @@
                             }
                         ]
                     },
-                    "ThingNS::Thing1 (ThingNS::Thing1, double)" : {
+                    "ThingNS::Thing1 (ThingNS::Thing1, float)" : {
+                        "access" : "public",
+                        "returnType" : "ThingNS::Thing1",
+                        "parameters" : [
+                            {
+                                "name" : "t1",
+                                "type" : "ThingNS::Thing1"
+                            },
+                            {
+                                "name" : "f",
+                                "type" : "float",
+                                "hasDefaultValue" : true
+                            }
+                        ]
+                    },
+                    "ThingNS::Thing1 (ThingNS::Thing1, char)" : {
                         "returnType" : "ThingNS::Thing1",
                         "parameters" : [
                             {
@@ -235,7 +126,40 @@
                             },
                             {
                                 "name" : "d",
-                                "type" : "double"
+                                "type" : "char",
+                                "hasDefaultValue" : true
+                            }
+                        ]
+                    },
+                    "ThingNS::Thing1 (ThingNS::Thing1, ThingNS::FullStruct, float)" : {
+                        "access" : "public",
+                        "returnType" : "ThingNS::Thing1",
+                        "parameters" : [
+                            {
+                                "name" : "t1",
+                                "type" : "ThingNS::Thing1"
+                            },
+                            {
+                                "name" : "fs",
+                                "type" : "ThingNS::FullStruct",
+                                "hasDefaultValue" : true
+                            },
+                            {
+                                "name" : "f",
+                                "type" : "float",
+                                "hasDefaultValue" : true
+                            }
+                        ]
+                    }
+                },
+                "wasteful" : {
+                    "const char *(const char *)" : {
+                        "returnType" : "const char *",
+                        "parameters" : [
+                            {
+                                "name" : "str",
+                                "type" : "const char *",
+                                "hasDefaultValue" : true
                             }
                         ]
                     }

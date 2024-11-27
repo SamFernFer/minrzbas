@@ -1,0 +1,57 @@
+{
+    "variables" : {
+        "c" : {
+            "type" : "char"
+        },
+        "str" : {
+            "type" : "const char *"
+        }
+    },
+    "namespaces" : {
+        "NS" : {
+            "types" : {
+                "VarType" : {
+                    "isDefined" : true,
+                    "isAnonymous" : false,
+                    "recordType" : "class"
+                },
+                "Class" : {
+                    "isDefined" : true,
+                    "isAnonymous" : false,
+                    "recordType" : "class",
+                    "fields" : {
+                        "privateVar" : {
+                            "access" : "private",
+                            "type" : "NS::VarType"
+                        },
+                        "publicVar" : {
+                            "access" : "public",
+                            "type" : "NS::VarType"
+                        }
+                    }
+                },
+                "Struct" : {
+                    "isDefined" : true,
+                    "isAnonymous" : false,
+                    "recordType" : "struct",
+                    "fields" : {
+                        "publicVar" : {
+                            "access" : "public",
+                            "type" : "const NS::VarType *"
+                        },
+                        "protectedVar" : {
+                            "access" : "protected",
+                            "type" : "volatile long"
+                        }
+                    }
+                }
+            },
+            "variables" : {
+                "doublePtr" : {
+                    "type" : "long **"
+                }
+            }
+        }
+    },
+    "inclusions" : []
+}

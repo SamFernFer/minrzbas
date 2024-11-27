@@ -7,9 +7,36 @@
                     "isAnonymous" : false,
                     "recordType" : "struct",
                     "fields" : {
+                        "b" : {
+                            "access" : "public",
+                            "type" : "bool"
+                        },
                         "c" : {
-                            "type" : "",
-                            "canonicalType" : "signed char"
+                            "access" : "private",
+                            "type" : "char *const volatile"
+                        }
+                    }
+                },
+                "MyStruct" : {
+                    "isDefined" : true,
+                    "isAnonymous" : false,
+                    "recordType" : "struct",
+                    "fields" : {
+                        "os" : {
+                            "access" : "public",
+                            "type" : "NS::OtherStruct"
+                        },
+                        "osPtr" : {
+                            "access" : "protected",
+                            "type" : "NS::OtherStruct *const"
+                        },
+                        "l" : {
+                            "access" : "protected",
+                            "type" : "long long"
+                        },
+                        "myLong" : {
+                            "access" : "private",
+                            "type" : "long"
                         }
                     }
                 }
