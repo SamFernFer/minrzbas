@@ -77,8 +77,10 @@ namespace Fenton::Minrzbas {
             clang_Cursor_isAnonymous(_cursor)
         ;
         // Returns an empty name if the type is anonymous.
-        return _isAnonymous? "" : to_string(clang_getTypeSpelling(_canonType));
-        //return to_string(/*clang_getTypeSpelling(clang_getCanonicalType(type))*/clang_getTypeSpelling(type));
+        // return _isAnonymous? "" : to_string(clang_getTypeSpelling(_canonType));
+
+        // Returns the name of the type visually used, not the canonical type.
+        return _isAnonymous? "" : to_string(clang_getTypeSpelling(type));
     }
     std::string to_string(const CXCursorKind& kind) {
         return to_string(clang_getCursorKindSpelling(kind));
@@ -554,6 +556,18 @@ namespace Fenton::Minrzbas {
                     true
                 >(*_dtors, c);
                 break;
+            }
+            // Bases.
+            case CXCursor_CXXBaseSpecifier: {
+                // Makes sure there is a "bases" array.
+                json::array& _bases = [&_obj](){
+                    json::value& _v = _obj["bases"];
+                    return _v.is_array()? _v.get_array() : _v.emplace_array();
+                }();
+
+                json::object& _thisBase = _bases.emplace_back(json::object{});
+                
+                _thisBase[""] to_string(clang_getCursorType(c));
             }
             // Aliases.
             case CXCursor_TypeAliasDecl: {
