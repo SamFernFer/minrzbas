@@ -15,8 +15,8 @@ long long sub(long long a, long long b) {
 }
 
 namespace ThingNS {
-    struct Thing1;
-    struct NonAnonymous;
+    struct Thing1 {};
+    struct NonAnonymous {};
 
     Thing1 getThing(Thing1 t1, double d = 0.1);
 
@@ -42,6 +42,9 @@ namespace ThingNS {
     const char* wasteful(const char* str = "Hello World!") {
         return str;
     }
+
+    Thing1 operator+(const Thing1& a, const Thing1& b);
 }
+float operator/(const ThingNS::Thing1& t, const ThingNS::NonAnonymous& n);
 
 #endif

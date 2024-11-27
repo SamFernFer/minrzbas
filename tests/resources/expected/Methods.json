@@ -131,6 +131,35 @@
                                     }
                                 ]
                             }
+                        },
+                        "operator=" : {
+                            "ThingNS::Thing1 &(ThingNS::Thing1 &&)" : {
+                                "access" : "protected",
+                                "returnType" : "ThingNS::Thing1 &",
+                                "methodSpecifiers" : [
+                                    "move"
+                                ],
+                                "parameters" : [
+                                    {
+                                        "name" : "",
+                                        "type" : "ThingNS::Thing1 &&"
+                                    }
+                                ]
+                            },
+                            "ThingNS::Thing1 &(const ThingNS::Thing1 &)" : {
+                                "access" : "protected",
+                                "returnType" : "ThingNS::Thing1 &",
+                                "methodSpecifiers" : [
+                                    "defaulted",
+                                    "copy"
+                                ],
+                                "parameters" : [
+                                    {
+                                        "name" : "",
+                                        "type" : "const ThingNS::Thing1 &"
+                                    }
+                                ]
+                            }
                         }
                     }
                 }

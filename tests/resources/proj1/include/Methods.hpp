@@ -19,6 +19,9 @@ protected:
         const char* getStr() override;
 
         void doThing(float f, double d, long long ll = 42);
+
+        Thing1& operator=(Thing1&&);
+        Thing1& operator=(const Thing1&) = default;
     };
     Thing1 Thing1::New(long myLong) {
         return {};

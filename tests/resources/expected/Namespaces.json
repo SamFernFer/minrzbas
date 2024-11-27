@@ -1,0 +1,35 @@
+{
+    "namespaces" : {
+        "Root" : {
+            "namespaces" : {
+                "Named" : {
+                    "namespaces" : {
+                        "NS" : {
+                            "namespaces" : {
+                                "A" : {},
+                                "B" : {},
+                                "C" : {}
+                            }
+                        },
+                        "Cat" : {
+                            "namespaces" : {
+                                "Dog" : {}
+                            }
+                        }
+                    }
+                },
+                "" : {
+                    "namespaces" : {
+                        "Hidden" : {
+                            "namespaces" : {
+                                "Zero" : {}
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "Other" : {}
+    },
+    "inclusions" : []
+}

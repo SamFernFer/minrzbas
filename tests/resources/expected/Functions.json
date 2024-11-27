@@ -55,16 +55,35 @@
                     }
                 ]
             }
+        },
+        "operator/" : {
+            "float (const ThingNS::Thing1 &, const ThingNS::NonAnonymous &)" : {
+                "returnType" : "float",
+                "parameters" : [
+                    {
+                        "name" : "t",
+                        "type" : "const ThingNS::Thing1 &"
+                    },
+                    {
+                        "name" : "n",
+                        "type" : "const ThingNS::NonAnonymous &"
+                    }
+                ]
+            }
         }
     },
     "namespaces" : {
         "ThingNS" : {
             "types" : {
                 "Thing1" : {
-                    "isDefined" : false
+                    "isDefined" : true,
+                    "isAnonymous" : false,
+                    "recordType" : "struct"
                 },
                 "NonAnonymous" : {
-                    "isDefined" : false
+                    "isDefined" : true,
+                    "isAnonymous" : false,
+                    "recordType" : "struct"
                 },
                 "FullStruct" : {
                     "isDefined" : true,
@@ -89,7 +108,6 @@
                         ]
                     },
                     "ThingNS::Thing1 (ThingNS::Thing1, ThingNS::NonAnonymous)" : {
-                        "access" : "public",
                         "returnType" : "ThingNS::Thing1",
                         "parameters" : [
                             {
@@ -103,7 +121,6 @@
                         ]
                     },
                     "ThingNS::Thing1 (ThingNS::Thing1, float)" : {
-                        "access" : "public",
                         "returnType" : "ThingNS::Thing1",
                         "parameters" : [
                             {
@@ -132,7 +149,6 @@
                         ]
                     },
                     "ThingNS::Thing1 (ThingNS::Thing1, ThingNS::FullStruct, float)" : {
-                        "access" : "public",
                         "returnType" : "ThingNS::Thing1",
                         "parameters" : [
                             {
@@ -160,6 +176,21 @@
                                 "name" : "str",
                                 "type" : "const char *",
                                 "hasDefaultValue" : true
+                            }
+                        ]
+                    }
+                },
+                "operator+" : {
+                    "ThingNS::Thing1 (const ThingNS::Thing1 &, const ThingNS::Thing1 &)" : {
+                        "returnType" : "ThingNS::Thing1",
+                        "parameters" : [
+                            {
+                                "name" : "a",
+                                "type" : "const ThingNS::Thing1 &"
+                            },
+                            {
+                                "name" : "b",
+                                "type" : "const ThingNS::Thing1 &"
                             }
                         ]
                     }

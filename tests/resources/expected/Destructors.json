@@ -1,0 +1,63 @@
+{
+    "types" : {
+        "Class" : {
+            "isDefined" : true,
+            "isAnonymous" : false,
+            "recordType" : "class",
+            "destructors" : {
+                "void ()" : {
+                    "access" : "private",
+                    "methodSpecifiers" : [],
+                    "parameters" : []
+                },
+                "void (int, long) noexcept" : {
+                    "access" : "public",
+                    "methodSpecifiers" : [],
+                    "parameters" : [
+                        {
+                            "name" : "i",
+                            "type" : "int"
+                        },
+                        {
+                            "name" : "l",
+                            "type" : "long"
+                        }
+                    ]
+                },
+                "void (double, double)" : {
+                    "access" : "protected",
+                    "methodSpecifiers" : [],
+                    "parameters" : [
+                        {
+                            "name" : "a",
+                            "type" : "double"
+                        },
+                        {
+                            "name" : "b",
+                            "type" : "double"
+                        }
+                    ]
+                },
+                "void (float, const Class *, long)" : {
+                    "access" : "private",
+                    "methodSpecifiers" : [],
+                    "parameters" : [
+                        {
+                            "name" : "a",
+                            "type" : "float"
+                        },
+                        {
+                            "name" : "parentClass",
+                            "type" : "const Class *"
+                        },
+                        {
+                            "name" : "myLong",
+                            "type" : "long"
+                        }
+                    ]
+                }
+            }
+        }
+    },
+    "inclusions" : []
+}

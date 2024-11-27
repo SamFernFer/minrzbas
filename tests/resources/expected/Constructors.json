@@ -1,0 +1,120 @@
+{
+    "types" : {
+        "Struct" : {
+            "isDefined" : true,
+            "isAnonymous" : false,
+            "recordType" : "struct",
+            "constructors" : {
+                "void (long)" : {
+                    "access" : "public",
+                    "methodSpecifiers" : [],
+                    "constructorType" : "converting",
+                    "parameters" : [
+                        {
+                            "name" : "l",
+                            "type" : "long"
+                        }
+                    ]
+                },
+                "void (double)" : {
+                    "access" : "public",
+                    "methodSpecifiers" : [
+                        "explicit"
+                    ],
+                    "constructorType" : "general",
+                    "parameters" : [
+                        {
+                            "name" : "d",
+                            "type" : "double"
+                        }
+                    ]
+                },
+                "void (char, char)" : {
+                    "access" : "protected",
+                    "methodSpecifiers" : [],
+                    "constructorType" : "general",
+                    "parameters" : [
+                        {
+                            "name" : "a",
+                            "type" : "char"
+                        },
+                        {
+                            "name" : "b",
+                            "type" : "char"
+                        }
+                    ]
+                },
+                "void (const char *)" : {
+                    "access" : "private",
+                    "methodSpecifiers" : [],
+                    "constructorType" : "converting",
+                    "parameters" : [
+                        {
+                            "name" : "str",
+                            "type" : "const char *const",
+                            "hasDefaultValue" : true
+                        }
+                    ]
+                },
+                "void ()" : {
+                    "access" : "public",
+                    "methodSpecifiers" : [],
+                    "constructorType" : "default",
+                    "parameters" : []
+                },
+                "void (Struct &&)" : {
+                    "access" : "public",
+                    "methodSpecifiers" : [
+                        "defaulted"
+                    ],
+                    "constructorType" : "move",
+                    "parameters" : [
+                        {
+                            "name" : "",
+                            "type" : "Struct &&"
+                        }
+                    ]
+                },
+                "void (const Struct &)" : {
+                    "access" : "public",
+                    "methodSpecifiers" : [
+                        "deleted"
+                    ],
+                    "constructorType" : "copy",
+                    "parameters" : [
+                        {
+                            "name" : "",
+                            "type" : "const Struct &"
+                        }
+                    ]
+                },
+                "void (double, double, double, double)" : {
+                    "access" : "public",
+                    "methodSpecifiers" : [],
+                    "constructorType" : "general",
+                    "parameters" : [
+                        {
+                            "name" : "a",
+                            "type" : "double"
+                        },
+                        {
+                            "name" : "b",
+                            "type" : "double"
+                        },
+                        {
+                            "name" : "c",
+                            "type" : "double",
+                            "hasDefaultValue" : true
+                        },
+                        {
+                            "name" : "d",
+                            "type" : "double",
+                            "hasDefaultValue" : true
+                        }
+                    ]
+                }
+            }
+        }
+    },
+    "inclusions" : []
+}

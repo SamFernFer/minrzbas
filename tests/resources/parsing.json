@@ -310,5 +310,56 @@
         },
         // The expected output JSON file inside the "resources/expected" directory.
         "out": "Methods.json"
+    },
+    // Namespaces
+    {
+        "title": "Namespaces",
+        "in": {
+            "args": [
+                // Include directory for libclang.
+                "-I=.",
+                "--input=Namespaces.hpp",
+                "--",
+                "--std=c++23"
+            ],
+            // The working directory inside "resources" to use when calling libclang.
+            "cwd": "proj1/include"
+        },
+        // The expected output JSON file inside the "resources/expected" directory.
+        "out": "Namespaces.json"
+    },
+    // Constructors
+    {
+        "title": "Constructors",
+        "in": {
+            "args": [
+                // Include directory for libclang.
+                "-I=.",
+                "--input=Constructors.hpp",
+                "--",
+                "--std=c++23"
+            ],
+            // The working directory inside "resources" to use when calling libclang.
+            "cwd": "proj1/include"
+        },
+        // The expected output JSON file inside the "resources/expected" directory.
+        "out": "Constructors.json"
+    },
+    // Destructors
+    {
+        "title": "Destructors",
+        "in": {
+            "args": [
+                // Include directory for libclang.
+                "-I=.",
+                "--input=Destructors.hpp",
+                "--",
+                "--std=c++23"
+            ],
+            // The working directory inside "resources" to use when calling libclang.
+            "cwd": "proj1/include"
+        },
+        // The expected output JSON file inside the "resources/expected" directory.
+        "out": "Destructors.json"
     }
 ]

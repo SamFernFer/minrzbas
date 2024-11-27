@@ -318,14 +318,16 @@ namespace Fenton::Minrzbas {
             if constexpr (isCtor) {
                 json::string& _ctorType = _callable["constructorType"].emplace_string();
 
-                if (clang_CXXConstructor_isConvertingConstructor(c))
-                    _ctorType = "converting";
-                else if (clang_CXXConstructor_isCopyConstructor(c))
+                if (clang_CXXConstructor_isCopyConstructor(c))
                     _ctorType = "copy";
-                else if (clang_CXXConstructor_isDefaultConstructor(c))
-                    _ctorType = "default";
                 else if (clang_CXXConstructor_isMoveConstructor(c))
                     _ctorType = "move";
+                // libclang consinders copy and move constructors as converting constructors 
+                // so this case must go after them.
+                else if (clang_CXXConstructor_isConvertingConstructor(c))
+                    _ctorType = "converting";
+                else if (clang_CXXConstructor_isDefaultConstructor(c))
+                    _ctorType = "default";
                 else
                     _ctorType = "general";
             }
@@ -451,18 +453,21 @@ namespace Fenton::Minrzbas {
         if (!clang_Location_isFromMainFile(clang_getCursorLocation(c)))
             return CXChildVisit_Continue;
         
+        const CXCursorKind _kind = clang_getCursorKind(c);
+        
         // At this point, it is not known whether the declaration is associated with another 
         // entity or not, so we skip it.
         if (
-            clang_Cursor_isAnonymousRecordDecl(c) ||
-            clang_Cursor_isAnonymous(c)
+            // Anonymous namespaces are easy to reference.
+            _kind != CXCursor_Namespace &&
+            (clang_Cursor_isAnonymousRecordDecl(c) ||
+            clang_Cursor_isAnonymous(c))
         ) {
             return CXChildVisit_Continue;
         }
 
         json::object& _obj = *static_cast<json::object*>(client_data);
         const std::string _cursorName = to_string(c);
-        const CXCursorKind _kind = clang_getCursorKind(c);
 
         // If the cursor is a base class specifier.
         if (_kind == CXCursor_CXXBaseSpecifier) {
