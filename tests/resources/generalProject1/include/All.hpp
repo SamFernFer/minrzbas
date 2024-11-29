@@ -137,32 +137,7 @@
 //         int i;
 //     }* varPtr;
 // }
-namespace Enums {
-    enum class MyEnum;
-    enum class MyEnum {
-        Val1,
-        Val2,
-        Val3
-    };
-    enum class OtherEnum {
-        Val1 = -90,
-        Val2 = 0,
-        Val3 = -29383423,
-        Val4 = 1234
-    };
-    enum class OtherEnum;
-    enum class UdeclaredEnum;
 
-    enum class DirectEnum : std::uint64_t {
-        Value1 = std::numeric_limits<std::uint64_t>::max(),
-        Value2 = 8,
-        Value3 = 7,
-        Value4 = 9
-    };
-    enum Unscoped {
-        A, Bad, Idea
-    };
-}
 struct {
     int i, j;
 } anoVar;
@@ -172,21 +147,6 @@ namespace AnyOther {
         int a, b, *c;
     };
 }
-
-// namespace Unions {
-//     union MyUnion;
-//     union MyUnion {
-//         Test1::Printer printer;
-//         long myLong;
-//     };
-// }
-// union MyUnion {
-//     int intVal;
-//     long longVal;
-//     char charVal;
-// };
-// union MyUnion;
-// union SimpleUnion {};
 
 // struct RandomThing {
 //     int i, *j;

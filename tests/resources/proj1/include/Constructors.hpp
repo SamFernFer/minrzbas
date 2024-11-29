@@ -10,5 +10,5 @@ public:
     Struct(Struct&&) = default;
     Struct(const Struct&) = delete;
     Struct(double a, double b, double c = 0.0, double d = 10.0);
-}
+};
 Struct::Struct(long l) {}

@@ -1,0 +1,23 @@
+{
+    "types" : {
+        "StructFwd" : {
+            "isDefined" : true,
+            "isAnonymous" : false,
+            "recordType" : "struct"
+        },
+        "StructBack" : {
+            "isDefined" : true,
+            "isAnonymous" : false,
+            "recordType" : "struct"
+        },
+        "StructUndefined" : {
+            "isDefined" : false
+        },
+        "StructBoth" : {
+            "isDefined" : true,
+            "isAnonymous" : false,
+            "recordType" : "struct"
+        }
+    },
+    "inclusions" : []
+}

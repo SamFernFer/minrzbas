@@ -1,33 +1,10 @@
 {
     "types" : {
-        "RandomType" : {
-            "isDefined" : true,
-            "isAnonymous" : false,
-            "recordType" : "struct",
-            "fields" : {
-                "b1" : {
-                    "type" : "bool"
-                },
-                "b2" : {
-                    "type" : "bool"
-                },
-                "b3" : {
-                    "type" : "bool"
-                }
-            }
-        }
-    },
-    "functions" : {
-        "defined_func" : {
-            "int (const RandomType &)" : {
-                "returnType" : "int",
-                "parameters" : [
-                    {
-                        "name" : "rt",
-                        "type" : "const RandomType &"
-                    }
-                ]
-            }
+        "Declared1" : {
+            "isDefined" : false
+        },
+        "Declared2" : {
+            "isDefined" : false
         }
     },
     "inclusions" : []

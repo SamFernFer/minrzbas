@@ -364,28 +364,19 @@ namespace Fenton::Minrzbas {
             typesPtr = &atOrInsertObject(obj, "types");
         
         bool _isAnonymous = clang_Cursor_isAnonymousRecordDecl(c);
-        bool _isDef = clang_isCursorDefinition(c);
         
         json::object& _type = atOrInsertObject(*typesPtr, _isAnonymous? "" : name);
 
-        json::value& _isDefVal = _type["isDefined"];
-        if (_isDef) {
-            if (bool* _isDefPtr = _isDefVal.if_bool()) {
-                if (*_isDefPtr) {
-                    // Prevents redefining.
-                    return;
-                } else {
-                    *_isDefPtr = true;
-                }
+        {
+            json::value& _isDefined = _type["isDefined"];
+            // Prevents redefining.
+            if (_isDefined.is_bool() && _isDefined.get_bool()) {
+                return;
             } else {
-                _isDefVal = true;
+                // Registers whether this is a definition and signs to break if it is not.
+                if (!(_isDefined.emplace_bool() = clang_isCursorDefinition(c)))
+                    return;
             }
-        } else {
-            // Prevents undefining if already defined.
-            if (!_isDefVal.is_bool())
-                _isDefVal = false;
-            // It's not a definition, so we skip it.
-            return;
         }
         _type["isAnonymous"] = _isAnonymous;
 
@@ -536,30 +527,29 @@ namespace Fenton::Minrzbas {
                     _enums = &atOrInsertObject(_obj, "enums");
                 
                 json::object& _enum = atOrInsertObject(*_enums, _cursorName);
-                json::value& _isDefVal = _enum["isDefined"];
-                bool* _isAlreadyDef = _isDefVal.if_bool();
-                bool _isDef = clang_isCursorDefinition(c);
 
-                if (_isDef) {
-                    if (bool* _isDefPtr = _isDefVal.if_bool()) {
-                        if (*_isDefPtr) {
-                            // Prevents redefining.
-                            break;
-                        } else {
-                            *_isDefPtr = true;
-                        }
+                bool _shouldBreak = false;
+                {
+                    json::value& _isDefined = _enum["isDefined"];
+                    // Prevents redefining.
+                    if (_isDefined.is_bool() && _isDefined.get_bool()) {
+                        _shouldBreak = true;
                     } else {
-                        _isDefVal = true;
+                        // Registers whether this is a definition and signs to break if it is not.
+                        if (!(_isDefined.emplace_bool() = clang_isCursorDefinition(c)))
+                            _shouldBreak = true;
                     }
-                } else {
-                    // Prevents undefining if already defined.
-                    if (!_isDefVal.is_bool())
-                        _isDefVal = false;
-                    // It's not a definition, so we skip it.
-                    break;
                 }
-                
-                _enum["isScoped"] = static_cast<bool>(clang_EnumDecl_isScoped(c));
+                // Registers whether the enum is scoped or not.
+                {
+                    json::value& _isScoped = _enum["isScoped"];
+                    // If it wasn't registered already, registers whether the enum is scoped 
+                    // or not.
+                    if (!_isScoped.is_bool())
+                        _isScoped.emplace_bool() = static_cast<bool>(clang_EnumDecl_isScoped(c));
+                }
+                if (_shouldBreak)
+                    break;
 
                 CXType _enumType = clang_getCanonicalType(clang_getEnumDeclIntegerType(c));
                 

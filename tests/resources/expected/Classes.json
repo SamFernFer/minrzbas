@@ -1,0 +1,23 @@
+{
+    "types" : {
+        "ClassFwd" : {
+            "isDefined" : true,
+            "isAnonymous" : false,
+            "recordType" : "class"
+        },
+        "ClassBack" : {
+            "isDefined" : true,
+            "isAnonymous" : false,
+            "recordType" : "class"
+        },
+        "ClassUndefined" : {
+            "isDefined" : false
+        },
+        "ClassBoth" : {
+            "isDefined" : true,
+            "isAnonymous" : false,
+            "recordType" : "class"
+        }
+    },
+    "inclusions" : []
+}

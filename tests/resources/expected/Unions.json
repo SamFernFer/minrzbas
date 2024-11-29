@@ -1,0 +1,53 @@
+{
+    "namespaces" : {
+        "Unions" : {
+            "types" : {
+                "MyUnion" : {
+                    "isDefined" : true,
+                    "isAnonymous" : false,
+                    "recordType" : "union",
+                    "fields" : {
+                        "printer" : {
+                            "access" : "public",
+                            "type" : "char &"
+                        },
+                        "myLong" : {
+                            "access" : "private",
+                            "type" : "long"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "types" : {
+        "MyUnion" : {
+            "isDefined" : true,
+            "isAnonymous" : false,
+            "recordType" : "union",
+            "fields" : {
+                "intVal" : {
+                    "access" : "public",
+                    "type" : "int"
+                },
+                "longVal" : {
+                    "access" : "public",
+                    "type" : "long"
+                },
+                "charVal" : {
+                    "access" : "protected",
+                    "type" : "char"
+                }
+            }
+        },
+        "SimpleUnion" : {
+            "isDefined" : true,
+            "isAnonymous" : false,
+            "recordType" : "union"
+        },
+        "Undefined" : {
+            "isDefined" : false
+        }
+    },
+    "inclusions" : []
+}

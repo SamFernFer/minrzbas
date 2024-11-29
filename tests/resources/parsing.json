@@ -75,7 +75,7 @@
         "in": {
             "args": [
                 // No include directories.
-                "-DFENTON_UNDEFINED_FUNC",
+                "-DFENTON_UNDECLARED",
                 "--input=include/Define.hpp",
                 "--",
                 "--std=c++23"
@@ -91,7 +91,7 @@
             "args": [
                 // One normal include directory.
                 "-Iinclude",
-                "-DFENTON_UNDEFINED_FUNC",
+                "-DFENTON_UNDECLARED",
                 "--input=include/Define.hpp",
                 "--",
                 "--std=c++23"
@@ -108,7 +108,7 @@
                 // One normal and one system include directory.
                 "-Iinclude",
                 "--isystem=sys",
-                "-DFENTON_UNDEFINED_FUNC",
+                "-DFENTON_UNDECLARED",
                 "--input=include/Define.hpp",
                 "--",
                 "--std=c++23"
@@ -125,7 +125,7 @@
                 // Two normal include directories.
                 "-Iinclude",
                 "-Isys",
-                "-DFENTON_UNDEFINED_FUNC",
+                "-DFENTON_UNDECLARED",
                 "--input=include/Define.hpp",
                 "--",
                 "--std=c++23"
@@ -144,8 +144,8 @@
         "in": {
             "args": [
                 // No include directories.
-                "-DFENTON_UNDEFINED_FUNC",
-                "-DFENTON_OTHER_FUNC",
+                "-DFENTON_UNDECLARED1",
+                "-DFENTON_UNDECLARED2",
                 "--input=include/MultipleDefines.hpp",
                 "--",
                 "--std=c++23"
@@ -161,8 +161,8 @@
             "args": [
                 // One normal include directory.
                 "-Iinclude",
-                "-DFENTON_UNDEFINED_FUNC",
-                "-DFENTON_OTHER_FUNC",
+                "-DFENTON_UNDECLARED1",
+                "-DFENTON_UNDECLARED2",
                 "--input=include/MultipleDefines.hpp",
                 "--",
                 "--std=c++23"
@@ -179,8 +179,8 @@
                 // One normal and one system include directory.
                 "-Iinclude",
                 "--isystem=sys",
-                "-DFENTON_UNDEFINED_FUNC",
-                "-DFENTON_OTHER_FUNC",
+                "-DFENTON_UNDECLARED1",
+                "-DFENTON_UNDECLARED2",
                 "--input=include/MultipleDefines.hpp",
                 "--",
                 "--std=c++23"
@@ -197,8 +197,8 @@
                 // Two normal include directories.
                 "-Iinclude",
                 "-Isys",
-                "-DFENTON_UNDEFINED_FUNC",
-                "-DFENTON_OTHER_FUNC",
+                "-DFENTON_UNDECLARED1",
+                "-DFENTON_UNDECLARED2",
                 "--input=include/MultipleDefines.hpp",
                 "--",
                 "--std=c++23"
@@ -242,6 +242,74 @@
         },
         // The expected output JSON file inside the "resources/expected" directory.
         "out": "NestedClass.json"
+    },
+    // Unions
+    {
+        "title": "Unions",
+        "in": {
+            "args": [
+                // Include directory for libclang.
+                "-I=.",
+                "--input=Unions.hpp",
+                "--",
+                "--std=c++23"
+            ],
+            // The working directory inside "resources" to use when calling libclang.
+            "cwd": "proj1/include"
+        },
+        // The expected output JSON file inside the "resources/expected" directory.
+        "out": "Unions.json"
+    },
+    // Classes
+    {
+        "title": "Classes",
+        "in": {
+            "args": [
+                // Include directory for libclang.
+                "-I=.",
+                "--input=Classes.hpp",
+                "--",
+                "--std=c++23"
+            ],
+            // The working directory inside "resources" to use when calling libclang.
+            "cwd": "proj1/include"
+        },
+        // The expected output JSON file inside the "resources/expected" directory.
+        "out": "Classes.json"
+    },
+    // Structs
+    {
+        "title": "Structs",
+        "in": {
+            "args": [
+                // Include directory for libclang.
+                "-I=.",
+                "--input=Structs.hpp",
+                "--",
+                "--std=c++23"
+            ],
+            // The working directory inside "resources" to use when calling libclang.
+            "cwd": "proj1/include"
+        },
+        // The expected output JSON file inside the "resources/expected" directory.
+        "out": "Structs.json"
+    },
+    // Enums
+    {
+        "title": "Enums",
+        "in": {
+            "args": [
+                // Include directory for libclang.
+                "-I=.",
+                "--input=Enums.hpp",
+                "--",
+                "--std=c++23"
+            ],
+            // The working directory inside "resources" to use when calling libclang.
+            "cwd": "proj1/include"
+        },
+        // The expected output JSON file inside the "resources/expected" directory.
+        "out": "Enums.json"
     },
     // Fields
     {
