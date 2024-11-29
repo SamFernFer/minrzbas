@@ -1,0 +1,52 @@
+{
+    "types" : {
+        "Upper" : {
+            "isDefined" : true,
+            "isAnonymous" : false,
+            "recordType" : "struct",
+            "types" : {
+                "NestedPublic" : {
+                    "isDefined" : true,
+                    "isAnonymous" : false,
+                    "access" : "public",
+                    "recordType" : "class",
+                    "attributes" : {},
+                    "clang::annotate" : [
+                        "MyAttr(1)",
+                        "MyAttr(2)",
+                        "MyAttr(3)"
+                    ],
+                    "types" : {
+                        "InnerPrivate" : {
+                            "isDefined" : true,
+                            "isAnonymous" : false,
+                            "access" : "private",
+                            "recordType" : "class"
+                        }
+                    }
+                },
+                "Private" : {
+                    "isDefined" : true,
+                    "isAnonymous" : false,
+                    "access" : "private",
+                    "recordType" : "struct",
+                    "attributes" : {},
+                    "clang::annotate" : [
+                        "OtherAttr(\"Thing\")"
+                    ]
+                },
+                "Protected" : {
+                    "isDefined" : true,
+                    "isAnonymous" : false,
+                    "access" : "protected",
+                    "recordType" : "class",
+                    "attributes" : {},
+                    "clang::annotate" : [
+                        "Thing(0,1)"
+                    ]
+                }
+            }
+        }
+    },
+    "inclusions" : []
+}

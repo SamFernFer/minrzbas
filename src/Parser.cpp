@@ -91,14 +91,14 @@ namespace Fenton::Minrzbas {
     static CXChildVisitResult reflVisitor(CXCursor c, CXCursor parent, CXClientData client_data);
     // Adds the "type" and "canonicalType" fields with the visual and canonical type spellings 
     // respectively.
-    static void addViewAndCanonicalType(json::object& obj, CXType type) {
+    static void addType(json::object& obj, CXType type) {
         obj["type"] = typeToString(type);
         // obj["canonicalType"] = typeToString<true>(type);
     }
     // Adds the "type" and "canonicalType" fields with the visual and canonical type spellings 
     // of the cursor's type, respectively.
-    static void addViewAndCanonicalType(json::object& obj, CXCursor c) {
-        addViewAndCanonicalType(obj, clang_getCursorType(c));
+    static void addType(json::object& obj, CXCursor c) {
+        addType(obj, clang_getCursorType(c));
     }
     // Adds the "access" field containing the entity's access level if it is specified, 
     // else does nothing.
@@ -196,7 +196,7 @@ namespace Fenton::Minrzbas {
             { "name", to_string(c) }
         };
         // Adds the type to the parameter.
-        addViewAndCanonicalType(_param, c);
+        addType(_param, c);
         // If the parameter has an expression inside it, then it has a default value 
         // and the "hasDefaultValue" will be added.
         clang_visitChildren(c, defaultParamValueVisitor, &_param);
@@ -440,6 +440,50 @@ namespace Fenton::Minrzbas {
         }
         return CXChildVisit_Continue;
     }
+    template<bool isTypedef>
+    static void addAlias(json::object& obj, CXCursor c, std::string_view name) {
+        json::object& _aliases = [&obj]()->json::object&{
+            json::value& _val = obj["aliases"];
+            return _val.is_object()? _val.get_object() : _val.emplace_object();
+        }();
+        // Adds the object representing the type alias.
+        json::object& _alias = _aliases[name].emplace_object();
+        // Adds the alias's access level.
+        addAccess(_alias, c);
+        // Adds the kind of alias.
+        if constexpr (isTypedef) {
+            // A C type alias.
+            _alias["aliasType"] = "typedef";
+        } else {
+            // A C++ type alias.
+            _alias["aliasType"] = "using";
+        }
+        // Adds the alias's type.
+        addType(_alias, c);
+    }
+    // Adds a clang::annotate attribute to the object. name is actually the attribute's 
+    // string argument.
+    void addAnnotateAttr(json::object& obj, std::string_view name) {
+        // It's an object to avoid repeating the attribute's name.
+        json::object& _attrs = [&obj]()->json::object&{
+            json::value& _val = obj["attributes"];
+            return _val.is_object()? _val.get_object() : _val.emplace_object();
+        }();
+
+        json::array& _annotAttrs = [&obj]()->json::array&{
+            json::value& _val = obj["clang::annotate"];
+            return _val.is_array()? _val.get_array() : _val.emplace_array();
+        }();
+
+        // The clang::annotate attribute has only a single string argument, so each 
+        // occurrence of each is represented by a string. An object for each one would 
+        // be wasteful.
+        _annotAttrs.emplace_back(name);
+    }
+    // A visitor specific for 
+    // static CXChildVisitResult attrsVisitor(CXCursor c, CXCursor parent, CXClientData client_data) {
+    //     d
+    // }
     static CXChildVisitResult reflVisitor(CXCursor c, CXCursor parent, CXClientData client_data) {
         if (!clang_Location_isFromMainFile(clang_getCursorLocation(c)))
             return CXChildVisit_Continue;
@@ -450,8 +494,10 @@ namespace Fenton::Minrzbas {
         // entity or not, so we skip it.
         if (
             // Anonymous namespaces are easy to reference.
-            _kind != CXCursor_Namespace &&
-            (clang_Cursor_isAnonymousRecordDecl(c) ||
+            _kind != CXCursor_Namespace
+            // Attributes might be considered anonymous.
+            // && !(_kind >= CXCursor_FirstAttr && _kind <= CXCursor_LastAttr)
+            && (clang_Cursor_isAnonymousRecordDecl(c) ||
             clang_Cursor_isAnonymous(c))
         ) {
             return CXChildVisit_Continue;
@@ -469,7 +515,7 @@ namespace Fenton::Minrzbas {
             }();
             json::object _base;
             // Adds the base's type.
-            addViewAndCanonicalType(_base, c);
+            addType(_base, c);
             // Adds the base's access.
             addAccess(_base, c);
             // Adds the base.
@@ -479,7 +525,9 @@ namespace Fenton::Minrzbas {
 
         // Only registers entities when the semantic and lexical parents are the same.
         // This avoids error with out-of-line definitions.
-        if (!clang_equalCursors(
+        if (
+            !(_kind >= CXCursor_FirstAttr && _kind <= CXCursor_LastAttr)
+            && !clang_equalCursors(
             // Semantic parent.
             clang_getCursorSemanticParent(c),
             // Lexical parent.
@@ -554,7 +602,7 @@ namespace Fenton::Minrzbas {
                 CXType _enumType = clang_getCanonicalType(clang_getEnumDeclIntegerType(c));
                 
                 // Adds the enum's underlying type.
-                addViewAndCanonicalType(_enum, _enumType);
+                addType(_enum, _enumType);
 
                 if (isTypeUnsigned(_enumType)) {
                     clang_visitChildren(c, visitEnum<true>, &_enum["values"].emplace_object());
@@ -576,7 +624,7 @@ namespace Fenton::Minrzbas {
                     // Adds the field's access level.
                     addAccess(_field, c);
                     // Adds the field's type.
-                    addViewAndCanonicalType(_field, c);
+                    addType(_field, c);
                 }
                 break;
             }
@@ -592,7 +640,7 @@ namespace Fenton::Minrzbas {
                     // Adds the variable's access level.
                     addAccess(_var, c);
                     // Adds the variable's type.
-                    addViewAndCanonicalType(_var, c);
+                    addType(_var, c);
                 }
                 break;
             }
@@ -643,9 +691,18 @@ namespace Fenton::Minrzbas {
             }
             // Aliases.
             case CXCursor_TypeAliasDecl: {
+                addAlias<false>(_obj, c, _cursorName);
+                
                 break;
             }
             case CXCursor_TypedefDecl: {
+                addAlias<true>(_obj, c, _cursorName);
+                break;
+            }
+            // Attributes.
+            case CXCursor_AnnotateAttr: {
+                // Adds the clang::annotate attribute.
+                addAnnotateAttr(_obj, _cursorName);
                 break;
             }
         }

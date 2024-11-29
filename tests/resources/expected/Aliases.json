@@ -1,0 +1,75 @@
+{
+    "namespaces" : {
+        "Original" : {
+            "namespaces" : {
+                "Inner" : {
+                    "types" : {
+                        "Simple" : {
+                            "isDefined" : true,
+                            "isAnonymous" : false,
+                            "recordType" : "struct"
+                        }
+                    }
+                }
+            }
+        },
+        "Aliases" : {
+            "aliases" : {
+                "S" : {
+                    "aliasType" : "using",
+                    "type" : "Original::Inner::Simple"
+                },
+                "T" : {
+                    "aliasType" : "typedef",
+                    "type" : "Original::Inner::Simple"
+                },
+                "TT" : {
+                    "aliasType" : "using",
+                    "type" : "Original::Inner::Simple"
+                },
+                "SS" : {
+                    "aliasType" : "typedef",
+                    "type" : "Original::Inner::Simple"
+                },
+                "PtrT" : {
+                    "aliasType" : "using",
+                    "type" : "long long *const *"
+                },
+                "PtrTT" : {
+                    "aliasType" : "using",
+                    "type" : "long long *const *"
+                }
+            },
+            "types" : {
+                "Class" : {
+                    "isDefined" : true,
+                    "isAnonymous" : false,
+                    "recordType" : "class",
+                    "aliases" : {
+                        "C" : {
+                            "access" : "private",
+                            "aliasType" : "using",
+                            "type" : "Aliases::Class *"
+                        },
+                        "CStr" : {
+                            "access" : "private",
+                            "aliasType" : "using",
+                            "type" : "Aliases::Class *const *"
+                        },
+                        "P" : {
+                            "access" : "public",
+                            "aliasType" : "using",
+                            "type" : "long long *const *"
+                        },
+                        "PtrT" : {
+                            "access" : "protected",
+                            "aliasType" : "typedef",
+                            "type" : "Original::Inner::Simple *"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "inclusions" : []
+}

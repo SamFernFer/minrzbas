@@ -429,5 +429,56 @@
         },
         // The expected output JSON file inside the "resources/expected" directory.
         "out": "Destructors.json"
+    },
+    // Aliases
+    {
+        "title": "Aliases",
+        "in": {
+            "args": [
+                // Include directory for libclang.
+                "-I=.",
+                "--input=Aliases.hpp",
+                "--",
+                "--std=c++23"
+            ],
+            // The working directory inside "resources" to use when calling libclang.
+            "cwd": "proj1/include"
+        },
+        // The expected output JSON file inside the "resources/expected" directory.
+        "out": "Aliases.json"
+    },
+    // (skipped) Attributes - Bases
+    {
+        "title": "Attributes - Bases",
+        // "in": {
+        //     "args": [
+        //         // Include directory for libclang.
+        //         "-I=.",
+        //         "--input=AttributesBases.hpp",
+        //         "--",
+        //         "--std=c++23"
+        //     ],
+        //     // The working directory inside "resources" to use when calling libclang.
+        //     "cwd": "proj1/include"
+        // },
+        // The expected output JSON file inside the "resources/expected" directory.
+        "out": "AttributesBases.json"
+    },
+    // (skipped) Attributes - Bases
+    {
+        "title": "Attributes - NestedClass",
+        "in": {
+            "args": [
+                // Include directory for libclang.
+                "-I=.",
+                "--input=AttributesNestedClass.hpp",
+                "--",
+                "--std=c++23"
+            ],
+            // The working directory inside "resources" to use when calling libclang.
+            "cwd": "proj1/include"
+        },
+        // The expected output JSON file inside the "resources/expected" directory.
+        "out": "AttributesNestedClass.json"
     }
 ]
