@@ -16,28 +16,41 @@ namespace Fenton::Minrzbas::Tests {
         }
     };
 
-    struct FuncHolder {
-        inline static std::list<std::function<void()>> funcs;
+    template<typename Tag> struct FuncHolder {
+        // inline static std::list<std::functon<void()>> funcs;
+        inline static void(*f)();
     };
-    template<typename T> struct TemplTest {
-        struct Reg {
-            Reg() {
-                FuncHolder::funcs.emplace_back(T::test);
-            }
-        };
-        inline static Reg reg;
+    template<typename Tag> struct TestHolder {
+        inline static void(*f)();
     };
-    template<int I> struct Wrapper {
-        using type = int;
+    template<typename Tag, typename T> struct TemplTest {
+        // struct Reg {
+        //     Reg() {
+        //         TestHolder<Tag>::f = T::test;
+        //     }
+        // };
+        // static Reg reg;
+        TemplTest() {
+            // FuncHolder<Tag>::funcs.emplace_back(T::test);
+            FuncHolder<Tag>::f = &T::test;
+        }
+        // static volatile TemplTest<Tag, T> ins;
     };
+    template<typename Tag, typename T> TemplTest<Tag, T> templVar;
 
-    // template<> TemplTest<Outer::Inner>::Reg TemplTest<Outer::Inner>::reg;
+    struct Tag1 {};
+    struct Tag2 {};
 
-    template<> using Wrapper<0>::type = TemplTest<Outer::Inner>::reg;
+    template<> TemplTest<Tag1, Public> templVar<Tag1, Public>;
+    template<> TemplTest<Tag2, Outer::Inner> templVar<Tag2, Outer::Inner>;
+
+    // template<> Ret<Outer::Inner, Public> var;
+
+    // template<> volatile TemplTest<Tag1, Public> TemplTest<Tag1, Public>::ins;
+    // template<> volatile TemplTest<Tag2, Outer::Inner> TemplTest<Tag2, Outer::Inner>::ins;
 
     void templ_access() {
-        for (auto& f : FuncHolder::funcs) {
-            f();
-        }
+        FuncHolder<Tag1>::f();
+        FuncHolder<Tag2>::f();
     }
 }
