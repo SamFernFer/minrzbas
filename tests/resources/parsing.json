@@ -464,7 +464,7 @@
         // The expected output JSON file inside the "resources/expected" directory.
         "out": "AttributesBases.json"
     },
-    // (skipped) Attributes - Bases
+    // Attributes - NestedClass
     {
         "title": "Attributes - NestedClass",
         "in": {

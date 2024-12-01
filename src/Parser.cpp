@@ -1,5 +1,4 @@
 #include <minrzbas/Parser.hpp>
-#include <clang-c/Index.h>
 
 #include <utils/Misc.hpp>
 
@@ -15,9 +14,7 @@ namespace json = boost::json;
 namespace fs = std::filesystem;
 
 namespace Fenton::Minrzbas {
-    struct ReflVisitData {
-
-    };
+    static std::list<AttrForRewrite> rewriteAttrList;
 
     // Converts a clang error code to a string.
     std::string to_string(const CXErrorCode& v) {
@@ -400,6 +397,8 @@ namespace Fenton::Minrzbas {
         // TODO: Implement it for the members.
         // _type["isBitField"] = clang_Cursor_isBitField(c);
 
+        addAttrs(_type, c);
+
         clang_visitChildren(
             c, reflVisitor,
             &_type
@@ -461,29 +460,56 @@ namespace Fenton::Minrzbas {
         // Adds the alias's type.
         addType(_alias, c);
     }
+    // Adds information about an attribute to rewriteAttrList. This list will be used 
+    // when rewriting the source file.
+    static void addToRewriteAttrList(json::object& obj, CXCursor anchor, std::string_view expr) {
+        rewriteAttrList.emplace_back(AttrForRewrite{
+            .obj = obj,
+            .anchor = anchor,
+            .expr = std::string(expr)
+        });
+    }
     // Adds a clang::annotate attribute to the object. name is actually the attribute's 
     // string argument.
-    void addAnnotateAttr(json::object& obj, std::string_view name) {
-        // It's an object to avoid repeating the attribute's name.
-        json::object& _attrs = [&obj]()->json::object&{
-            json::value& _val = obj["attributes"];
-            return _val.is_object()? _val.get_object() : _val.emplace_object();
-        }();
-
+    static void addAnnotateAttr(
+        json::object& obj, CXCursor anchor, std::string_view name
+    ) {
         json::array& _annotAttrs = [&obj]()->json::array&{
             json::value& _val = obj["clang::annotate"];
             return _val.is_array()? _val.get_array() : _val.emplace_array();
         }();
-
         // The clang::annotate attribute has only a single string argument, so each 
         // occurrence of each is represented by a string. An object for each one would 
         // be wasteful.
-        _annotAttrs.emplace_back(name);
+        _annotAttrs.emplace_back(json::object{
+            { "string", name }
+        });
+
+        addToRewriteAttrList(_annotAttrs.rbegin()->as_object(), anchor, name);
     }
-    // A visitor specific for 
-    // static CXChildVisitResult attrsVisitor(CXCursor c, CXCursor parent, CXClientData client_data) {
-    //     d
-    // }
+    static CXChildVisitResult attrsVisitor(
+        CXCursor c, CXCursor parent, CXClientData client_data
+    ) {
+        json::object& _obj = *static_cast<json::object*>(client_data);
+        switch (clang_getCursorKind(c)) {
+            case CXCursor_AnnotateAttr: {
+                // Adds the clang::annotate attribute.
+                // NOTE: The parent cursor is used as the anchor for now.
+                addAnnotateAttr(_obj, parent, to_string(c));
+                break;
+            }
+        }
+        return CXChildVisit_Continue;
+    }
+    // Registers the cursor's attributes.
+    void addAttrs(json::object& obj, CXCursor c) {
+        // Only visits if the cursor has attributes.
+        if (clang_Cursor_hasAttrs(c)) {
+            clang_visitChildren(c, attrsVisitor,
+            // It's an object to avoid repeating the attribute's name.
+            &obj["attributes"].emplace_object());
+        }
+    }
     static CXChildVisitResult reflVisitor(CXCursor c, CXCursor parent, CXClientData client_data) {
         if (!clang_Location_isFromMainFile(clang_getCursorLocation(c)))
             return CXChildVisit_Continue;
@@ -525,9 +551,7 @@ namespace Fenton::Minrzbas {
 
         // Only registers entities when the semantic and lexical parents are the same.
         // This avoids error with out-of-line definitions.
-        if (
-            !(_kind >= CXCursor_FirstAttr && _kind <= CXCursor_LastAttr)
-            && !clang_equalCursors(
+        if (!clang_equalCursors(
             // Semantic parent.
             clang_getCursorSemanticParent(c),
             // Lexical parent.
@@ -699,12 +723,6 @@ namespace Fenton::Minrzbas {
                 addAlias<true>(_obj, c, _cursorName);
                 break;
             }
-            // Attributes.
-            case CXCursor_AnnotateAttr: {
-                // Adds the clang::annotate attribute.
-                addAnnotateAttr(_obj, _cursorName);
-                break;
-            }
         }
         return CXChildVisit_Continue;
     }
@@ -771,6 +789,14 @@ namespace Fenton::Minrzbas {
         const std::vector<const char*>& args,
         bool dumpAST
     ) {
+        // The constructor clears rewriteAttrList, to make sure it gets cleaned up even 
+        // if an exception is thrown.
+        struct ClearRewriteAttrList {
+            ~ClearRewriteAttrList () {
+                rewriteAttrList.clear();
+            }
+        } clearRewriteAttrList;
+
         if (!fs::exists(filePath)) {
             throw std::runtime_error(std::format(
                 "The file {0} could not be found.", quote(filePath)
@@ -829,6 +855,22 @@ namespace Fenton::Minrzbas {
             reflVisitor,
             &_rootObj
         );
+
+        // DEBUG: prints the attributes which will be used when rewriting the source file.
+        if (!rewriteAttrList.empty()) {
+            for (const AttrForRewrite& a : rewriteAttrList) {
+                Fenton::printlnf(
+                    "{{\n"
+                    "\t.anchor = ({0}){1}\n"
+                    "\t.expr = {2}\n"
+                    "}}",
+                    to_string(clang_getCursorKind(a.anchor)),
+                    to_string(a.anchor),
+                    a.expr
+                );
+            }
+        }
+
         json::array _incs;
         // Resizes the array once.
         _incs.resize(_incData.second.size());

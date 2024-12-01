@@ -8,10 +8,7 @@
 #include <locale>
 
 namespace Fenton::Minrzbas::Tests {
-    bool classes();
-    bool filtering();
     bool parsing();
-    void templ_access();
 }
 int main() {
     using namespace Fenton::Minrzbas::Tests;
@@ -21,15 +18,13 @@ int main() {
     SetConsoleOutputCP(CP_UTF8);
 #endif
 
-    // Changes the default output stream (we're using std::cout for the tests).
+    // Changes the default output stream (we're using std::cout for the tests, so it's 
+    // commented-out).
     // Fenton::setDefaultOutput(_out);
 
     bool _pass = true;
     try {
-        // _pass &= classes();
-        // _pass &= filtering();
-        // _pass &= parsing();
-        templ_access();
+        _pass &= parsing();
     } catch(const std::exception& e) {
         _pass = false;
         Fenton::printlnf("[EXCEPTION]\n{}", e.what());

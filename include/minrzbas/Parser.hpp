@@ -1,5 +1,7 @@
 #include <utils/JSON.hpp>
 
+#include <clang-c/Index.h>
+
 #include <boost/program_options.hpp>
 #include <string>
 #include <vector>
@@ -26,6 +28,16 @@ namespace Fenton::Minrzbas {
     enum class RecordType {
         Class, Struct, Union
     };
+    struct AttrForRewrite {
+        // The object containing information about the attribute.
+        boost::json::object& obj;
+        // The cursor before which is safe adding a variable declaration.
+        CXCursor anchor;
+        // The expression which should be generated as the value for the variable 
+        // declaration.
+        std::string expr;
+    };
+    void addAttrs(boost::json::object& obj, CXCursor c);
     // Decomposes the options in the variables_map so that they can be used more easily elsewhere.
     OptionsDecomposition decomposeOptions(const boost::program_options::variables_map& vm);
 }
