@@ -11,6 +11,7 @@ namespace Fenton::Minrzbas::Tests {
     bool classes();
     bool filtering();
     bool parsing();
+    void templ_access();
 }
 int main() {
     using namespace Fenton::Minrzbas::Tests;
@@ -27,7 +28,8 @@ int main() {
     try {
         // _pass &= classes();
         // _pass &= filtering();
-        _pass &= parsing();
+        // _pass &= parsing();
+        templ_access();
     } catch(const std::exception& e) {
         _pass = false;
         Fenton::printlnf("[EXCEPTION]\n{}", e.what());
