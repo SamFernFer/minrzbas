@@ -9,6 +9,7 @@
 
 namespace Fenton::Minrzbas::Tests {
     bool parsing();
+    // bool current_type();
 }
 int main() {
     using namespace Fenton::Minrzbas::Tests;
@@ -24,6 +25,7 @@ int main() {
 
     bool _pass = true;
     try {
+        // _pass &= current_type();
         _pass &= parsing();
     } catch(const std::exception& e) {
         _pass = false;

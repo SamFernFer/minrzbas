@@ -857,19 +857,19 @@ namespace Fenton::Minrzbas {
         );
 
         // DEBUG: prints the attributes which will be used when rewriting the source file.
-        if (!rewriteAttrList.empty()) {
-            for (const AttrForRewrite& a : rewriteAttrList) {
-                Fenton::printlnf(
-                    "{{\n"
-                    "\t.anchor = ({0}){1}\n"
-                    "\t.expr = {2}\n"
-                    "}}",
-                    to_string(clang_getCursorKind(a.anchor)),
-                    to_string(a.anchor),
-                    a.expr
-                );
-            }
-        }
+        // if (!rewriteAttrList.empty()) {
+        //     for (const AttrForRewrite& a : rewriteAttrList) {
+        //         std::cerr << std::format(
+        //             "{{\n"
+        //             "\t.anchor = ({0}){1}\n"
+        //             "\t.expr = {2}\n"
+        //             "}}",
+        //             to_string(clang_getCursorKind(a.anchor)),
+        //             to_string(a.anchor),
+        //             a.expr
+        //         ) << std::endl;
+        //     }
+        // }
 
         json::array _incs;
         // Resizes the array once.

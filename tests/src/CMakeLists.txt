@@ -7,6 +7,7 @@ add_executable(tests
 	"Common.cpp"
 	"ParsingTest.cpp"
 	"TemplAccessTest.cpp"
+	"CurrentType.cpp"
 )
 
 target_compile_definitions(tests PUBLIC
