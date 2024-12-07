@@ -6,9 +6,12 @@
 
 #include <iostream>
 #include <locale>
+#include <filesystem>
+
+namespace fs = std::filesystem;
 
 namespace Fenton::Minrzbas::Tests {
-    bool parsing();
+    bool parsing(const fs::path& fileName);
     // bool current_type();
 }
 int main() {
@@ -26,7 +29,7 @@ int main() {
     bool _pass = true;
     try {
         // _pass &= current_type();
-        _pass &= parsing();
+        _pass &= parsing("parsing.json");//("parsing.json");
     } catch(const std::exception& e) {
         _pass = false;
         Fenton::printlnf("[EXCEPTION]\n{}", e.what());

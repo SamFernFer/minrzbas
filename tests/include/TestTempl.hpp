@@ -8,7 +8,6 @@
 FENTON_TESTS_PROJECT
 FENTON_TESTS_FUNC_NAME
 FENTON_TESTS_INIT
-FENTON_TESTS_FILE_NAME
 FENTON_TESTS_CASES_INIT
 FENTON_TESTS_INPUT
 FENTON_TESTS_ERROR
@@ -27,7 +26,7 @@ FENTON_TESTS_TEST_NAME
 
 namespace json = boost::json;
 namespace Fenton::FENTON_TESTS_PROJECT::Tests {
-    bool FENTON_TESTS_FUNC_NAME() {
+    bool FENTON_TESTS_FUNC_NAME(const std::filesystem::path& fileName) {
         bool _pass = true;
 
 #ifdef FENTON_TESTS_INIT
@@ -36,7 +35,7 @@ namespace Fenton::FENTON_TESTS_PROJECT::Tests {
 
         // Remember not to use a reference, because the original value will get 
         // destroyed.
-        json::array _cases = loadJSONFile(FENTON_TESTS_FILE_NAME).as_array();
+        json::array _cases = loadJSONFile(fileName).as_array();
 
 #ifdef FENTON_TESTS_CASES_INIT
         FENTON_TESTS_CASES_INIT
@@ -120,6 +119,8 @@ namespace Fenton::FENTON_TESTS_PROJECT::Tests {
                     Fenton::printlnf("[CASE {0} FAILED] {1}", i, _title);
                 }
             }
+            // DEBUG - prints the current case.
+            // Fenton::printlnf("[CASE {0}] {1}", i, _title);
         }
 #ifdef FENTON_TESTS_FINISH
         FENTON_TESTS_FINISH

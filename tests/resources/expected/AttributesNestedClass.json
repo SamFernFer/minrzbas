@@ -10,12 +10,13 @@
                     "isAnonymous" : false,
                     "access" : "public",
                     "recordType" : "class",
-                    "attributes" : {},
-                    "clang::annotate" : [
-                        "MyAttr(1)",
-                        "MyAttr(2)",
-                        "MyAttr(3)"
-                    ],
+                    "attributes" : {
+                        "clang::annotate" : [
+                            "MyAttr(1)",
+                            "MyAttr(2)",
+                            "MyAttr(3)"
+                        ]
+                    },
                     "types" : {
                         "InnerPrivate" : {
                             "isDefined" : true,
@@ -30,20 +31,22 @@
                     "isAnonymous" : false,
                     "access" : "private",
                     "recordType" : "struct",
-                    "attributes" : {},
-                    "clang::annotate" : [
-                        "OtherAttr(\"Thing\")"
-                    ]
+                    "attributes" : {
+                        "clang::annotate" : [
+                            "OtherAttr(MyEnum::First)"
+                        ]
+                    }
                 },
                 "Protected" : {
                     "isDefined" : true,
                     "isAnonymous" : false,
                     "access" : "protected",
                     "recordType" : "class",
-                    "attributes" : {},
-                    "clang::annotate" : [
-                        "Thing(0,1)"
-                    ]
+                    "attributes" : {
+                        "clang::annotate" : [
+                            "Thing(0,1)"
+                        ]
+                    }
                 }
             }
         }

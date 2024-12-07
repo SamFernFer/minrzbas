@@ -14,7 +14,7 @@ namespace json = boost::json;
 namespace fs = std::filesystem;
 
 namespace Fenton::Minrzbas {
-    static std::list<AttrForRewrite> rewriteAttrList;
+    // static std::list<AttrForRewrite> rewriteAttrList;
 
     // Converts a clang error code to a string.
     std::string to_string(const CXErrorCode& v) {
@@ -462,13 +462,13 @@ namespace Fenton::Minrzbas {
     }
     // Adds information about an attribute to rewriteAttrList. This list will be used 
     // when rewriting the source file.
-    static void addToRewriteAttrList(json::object& obj, CXCursor anchor, std::string_view expr) {
-        rewriteAttrList.emplace_back(AttrForRewrite{
-            .obj = obj,
-            .anchor = anchor,
-            .expr = std::string(expr)
-        });
-    }
+    // static void addToRewriteAttrList(json::object& obj, CXCursor anchor, std::string_view expr) {
+    //     rewriteAttrList.emplace_back(AttrForRewrite{
+    //         .obj = obj,
+    //         .anchor = anchor,
+    //         .expr = std::string(expr)
+    //     });
+    // }
     // Adds a clang::annotate attribute to the object. name is actually the attribute's 
     // string argument.
     static void addAnnotateAttr(
@@ -481,11 +481,14 @@ namespace Fenton::Minrzbas {
         // The clang::annotate attribute has only a single string argument, so each 
         // occurrence of each is represented by a string. An object for each one would 
         // be wasteful.
-        _annotAttrs.emplace_back(json::object{
-            { "string", name }
-        });
+        // _annotAttrs.emplace_back(json::object{
+        //     { "string", name }
+        // });
+        _annotAttrs.emplace_back(name);
 
-        addToRewriteAttrList(_annotAttrs.rbegin()->as_object(), anchor, name);
+        // TODO: implement rewriting source files to remake the references in attribute 
+        // expressions.
+        // addToRewriteAttrList(_annotAttrs.rbegin()->as_object(), anchor, name);
     }
     static CXChildVisitResult attrsVisitor(
         CXCursor c, CXCursor parent, CXClientData client_data
@@ -791,11 +794,13 @@ namespace Fenton::Minrzbas {
     ) {
         // The constructor clears rewriteAttrList, to make sure it gets cleaned up even 
         // if an exception is thrown.
-        struct ClearRewriteAttrList {
-            ~ClearRewriteAttrList () {
-                rewriteAttrList.clear();
-            }
-        } clearRewriteAttrList;
+        // TODO: implement rewriting source files to remake the references in attribute 
+        // expressions.
+        // struct ClearRewriteAttrList {
+        //     ~ClearRewriteAttrList () {
+        //         rewriteAttrList.clear();
+        //     }
+        // } clearRewriteAttrList;
 
         if (!fs::exists(filePath)) {
             throw std::runtime_error(std::format(

@@ -232,13 +232,13 @@
         "in": {
             "args": [
                 // Include directory for libclang.
-                "-I=.",
-                "--input=NestedClass.hpp",
+                "-Iinclude",
+                "--input=include/NestedClass.hpp",
                 "--",
                 "--std=c++23"
             ],
             // The working directory inside "resources" to use when calling libclang.
-            "cwd": "proj1/include"
+            "cwd": "proj1"
         },
         // The expected output JSON file inside the "resources/expected" directory.
         "out": "NestedClass.json"
@@ -249,13 +249,13 @@
         "in": {
             "args": [
                 // Include directory for libclang.
-                "-I=.",
-                "--input=Unions.hpp",
+                "-Iinclude",
+                "--input=include/Unions.hpp",
                 "--",
                 "--std=c++23"
             ],
             // The working directory inside "resources" to use when calling libclang.
-            "cwd": "proj1/include"
+            "cwd": "proj1"
         },
         // The expected output JSON file inside the "resources/expected" directory.
         "out": "Unions.json"
@@ -266,13 +266,13 @@
         "in": {
             "args": [
                 // Include directory for libclang.
-                "-I=.",
-                "--input=Classes.hpp",
+                "-Iinclude",
+                "--input=include/Classes.hpp",
                 "--",
                 "--std=c++23"
             ],
             // The working directory inside "resources" to use when calling libclang.
-            "cwd": "proj1/include"
+            "cwd": "proj1"
         },
         // The expected output JSON file inside the "resources/expected" directory.
         "out": "Classes.json"
@@ -283,13 +283,13 @@
         "in": {
             "args": [
                 // Include directory for libclang.
-                "-I=.",
-                "--input=Structs.hpp",
+                "-Iinclude",
+                "--input=include/Structs.hpp",
                 "--",
                 "--std=c++23"
             ],
             // The working directory inside "resources" to use when calling libclang.
-            "cwd": "proj1/include"
+            "cwd": "proj1"
         },
         // The expected output JSON file inside the "resources/expected" directory.
         "out": "Structs.json"
@@ -300,13 +300,13 @@
         "in": {
             "args": [
                 // Include directory for libclang.
-                "-I=.",
-                "--input=Enums.hpp",
+                "-Iinclude",
+                "--input=include/Enums.hpp",
                 "--",
                 "--std=c++23"
             ],
             // The working directory inside "resources" to use when calling libclang.
-            "cwd": "proj1/include"
+            "cwd": "proj1"
         },
         // The expected output JSON file inside the "resources/expected" directory.
         "out": "Enums.json"
@@ -351,13 +351,13 @@
         "in": {
             "args": [
                 // Include directory for libclang.
-                "-I=.",
-                "--input=Functions.hpp",
+                "-Iinclude",
+                "--input=include/Functions.hpp",
                 "--",
                 "--std=c++23"
             ],
             // The working directory inside "resources" to use when calling libclang.
-            "cwd": "proj1/include"
+            "cwd": "proj1"
         },
         // The expected output JSON file inside the "resources/expected" directory.
         "out": "Functions.json"
@@ -368,13 +368,13 @@
         "in": {
             "args": [
                 // Include directory for libclang.
-                "-I=.",
-                "--input=Methods.hpp",
+                "-Iinclude",
+                "--input=include/Methods.hpp",
                 "--",
                 "--std=c++23"
             ],
             // The working directory inside "resources" to use when calling libclang.
-            "cwd": "proj1/include"
+            "cwd": "proj1"
         },
         // The expected output JSON file inside the "resources/expected" directory.
         "out": "Methods.json"
@@ -385,13 +385,13 @@
         "in": {
             "args": [
                 // Include directory for libclang.
-                "-I=.",
-                "--input=Namespaces.hpp",
+                "-Iinclude",
+                "--input=include/Namespaces.hpp",
                 "--",
                 "--std=c++23"
             ],
             // The working directory inside "resources" to use when calling libclang.
-            "cwd": "proj1/include"
+            "cwd": "proj1"
         },
         // The expected output JSON file inside the "resources/expected" directory.
         "out": "Namespaces.json"
@@ -402,13 +402,13 @@
         "in": {
             "args": [
                 // Include directory for libclang.
-                "-I=.",
-                "--input=Constructors.hpp",
+                "-Iinclude",
+                "--input=include/Constructors.hpp",
                 "--",
                 "--std=c++23"
             ],
             // The working directory inside "resources" to use when calling libclang.
-            "cwd": "proj1/include"
+            "cwd": "proj1"
         },
         // The expected output JSON file inside the "resources/expected" directory.
         "out": "Constructors.json"
@@ -419,13 +419,13 @@
         "in": {
             "args": [
                 // Include directory for libclang.
-                "-I=.",
-                "--input=Destructors.hpp",
+                "-Iinclude",
+                "--input=include/Destructors.hpp",
                 "--",
                 "--std=c++23"
             ],
             // The working directory inside "resources" to use when calling libclang.
-            "cwd": "proj1/include"
+            "cwd": "proj1"
         },
         // The expected output JSON file inside the "resources/expected" directory.
         "out": "Destructors.json"
@@ -436,13 +436,13 @@
         "in": {
             "args": [
                 // Include directory for libclang.
-                "-I=.",
-                "--input=Aliases.hpp",
+                "-Iinclude",
+                "--input=include/Aliases.hpp",
                 "--",
                 "--std=c++23"
             ],
             // The working directory inside "resources" to use when calling libclang.
-            "cwd": "proj1/include"
+            "cwd": "proj1"
         },
         // The expected output JSON file inside the "resources/expected" directory.
         "out": "Aliases.json"
@@ -453,13 +453,13 @@
         // "in": {
         //     "args": [
         //         // Include directory for libclang.
-        //         "-I=.",
+        //         "-Iinclude",
         //         "--input=AttributesBases.hpp",
         //         "--",
         //         "--std=c++23"
         //     ],
         //     // The working directory inside "resources" to use when calling libclang.
-        //     "cwd": "proj1/include"
+        //     "cwd": "proj1"
         // },
         // The expected output JSON file inside the "resources/expected" directory.
         "out": "AttributesBases.json"
@@ -470,13 +470,13 @@
         "in": {
             "args": [
                 // Include directory for libclang.
-                "-I=.",
-                "--input=AttributesNestedClass.hpp",
+                "-Iinclude",
+                "--input=include/AttributesNestedClass.hpp",
                 "--",
                 "--std=c++23"
             ],
             // The working directory inside "resources" to use when calling libclang.
-            "cwd": "proj1/include"
+            "cwd": "proj1"
         },
         // The expected output JSON file inside the "resources/expected" directory.
         "out": "AttributesNestedClass.json"

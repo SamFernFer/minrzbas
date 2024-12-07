@@ -10,7 +10,6 @@
         { "resDir", _resPath.string() }\
     };\
     std::list<fs::path> _createdFiles;
-#define FENTON_TESTS_FILE_NAME "parsing.json"
 #define FENTON_TESTS_CASES_INIT
     /*Generates the versions of the test cases with the "--output" option.*/\
 #define FENTON_TESTS_INPUT\
@@ -68,10 +67,20 @@
     json::object _actual;\
     if (_opts.output.empty()) {\
         std::stringstream _ss;\
-        std::ostream& _lastStream = Fenton::getDefaultOutput();\
-        Fenton::setDefaultOutput(_ss);\
-        generate(_opts);\
-        Fenton::setDefaultOutput(_lastStream);\
+        {\
+            struct OutputSetter {\
+                std::ostream& lastOut;\
+                /*Saves the last output stream and sets it to the new one.*/\
+                OutputSetter(std::ostream& out) : lastOut(Fenton::getDefaultOutput()) {\
+                    Fenton::setDefaultOutput(out);\
+                }\
+                /*Makes sure the default output stream is reverted back.*/\
+                ~OutputSetter() {\
+                    Fenton::setDefaultOutput(lastOut);\
+                }\
+            } outputSetter(_ss);\
+            generate(_opts);\
+        }\
         \
         json::parse_options _opts;\
         _opts.allow_comments = true;\
