@@ -1,0 +1,71 @@
+{
+    "namespaces" : {
+        "Unions" : {
+            "types" : {
+                "MyUnion" : {
+                    "attributes" : {
+                        "clang::annotate" : [
+                            "Unions::MyUnion(0)",
+                            "Unions::MyUnion(0)",
+                            "Unions::MyUnion(1)"
+                        ]
+                    },
+                    "isDefined" : true,
+                    "isAnonymous" : false,
+                    "recordType" : "union",
+                    "fields" : {
+                        "printer" : {
+                            "access" : "public",
+                            "type" : "char &"
+                        },
+                        "myLong" : {
+                            "access" : "private",
+                            "type" : "long"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "types" : {
+        "MyUnion" : {
+            "isDefined" : true,
+            "isAnonymous" : false,
+            "recordType" : "union",
+            "fields" : {
+                "intVal" : {
+                    "access" : "public",
+                    "type" : "int"
+                },
+                "longVal" : {
+                    "access" : "public",
+                    "type" : "long"
+                },
+                "charVal" : {
+                    "access" : "protected",
+                    "type" : "char"
+                }
+            },
+            "attributes" : {}
+        },
+        "SimpleUnion" : {
+            "attributes" : {
+                "clang::annotate" : [
+                    "SimpleUnion(0)"
+                ]
+            },
+            "isDefined" : true,
+            "isAnonymous" : false,
+            "recordType" : "union"
+        },
+        "Undefined" : {
+            "attributes" : {
+                "clang::annotate" : [
+                    "Undefined(0)"
+                ]
+            },
+            "isDefined" : false
+        }
+    },
+    "inclusions" : []
+}

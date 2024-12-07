@@ -29,7 +29,7 @@ int main() {
     bool _pass = true;
     try {
         // _pass &= current_type();
-        _pass &= parsing("parsing.json");//("parsing.json");
+        _pass &= parsing("parsing_temp.json");//("parsing.json");
     } catch(const std::exception& e) {
         _pass = false;
         Fenton::printlnf("[EXCEPTION]\n{}", e.what());

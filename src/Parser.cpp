@@ -364,6 +364,9 @@ namespace Fenton::Minrzbas {
         
         json::object& _type = atOrInsertObject(*typesPtr, _isAnonymous? "" : name);
 
+        // The attributes should be gotten even if it is a forward declaration.
+        addAttrs(_type, c);
+
         {
             json::value& _isDefined = _type["isDefined"];
             // Prevents redefining.
@@ -375,6 +378,7 @@ namespace Fenton::Minrzbas {
                     return;
             }
         }
+
         _type["isAnonymous"] = _isAnonymous;
 
         // Adds the record's access level.
@@ -396,8 +400,6 @@ namespace Fenton::Minrzbas {
 
         // TODO: Implement it for the members.
         // _type["isBitField"] = clang_Cursor_isBitField(c);
-
-        addAttrs(_type, c);
 
         clang_visitChildren(
             c, reflVisitor,
@@ -508,9 +510,14 @@ namespace Fenton::Minrzbas {
     void addAttrs(json::object& obj, CXCursor c) {
         // Only visits if the cursor has attributes.
         if (clang_Cursor_hasAttrs(c)) {
-            clang_visitChildren(c, attrsVisitor,
-            // It's an object to avoid repeating the attribute's name.
-            &obj["attributes"].emplace_object());
+            clang_visitChildren(
+                c, attrsVisitor,
+                // It's an object to avoid repeating the attribute's name.
+                [&obj]()->json::object*{
+                    json::value& _val = obj["attributes"];
+                    return _val.is_object()? &_val.get_object() : &_val.emplace_object();
+                }()
+            );
         }
     }
     static CXChildVisitResult reflVisitor(CXCursor c, CXCursor parent, CXClientData client_data) {

@@ -480,5 +480,22 @@
         },
         // The expected output JSON file inside the "resources/expected" directory.
         "out": "AttributesNestedClass.json"
+    },
+    // Attributes - Unions
+    {
+        "title": "Attributes - Unions",
+        "in": {
+            "args": [
+                // Include directory for libclang.
+                "-I.",
+                "--input=AttributesUnions.hpp",
+                "--",
+                "--std=c++23"
+            ],
+            // The working directory inside "resources" to use when calling libclang.
+            "cwd": "proj1/include"
+        },
+        // The expected output JSON file inside the "resources/expected" directory.
+        "out": "AttributesUnions.json"
     }
 ]

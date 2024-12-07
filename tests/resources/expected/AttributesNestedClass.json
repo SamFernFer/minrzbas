@@ -6,10 +6,6 @@
             "recordType" : "struct",
             "types" : {
                 "NestedPublic" : {
-                    "isDefined" : true,
-                    "isAnonymous" : false,
-                    "access" : "public",
-                    "recordType" : "class",
                     "attributes" : {
                         "clang::annotate" : [
                             "MyAttr(1)",
@@ -17,6 +13,10 @@
                             "MyAttr(3)"
                         ]
                     },
+                    "isDefined" : true,
+                    "isAnonymous" : false,
+                    "access" : "public",
+                    "recordType" : "class",
                     "types" : {
                         "InnerPrivate" : {
                             "isDefined" : true,
@@ -27,26 +27,26 @@
                     }
                 },
                 "Private" : {
-                    "isDefined" : true,
-                    "isAnonymous" : false,
-                    "access" : "private",
-                    "recordType" : "struct",
                     "attributes" : {
                         "clang::annotate" : [
                             "OtherAttr(MyEnum::First)"
                         ]
-                    }
-                },
-                "Protected" : {
+                    },
                     "isDefined" : true,
                     "isAnonymous" : false,
-                    "access" : "protected",
-                    "recordType" : "class",
+                    "access" : "private",
+                    "recordType" : "struct"
+                },
+                "Protected" : {
                     "attributes" : {
                         "clang::annotate" : [
                             "Thing(0,1)"
                         ]
-                    }
+                    },
+                    "isDefined" : true,
+                    "isAnonymous" : false,
+                    "access" : "protected",
+                    "recordType" : "class"
                 }
             }
         }
