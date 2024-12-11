@@ -3,6 +3,12 @@
         "Enums" : {
             "enums" : {
                 "MyEnum" : {
+                    "attributes": {
+                        "clang::annotate": [
+                            "My(0)",
+                            "My(1)"
+                        ]
+                    },
                     "isDefined" : true,
                     "isScoped" : true,
                     "type" : "int",
@@ -13,6 +19,12 @@
                     }
                 },
                 "OtherEnum" : {
+                    "attributes": {
+                        "clang::annotate": [
+                            "Other(0)",
+                            "Other(1)"
+                        ]
+                    },
                     "isDefined" : true,
                     "isScoped" : true,
                     "type" : "int",
@@ -24,10 +36,20 @@
                     }
                 },
                 "UndefinedEnum" : {
+                    "attributes": {
+                        "clang::annotate": [
+                            "Undefined(0)"
+                        ]
+                    },
                     "isDefined" : false,
                     "isScoped" : true
                 },
                 "DirectEnum" : {
+                    "attributes": {
+                        "clang::annotate": [
+                            "Direct(0)"
+                        ]
+                    },
                     "isDefined" : true,
                     "isScoped" : true,
                     "type" : "long long",
@@ -39,6 +61,13 @@
                     }
                 },
                 "Unscoped" : {
+                    "attributes": {
+                        "clang::annotate": [
+                            "Unscoped(0)",
+                            "Unscoped(1)",
+                            "Unscoped(2)"
+                        ]
+                    },
                     "isDefined" : true,
                     "isScoped" : false,
                     "type" : "int",
@@ -49,6 +78,11 @@
                     }
                 },
                 "UnscopedUndefined" : {
+                    "attributes": {
+                        "clang::annotate": [
+                            "UnscopedUndefined(0)"
+                        ]
+                    },
                     "isDefined" : false,
                     "isScoped" : false
                 }

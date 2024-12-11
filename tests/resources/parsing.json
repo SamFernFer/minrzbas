@@ -549,4 +549,38 @@
         // The expected output JSON file inside the "resources/expected" directory.
         "out": "AttributesEnums.json"
     },
+    // Attributes - Fields
+    {
+        "title": "Attributes - Fields",
+        "in": {
+            "args": [
+                // Include directory for libclang.
+                "-Iinclude",
+                "--input=include/AttributesFields.hpp",
+                "--",
+                "--std=c++23"
+            ],
+            // The working directory inside "resources" to use when calling libclang.
+            "cwd": "proj1"
+        },
+        // The expected output JSON file inside the "resources/expected" directory.
+        "out": "AttributesFields.json"
+    },
+    // Attributes - Variables
+    {
+        "title": "Attributes - Variables",
+        "in": {
+            "args": [
+                // Include directory for libclang.
+                "-Iinclude",
+                "--input=include/AttributesVariables.hpp",
+                "--",
+                "--std=c++23"
+            ],
+            // The working directory inside "resources" to use when calling libclang.
+            "cwd": "proj1"
+        },
+        // The expected output JSON file inside the "resources/expected" directory.
+        "out": "AttributesVariables.json"
+    }
 ]

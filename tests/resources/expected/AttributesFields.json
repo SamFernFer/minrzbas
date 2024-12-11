@@ -1,0 +1,81 @@
+{
+    "namespaces" : {
+        "NS" : {
+            "types" : {
+                "OtherStruct" : {
+                    "recordType" : "struct",
+                    "isDefined" : true,
+                    "isAnonymous" : false,
+                    "fields" : {
+                        "b" : {
+                            "attributes": {
+                                "clang::annotate": [
+                                    "OtherStruct(0)"
+                                ]
+                            },
+                            "access" : "public",
+                            "type" : "bool"
+                        },
+                        "c" : {
+                            "attributes": {
+                                "clang::annotate": [
+                                    "OtherStruct(1)"
+                                ]
+                            },
+                            "access" : "private",
+                            "type" : "char *const volatile"
+                        }
+                    }
+                },
+                "MyStruct" : {
+                    "recordType" : "struct",
+                    "isDefined" : true,
+                    "isAnonymous" : false,
+                    "fields" : {
+                        "os" : {
+                            "attributes": {
+                                "clang::annotate": [
+                                    "MyStruct(0)",
+                                    "MyStruct(0.0)",
+                                    "MyStruct(0.1)"
+                                ]
+                            },
+                            "access" : "public",
+                            "type" : "NS::OtherStruct"
+                        },
+                        "osPtr" : {
+                            "attributes": {
+                                "clang::annotate": [
+                                    "MyStruct(1)",
+                                    "MyStruct(1.0)",
+                                    "MyStruct(1.1)"
+                                ]
+                            },
+                            "access" : "protected",
+                            "type" : "NS::OtherStruct *const"
+                        },
+                        "l" : {
+                            "attributes": {
+                                "clang::annotate": [
+                                    "MyStruct(2)"
+                                ]
+                            },
+                            "access" : "protected",
+                            "type" : "long long"
+                        },
+                        "myLong" : {
+                            "attributes": {
+                                "clang::annotate": [
+                                    "MyStruct(3)"
+                                ]
+                            },
+                            "access" : "private",
+                            "type" : "long"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "inclusions" : []
+}

@@ -640,6 +640,9 @@ namespace Fenton::Minrzbas {
                 
                 json::object& _enum = atOrInsertObject(*_enums, _cursorName);
 
+                // The attributes should be gotten even if it is a forward declaration.
+                addAttrs(_enum, c);
+
                 bool _shouldBreak = false;
                 {
                     json::value& _isDefined = _enum["isDefined"];
@@ -685,6 +688,8 @@ namespace Fenton::Minrzbas {
                 // Makes sure the field is not redefined.
                 if (!_fieldVal.is_object()) {
                     json::object& _field = _fieldVal.emplace_object();
+                    // Adds the attributes.
+                    addAttrs(_field, c);
                     // Adds the field's access level.
                     addAccess(_field, c);
                     // Adds the field's type.
