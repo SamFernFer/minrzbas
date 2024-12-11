@@ -1,9 +1,11 @@
 {
     "types" : {
         "Declared1" : {
+            "recordType" : "struct",
             "isDefined" : false
         },
         "Declared2" : {
+            "recordType" : "struct",
             "isDefined" : false
         }
     },

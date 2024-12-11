@@ -497,5 +497,56 @@
         },
         // The expected output JSON file inside the "resources/expected" directory.
         "out": "AttributesUnions.json"
-    }
+    },
+    // Attributes - Classes
+    {
+        "title": "Attributes - Classes",
+        "in": {
+            "args": [
+                // Include directory for libclang.
+                "-Iinclude",
+                "--input=include/AttributesClasses.hpp",
+                "--",
+                "--std=c++23"
+            ],
+            // The working directory inside "resources" to use when calling libclang.
+            "cwd": "proj1"
+        },
+        // The expected output JSON file inside the "resources/expected" directory.
+        "out": "AttributesClasses.json"
+    },
+    // Attributes - Structs
+    {
+        "title": "Attributes - Structs",
+        "in": {
+            "args": [
+                // Include directory for libclang.
+                "-Iinclude",
+                "--input=include/AttributesStructs.hpp",
+                "--",
+                "--std=c++23"
+            ],
+            // The working directory inside "resources" to use when calling libclang.
+            "cwd": "proj1"
+        },
+        // The expected output JSON file inside the "resources/expected" directory.
+        "out": "AttributesStructs.json"
+    },
+    // Attributes - Enums
+    {
+        "title": "Attributes - Enums",
+        "in": {
+            "args": [
+                // Include directory for libclang.
+                "-Iinclude",
+                "--input=include/AttributesEnums.hpp",
+                "--",
+                "--std=c++23"
+            ],
+            // The working directory inside "resources" to use when calling libclang.
+            "cwd": "proj1"
+        },
+        // The expected output JSON file inside the "resources/expected" directory.
+        "out": "AttributesEnums.json"
+    },
 ]

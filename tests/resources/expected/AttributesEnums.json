@@ -1,0 +1,59 @@
+{
+    "namespaces" : {
+        "Enums" : {
+            "enums" : {
+                "MyEnum" : {
+                    "isDefined" : true,
+                    "isScoped" : true,
+                    "type" : "int",
+                    "values" : {
+                        "Val1" : 0,
+                        "Val2" : 1,
+                        "Val3" : 2
+                    }
+                },
+                "OtherEnum" : {
+                    "isDefined" : true,
+                    "isScoped" : true,
+                    "type" : "int",
+                    "values" : {
+                        "Val1" : -90,
+                        "Val2" : 0,
+                        "Val3" : -29383423,
+                        "Val4" : 1234
+                    }
+                },
+                "UndefinedEnum" : {
+                    "isDefined" : false,
+                    "isScoped" : true
+                },
+                "DirectEnum" : {
+                    "isDefined" : true,
+                    "isScoped" : true,
+                    "type" : "long long",
+                    "values" : {
+                        "Value1" : 255,
+                        "Value2" : 8,
+                        "Value3" : 7,
+                        "Value4" : 9
+                    }
+                },
+                "Unscoped" : {
+                    "isDefined" : true,
+                    "isScoped" : false,
+                    "type" : "int",
+                    "values" : {
+                        "A" : 0,
+                        "Bad" : 1,
+                        "Idea" : 2
+                    }
+                },
+                "UnscopedUndefined" : {
+                    "isDefined" : false,
+                    "isScoped" : false
+                }
+            }
+        }
+    },
+    "inclusions" : []
+}

@@ -11,7 +11,8 @@
             "recordType" : "struct"
         },
         "StructUndefined" : {
-            "isDefined" : false
+            "isDefined" : false,
+            "recordType" : "struct"
         },
         "StructBoth" : {
             "isDefined" : true,

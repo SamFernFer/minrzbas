@@ -11,7 +11,8 @@
             "recordType" : "class"
         },
         "ClassUndefined" : {
-            "isDefined" : false
+            "isDefined" : false,
+            "recordType" : "class"
         },
         "ClassBoth" : {
             "isDefined" : true,

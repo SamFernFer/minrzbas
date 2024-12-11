@@ -7,7 +7,7 @@
                 // Include directory for libclang.
                 "-I.",
                 "--input=AttributesUnions.hpp",
-                "--dump-ast",
+                // "--dump-ast",
                 "--",
                 "--std=c++23"
             ],

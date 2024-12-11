@@ -1,1 +1,85 @@
-{}
+{
+    "namespaces" : {
+        "Unions" : {
+            "types" : {
+                "MyUnion" : {
+                    "attributes" : {
+                        "clang::annotate" : [
+                            "Unions::MyUnion(0)",
+                            "Unions::MyUnion(1)"
+                        ]
+                    },
+                    "recordType" : "union",
+                    "isDefined" : true,
+                    "isAnonymous" : false,
+                    "fields" : {
+                        "printer" : {
+                            "access" : "public",
+                            "type" : "char *"
+                        },
+                        "myLong" : {
+                            "access" : "private",
+                            "type" : "long"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "types" : {
+        "MyUnion" : {
+            "recordType" : "union",
+            "isDefined" : true,
+            "isAnonymous" : false,
+            "fields" : {
+                "intVal" : {
+                    "access" : "public",
+                    "type" : "int"
+                },
+                "longVal" : {
+                    "access" : "public",
+                    "type" : "long"
+                },
+                "charVal" : {
+                    "access" : "protected",
+                    "type" : "char"
+                }
+            },
+            "attributes" : {}
+        },
+        "SimpleUnion" : {
+            "attributes" : {
+                "clang::annotate" : [
+                    "SimpleUnion(0)"
+                ]
+            },
+            "recordType" : "union",
+            "isDefined" : true,
+            "isAnonymous" : false
+        },
+        "Undefined" : {
+            "attributes" : {
+                "clang::annotate" : [
+                    "Undefined(0)"
+                ]
+            },
+            "recordType" : "union",
+            "isDefined" : false
+        },
+        "RedeclaredUnion" : {
+            "attributes" : {
+                "clang::annotate" : [
+                    "0",
+                    "0.0",
+                    "1",
+                    "2",
+                    "3"
+                ]
+            },
+            "recordType" : "union",
+            "isDefined" : true,
+            "isAnonymous" : false
+        }
+    },
+    "inclusions" : []
+}

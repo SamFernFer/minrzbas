@@ -3,9 +3,9 @@
         "Unions" : {
             "types" : {
                 "MyUnion" : {
+                    "recordType" : "union",
                     "isDefined" : true,
                     "isAnonymous" : false,
-                    "recordType" : "union",
                     "fields" : {
                         "printer" : {
                             "access" : "public",
@@ -22,9 +22,9 @@
     },
     "types" : {
         "MyUnion" : {
+            "recordType" : "union",
             "isDefined" : true,
             "isAnonymous" : false,
-            "recordType" : "union",
             "fields" : {
                 "intVal" : {
                     "access" : "public",
@@ -41,11 +41,12 @@
             }
         },
         "SimpleUnion" : {
+            "recordType" : "union",
             "isDefined" : true,
-            "isAnonymous" : false,
-            "recordType" : "union"
+            "isAnonymous" : false
         },
         "Undefined" : {
+            "recordType" : "union",
             "isDefined" : false
         }
     },

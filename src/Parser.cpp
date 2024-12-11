@@ -387,20 +387,6 @@ namespace Fenton::Minrzbas {
         // The attributes should be gotten even if it is a forward declaration.
         addAttrs(_type, c);
 
-        {
-            json::value& _isDefined = _type["isDefined"];
-            // Prevents redefining.
-            if (_isDefined.is_bool() && _isDefined.get_bool()) {
-                return;
-            } else {
-                // Registers whether this is a definition and signs to break if it is not.
-                if (!(_isDefined.emplace_bool() = clang_isCursorDefinition(c)))
-                    return;
-            }
-        }
-
-        _type["isAnonymous"] = _isAnonymous;
-
         // Adds the record's access level.
         addAccess(_type, c);
         // Adds the record's type.
@@ -417,6 +403,25 @@ namespace Fenton::Minrzbas {
                 _recordType = "union";
                 break;
         }
+
+        // Prevents unnecessary visits when the record has already been defined or 
+        // this is not a definition.
+        {
+            json::value& _isDefined = _type["isDefined"];
+            // Prevents redefining.
+            if (_isDefined.is_bool() && _isDefined.get_bool()) {
+                return;
+            } else {
+                // Registers whether this is a definition and signs to break if it is not.
+                if (!(_isDefined.emplace_bool() = clang_isCursorDefinition(c)))
+                    return;
+            }
+        }
+
+        // Anonymous records must always be defined, so the field is only added when 
+        // the cursor is a definition (otherwise the function returns sooner and does 
+        // not reach this part).
+        _type["isAnonymous"] = _isAnonymous;
 
         // TODO: Implement it for the members.
         // _type["isBitField"] = clang_Cursor_isBitField(c);

@@ -1,0 +1,47 @@
+{
+    "types" : {
+        "StructFwd" : {
+            "attributes" : {
+                "clang::annotate" : [
+                    "Fwd(0)",
+                    "Fwd(1)"
+                ]
+            },
+            "recordType" : "struct",
+            "isDefined" : true,
+            "isAnonymous" : false
+        },
+        "StructBack" : {
+            "attributes" : {
+                "clang::annotate" : [
+                    "Back(0)",
+                    "Back(1)"
+                ]
+            },
+            "recordType" : "struct",
+            "isDefined" : true,
+            "isAnonymous" : false
+        },
+        "StructUndefined" : {
+            "attributes" : {
+                "clang::annotate" : [
+                    "Undefined(0)"
+                ]
+            },
+            "recordType" : "struct",
+            "isDefined" : false
+        },
+        "StructBoth" : {
+            "attributes" : {
+                "clang::annotate" : [
+                    "Both(0)",
+                    "Both(1)"
+                ]
+            },
+            "recordType" : "struct",
+            "isDefined" : true,
+            "isAnonymous" : false
+        }
+    },
+    "inclusions" : []
+}
