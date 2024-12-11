@@ -1,5 +1,6 @@
 # Call as:
 # python tests/python/parsing.py bin/minrzbas.exe tests/resources/parsing.json tests/resources
+# python tests/python/parsing.py bin/minrzbas.exe tests/resources/parsing_temp.json tests/resources
 
 import json5, json, sys, os, subprocess
 

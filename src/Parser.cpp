@@ -135,16 +135,36 @@ namespace Fenton::Minrzbas {
         std::string* _indent = static_cast<std::string*>(client_data);
 
         // Prints the cursor's name.
-        Fenton::println(*_indent + "<" + to_string(clang_getCursorKind(c)) + ">: " + to_string(c));
-        // Fenton::println(*_indent + "< PARENT = " + to_string(clang_getCursorKind(parent)) + ">: " + to_string(c));
-        // Fenton::println(*_indent + "< SEMANTIC PARENT = "
-        //     + to_string(clang_getCursorKind(clang_getCursorSemanticParent(c)))
-        //     + ">: " + to_string(c)
-        // );
-        // Fenton::println(*_indent + "< LEXICAL PARENT = "
-        //     + to_string(clang_getCursorKind(clang_getCursorLexicalParent(c)))
-        //     + ">: " + to_string(c)
-        // );
+        Fenton::printlnf(
+            *_indent + "<{0}>: {1}",
+            to_string(clang_getCursorKind(c)),
+            to_string(c)
+        );
+#if 0
+        // Prints the cursor's parent.
+        Fenton::printlnf(
+            *_indent + "< PARENT = {0}>: {1}",
+            to_string(clang_getCursorKind(parent)),
+            to_string(parent)
+        );
+        // Prints the cursor's semantic parent.
+        {
+            CXCursor _semanticParent = clang_getCursorSemanticParent(c);
+            Fenton::printlnf(
+                *_indent + "< SEMANTIC PARENT = {0}>: {1}",
+                to_string(clang_getCursorKind(_semanticParent)),
+                to_string(_semanticParent)
+            );
+        }
+        {
+            CXCursor _lexicalParent = clang_getCursorLexicalParent(c);
+            Fenton::printlnf(
+                *_indent + "< LEXICAL PARENT = {0}>: {1}",
+                to_string(clang_getCursorKind(_lexicalParent)),
+                to_string(_lexicalParent)
+            );
+        }
+#endif
         if (clang_getCursorKind(c) == CXCursor_InclusionDirective) {
             CXFile _file = clang_getIncludedFile(c);
 
@@ -496,6 +516,7 @@ namespace Fenton::Minrzbas {
         CXCursor c, CXCursor parent, CXClientData client_data
     ) {
         json::object& _obj = *static_cast<json::object*>(client_data);
+
         switch (clang_getCursorKind(c)) {
             case CXCursor_AnnotateAttr: {
                 // Adds the clang::annotate attribute.
@@ -508,14 +529,18 @@ namespace Fenton::Minrzbas {
     }
     // Registers the cursor's attributes.
     void addAttrs(json::object& obj, CXCursor c) {
-        // Only visits if the cursor has attributes.
+        // Only visits (and adds the "attributes" field) if the cursor has attributes.
         if (clang_Cursor_hasAttrs(c)) {
             clang_visitChildren(
                 c, attrsVisitor,
                 // It's an object to avoid repeating the attribute's name.
                 [&obj]()->json::object*{
-                    json::value& _val = obj["attributes"];
-                    return _val.is_object()? &_val.get_object() : &_val.emplace_object();
+                    // json::value& _val = obj["attributes"];
+                    // return _val.is_object()? &_val.get_object() : &_val.emplace_object();
+
+                    // TODO: save the last cursor for the entity instead of 
+                    // repeatedly rebuilding the array.
+                    return &obj["attributes"].emplace_object();
                 }()
             );
         }
@@ -841,6 +866,18 @@ namespace Fenton::Minrzbas {
         CXCursor cursor = clang_getTranslationUnitCursor(unit);
 
         if (dumpAST) {
+            // Sets the output to std::cerr to make sure the AST dump doesn't get 
+            // caught by any program reading standard output.
+            struct OutputSetter {
+                std::ostream* const lastOut;
+                OutputSetter() : lastOut(&Fenton::getDefaultOutput()) {
+                    Fenton::setDefaultOutput(std::cerr);
+                }
+                ~OutputSetter() {
+                    Fenton::setDefaultOutput(*lastOut);
+                }
+            } outputSetter;
+
             std::string _indent;
             // DEBUG - Visits the children recursively.
             clang_visitChildren(

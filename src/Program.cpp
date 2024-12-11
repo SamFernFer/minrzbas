@@ -102,10 +102,15 @@ namespace Fenton::Minrzbas {
                 std::cout << "Missing \"input\" option." << std::endl;
                 return -1;
             }
-            generate(_vm);
+            try {
+                generate(_vm);
+            } catch (const std::exception& e) {
+                std::cout << "[Exception] " << e.what() << std::endl;
+                return -1;
+            }
             return 0;
         } catch (const std::exception& e) {
-            std::cout << "[Exception] " << e.what() << "\n\n";
+            std::cout << "[Command-Line Exception] " << e.what() << "\n\n";
             std::cout << _desc << "\n";
             return -1;
         }
