@@ -19,7 +19,7 @@
                     "isDefined" : true,
                     "isAnonymous" : false,
                     "recordType" : "class",
-                    "fields" : {
+                    "variables" : {
                         "privateVar" : {
                             "access" : "private",
                             "type" : "NS::VarType"
@@ -34,7 +34,7 @@
                     "isDefined" : true,
                     "isAnonymous" : false,
                     "recordType" : "struct",
-                    "fields" : {
+                    "variables" : {
                         "publicVar" : {
                             "access" : "public",
                             "type" : "const NS::VarType *"

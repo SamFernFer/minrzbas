@@ -1,0 +1,61 @@
+{
+    "types" : {
+        "Friend" : {
+            "recordType" : "class",
+            "isDefined" : true,
+            "isAnonymous" : false
+        },
+        "Other" : {
+            "recordType" : "struct",
+            "isDefined" : false
+        },
+        "Me" : {
+            "recordType" : "class",
+            "isDefined" : true,
+            "isAnonymous" : false,
+            "friends" : {
+                "types" : [
+                    "Friend",
+                    "Other"
+                ]
+            }
+        }
+    },
+    "namespaces" : {
+        "Distant" : {
+            "namespaces" : {
+                "Horizon" : {
+                    "types" : {
+                        "Friend" : {
+                            "recordType" : "struct",
+                            "isDefined" : true,
+                            "isAnonymous" : false
+                        }
+                    }
+                }
+            },
+            "types" : {
+                "Other" : {
+                    "recordType" : "class",
+                    "isDefined" : false
+                }
+            }
+        },
+        "Scope" : {
+            "types" : {
+                "Inner" : {
+                    "recordType" : "class",
+                    "isDefined" : true,
+                    "isAnonymous" : false,
+                    "friends" : {
+                        "types" : [
+                            "Distant::Horizon::Friend",
+                            "Distant::Other"
+                        ]
+                    }
+                }
+            }
+        }
+    },
+    "inclusions" : []
+}

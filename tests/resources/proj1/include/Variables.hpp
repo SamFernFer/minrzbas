@@ -1,20 +1,20 @@
 char c = 90;
+extern const char* str;
 const char* str = "On";
 namespace NS {
-    class VarType {
-    };
+    class VarType {};
 
     long** doublePtr;
 
     class Class {
-        VarType privateVar;
+        static VarType privateVar;
     public:
-        VarType publicVar;
+        static VarType publicVar;
     };
 
     struct Struct {
-        const VarType* publicVar;
+        static const VarType* publicVar;
     protected:
-        long volatile protectedVar;
+        static long volatile protectedVar;
     };
 }

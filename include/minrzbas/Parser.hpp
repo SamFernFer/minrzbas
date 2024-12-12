@@ -28,6 +28,9 @@ namespace Fenton::Minrzbas {
     enum class RecordType {
         Class, Struct, Union
     };
+    enum class FriendKind {
+        Type
+    };
     struct AttrForRewrite {
         // The object containing information about the attribute.
         boost::json::object& obj;

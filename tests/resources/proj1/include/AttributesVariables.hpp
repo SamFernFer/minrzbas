@@ -1,25 +1,31 @@
 [[clang::annotate("Global(0)")]] char c = 90;
 [[clang::annotate("Global(0.0)")]] extern const char* str;
 
-[[clang::annotate("Global(0.1)")]] const char* str = "On";
+[[clang::annotate("Global(0.1)")]] extern const char* str;
+
+[[clang::annotate("Global(0.2)")]] const char* str = "On";
 
 namespace NS {
-    class VarType {
-    };
+    class VarType {};
 
-    [[clang::annotate("NS(0)")]]
     [[clang::annotate("NS(0.0)")]]
+    [[clang::annotate("NS(0.1)")]]
     long** doublePtr;
 
     class Class {
-        VarType privateVar;
+        [[
+            clang::annotate("Class(0.0)"),
+            clang::annotate("Class(0.1)")
+        ]] static VarType privateVar;
     public:
-        VarType publicVar;
+        [[clang::annotate("Class(1)")]] static VarType publicVar;
     };
 
     struct Struct {
-        const VarType* publicVar;
+        [[clang::annotate("Class(0)")]] static const VarType* publicVar;
     protected:
-        long volatile protectedVar;
+        [[clang::annotate("Class(1.0)")]]
+        [[clang::annotate("Class(1.1)")]]
+        static long volatile protectedVar;
     };
 }

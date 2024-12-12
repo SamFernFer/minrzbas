@@ -1,9 +1,21 @@
 {
     "variables" : {
         "c" : {
+            "attributes": {
+                "clang::annotate": [
+                    "Global(0)"
+                ]
+            },
             "type" : "char"
         },
         "str" : {
+            "attributes": {
+                "clang::annotate": [
+                    "Global(0.0)",
+                    "Global(0.1)",
+                    "Global(0.2)"
+                ]
+            },
             "type" : "const char *"
         }
     },
@@ -19,12 +31,23 @@
                     "isDefined" : true,
                     "isAnonymous" : false,
                     "recordType" : "class",
-                    "fields" : {
+                    "variables" : {
                         "privateVar" : {
+                            "attributes": {
+                                "clang::annotate": [
+                                    "Class(0.0)",
+                                    "Class(0.1)"
+                                ]
+                            },
                             "access" : "private",
                             "type" : "NS::VarType"
                         },
                         "publicVar" : {
+                            "attributes": {
+                                "clang::annotate": [
+                                    "Class(1)"
+                                ]
+                            },
                             "access" : "public",
                             "type" : "NS::VarType"
                         }
@@ -34,12 +57,23 @@
                     "isDefined" : true,
                     "isAnonymous" : false,
                     "recordType" : "struct",
-                    "fields" : {
+                    "variables" : {
                         "publicVar" : {
+                            "attributes": {
+                                "clang::annotate": [
+                                    "Class(0)"
+                                ]
+                            },
                             "access" : "public",
                             "type" : "const NS::VarType *"
                         },
                         "protectedVar" : {
+                            "attributes": {
+                                "clang::annotate": [
+                                    "Class(1.0)",
+                                    "Class(1.1)"
+                                ]
+                            },
                             "access" : "protected",
                             "type" : "volatile long"
                         }
@@ -48,6 +82,12 @@
             },
             "variables" : {
                 "doublePtr" : {
+                    "attributes": {
+                        "clang::annotate": [
+                            "NS(0.0)",
+                            "NS(0.1)"
+                        ]
+                    },
                     "type" : "long **"
                 }
             }

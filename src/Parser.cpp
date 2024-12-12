@@ -9,6 +9,7 @@
 #include <list>
 #include <iterator>
 #include <set>
+#include <utility>
 
 namespace json = boost::json;
 namespace fs = std::filesystem;
@@ -532,7 +533,9 @@ namespace Fenton::Minrzbas {
         }
         return CXChildVisit_Continue;
     }
-    // Registers the cursor's attributes.
+    // Registers the cursor's attributes. Replaces the previous attribute object, as 
+    // libclang has the fullest attribute list only at the last declaration or 
+    // definition.
     void addAttrs(json::object& obj, CXCursor c) {
         // Only visits (and adds the "attributes" field) if the cursor has attributes.
         if (clang_Cursor_hasAttrs(c)) {
@@ -550,7 +553,54 @@ namespace Fenton::Minrzbas {
             );
         }
     }
-    static CXChildVisitResult reflVisitor(CXCursor c, CXCursor parent, CXClientData client_data) {
+    static CXChildVisitResult friendsVisitor(
+        CXCursor c, CXCursor parent, CXClientData client_data
+    ) {
+        using FriendPair = std::pair<FriendKind, json::value>;
+        FriendPair& _pair = *static_cast<FriendPair*>(client_data);
+
+        switch (clang_getCursorKind(c)) {
+            case CXCursor_TypeRef:
+                // Registers the friend's kind.
+                _pair.first = FriendKind::Type;
+                // Registers the class's name.
+                _pair.second = typeToString(clang_getCursorType(c));
+                return CXChildVisit_Break;
+            default:
+                return CXChildVisit_Continue;
+        }
+    }
+    static void addFriend(json::object& obj, CXCursor c) {
+        using FriendPair = std::pair<FriendKind, json::value>;
+        FriendPair _pair;
+        // Visits the declaration to find out which type of friend it is.
+        clang_visitChildren(c, friendsVisitor, &_pair);
+        // Creates the "friends" object.
+        auto makeFriends = [&obj]()->decltype(auto){
+            json::value& _val = obj["friends"];
+            return _val.is_object()? _val.get_object() : _val.emplace_object();
+        };
+        // Handles each type of friend, adding the "friends" object only if the 
+        // friend's kind is supported.
+        switch (_pair.first) {
+            case FriendKind::Type: {
+                json::object& _friends = makeFriends();
+                // Creates the "types" array inside the "friends" object.
+                json::array& _types = [&_friends]()->decltype(auto){
+                    json::value& _val = _friends["types"];
+                    return _val.is_array()? _val.get_array() : _val.emplace_array();
+                }();
+                // Moves the type's spelling to the "types" array.
+                _types.emplace_back(std::move(_pair.second));
+                break;
+            }
+            default:
+                break;
+        }
+    }
+    static CXChildVisitResult reflVisitor(
+        CXCursor c, CXCursor parent, CXClientData client_data
+    ) {
         if (!clang_Location_isFromMainFile(clang_getCursorLocation(c)))
             return CXChildVisit_Continue;
         
@@ -634,6 +684,12 @@ namespace Fenton::Minrzbas {
             case CXCursor_UnionDecl:
                 addRecord<RecordType::Union>(_obj, _types, c, _cursorName);
                 break;
+            // Friends.
+            case CXCursor_FriendDecl: {
+                addFriend(_obj, c);
+                break;
+            }
+            // Enums.
             case CXCursor_EnumDecl: {
                 if (!_enums)
                     _enums = &atOrInsertObject(_obj, "enums");
@@ -703,9 +759,16 @@ namespace Fenton::Minrzbas {
                 
                 json::value& _varVal = (*_vars)[_cursorName];
 
-                // Makes sure the variable is not redefined.
-                if (!_varVal.is_object()) {
+                // Makes sure the other fields are not replaced unnecessarily.
+                if (_varVal.is_object()) {
+                    json::object& _var = _varVal.get_object();
+                    // Adds attributes, if any, even if the variable has already been 
+                    // registered.
+                    addAttrs(_var, c);
+                } else {
                     json::object& _var = _varVal.emplace_object();
+                    // Adds attributes, if any.
+                    addAttrs(_var, c);
                     // Adds the variable's access level.
                     addAccess(_var, c);
                     // Adds the variable's type.
