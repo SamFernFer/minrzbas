@@ -13,5 +13,5 @@ Follow the normal CMake compilation steps, but remember to define the following 
 
 # Limitations
 
-- Templates are not implemented.
-- Attributes others than `clang::annotate` are not included;
+- Templates are not implemented;
+- Attributes other than `clang::annotate` are not included;
